@@ -7,10 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     players: [],
     squizz: {
       currentIndex: 0,
-      total: 10,
+      total: 12,
       question: null,
       timeLimit: 30,
-      timeRemaining: 30
+      timeRemaining: 30,
+      isRevealed: false
     },
     qa: {
       currentIndex: 0,
@@ -48,6 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag] || tag));
+  }
+
   // Load Info
   fetch('/api/info')
     .then(r => r.json())
@@ -70,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
       renderSquizz(data.squizz.question, data.squizz.currentIndex, data.squizzQuestions.length, data.squizz.timeLimit);
-      if (data.squizz.tally) renderSquizzTally(data.squizz.tally);
+      projState.squizz.isRevealed = data.squizz.isRevealed;
+      if (data.squizz.tally) renderSquizzTally(data.squizz.tally, data.squizz.isRevealed);
       if (data.squizz.isRevealed) showSpotlight(data.squizz.tally, data.squizz.question, data.squizz.tally.winner);
       switchView('squizz');
     } else if (data.mode === 'QA' && data.qa && data.qa.question) {
@@ -115,7 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     projState.players.forEach(p => {
       const chip = document.createElement('div');
       chip.className = 'player-chip';
-      chip.innerHTML = `<span class="avatar">${p.avatar}</span> <span>${p.nickname}</span>`;
+      const zodiacText = (p.zodiacInfo && p.zodiacInfo.sign) ? ` <span style="font-size: 0.8rem; opacity: 0.85;">(${p.zodiacInfo.sign.icon})</span>` : '';
+      chip.innerHTML = `<span class="avatar">${p.avatar}</span> <span>${p.nickname}${zodiacText}</span>`;
       elPlayerGrid.appendChild(chip);
     });
   }
@@ -126,6 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const elSqText = document.getElementById('proj-sq-text');
   const elSqTarget = document.getElementById('proj-sq-target');
   const elSqTallyList = document.getElementById('proj-sq-tally-list');
+  const elSqWordwall = document.getElementById('proj-sq-wordwall');
+  const elSqMysteryBadge = document.getElementById('proj-sq-mystery-badge');
   const elSqVoted = document.getElementById('proj-sq-voted');
   const elSqLock = document.getElementById('proj-sq-lock-status');
   const elSqTimerCard = document.getElementById('proj-sq-timer-card');
@@ -133,7 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Spotlight Elements
   const spotlightModal = document.getElementById('spotlight-modal');
+  const spotlightCrown = document.getElementById('spotlight-crown');
+  const spotlightBadge = document.getElementById('spotlight-badge');
   const spotWinnerName = document.getElementById('spotlight-winner-name');
+  const spotWinnerRole = document.getElementById('spotlight-winner-role');
+  const spotZodiacCard = document.getElementById('spotlight-zodiac-card');
   const spotWinnerVotes = document.getElementById('spotlight-winner-votes');
   const spotPunishment = document.getElementById('spotlight-punishment');
   const spotMcVoice = document.getElementById('spotlight-mc-voice');
@@ -143,9 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
     projState.squizz.question = q;
     projState.squizz.timeLimit = timeLimit || 30;
     projState.squizz.timeRemaining = projState.squizz.timeLimit;
+    projState.squizz.isRevealed = false;
 
-    elSqIndex.textContent = `CÂU ${index + 1} / ${total || 10}`;
-    elSqTitle.textContent = q.title || `Câu hỏi ${index + 1}`;
+    elSqIndex.textContent = `CÂU ${index + 1} / ${total || 12}`;
+    elSqTitle.textContent = `${q.icon || '🎯'} ${q.title || `Câu hỏi ${index + 1}`}`;
     elSqText.textContent = q.question;
     elSqTarget.textContent = `🎯 Mục tiêu: ${q.target || 'Bình chọn vui nhộn'}`;
     elSqVoted.textContent = '0';
@@ -161,18 +178,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
     spotlightModal.style.display = 'none';
 
-    elSqTallyList.innerHTML = `
-      <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
-        Đang chờ anh em gửi tên bình chọn từ điện thoại...
-      </div>
-    `;
+    if (q.type === 'OPEN_TEXT') {
+      if (elSqTallyList) elSqTallyList.style.display = 'none';
+      if (elSqWordwall) {
+        elSqWordwall.style.display = 'grid';
+        elSqWordwall.innerHTML = `
+          <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem; grid-column: 1 / -1;">
+            Đang chờ anh em gửi câu trả lời từ điện thoại...
+          </div>
+        `;
+      }
+      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'none';
+    } else {
+      if (elSqTallyList) {
+        elSqTallyList.style.display = 'flex';
+        elSqTallyList.innerHTML = `
+          <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
+            Đang chờ anh em gửi tên bình chọn từ điện thoại...
+          </div>
+        `;
+      }
+      if (elSqWordwall) elSqWordwall.style.display = 'none';
+      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'inline-flex';
+    }
   }
 
-  function renderSquizzTally(tally) {
-    if (!tally || !tally.tallyList) return;
+  function renderSquizzTally(tally, isRevealed = false) {
+    if (!tally) return;
     elSqVoted.textContent = tally.totalVotes;
 
-    if (tally.tallyList.length === 0) {
+    const isText = (projState.squizz.question && projState.squizz.question.type === 'OPEN_TEXT') || tally.isTextQuestion;
+
+    if (isText) {
+      // Render Word Wall
+      if (elSqTallyList) elSqTallyList.style.display = 'none';
+      if (elSqWordwall) {
+        elSqWordwall.style.display = 'grid';
+        if (!tally.responses || tally.responses.length === 0) {
+          elSqWordwall.innerHTML = `
+            <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem; grid-column: 1 / -1;">
+              Đang chờ anh em gửi câu trả lời từ điện thoại...
+            </div>
+          `;
+          return;
+        }
+
+        elSqWordwall.innerHTML = '';
+        tally.responses.forEach(resp => {
+          const card = document.createElement('div');
+          card.className = 'open-text-card';
+          card.innerHTML = `
+            <div class="open-text-content">"${escapeHtml(resp.text)}"</div>
+            <div class="open-text-author">
+              <span>${resp.avatar || '😎'}</span>
+              <span>${escapeHtml(resp.voter || 'Đồng nghiệp')}</span>
+            </div>
+          `;
+          elSqWordwall.appendChild(card);
+        });
+      }
+      return;
+    }
+
+    // Render Member Vote Bar Chart
+    if (elSqWordwall) elSqWordwall.style.display = 'none';
+    if (!elSqTallyList) return;
+    elSqTallyList.style.display = 'flex';
+
+    if (!tally.tallyList || tally.tallyList.length === 0) {
       elSqTallyList.innerHTML = `
         <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
           Đang chờ anh em gửi tên bình chọn từ điện thoại...
@@ -184,16 +257,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxVotes = tally.tallyList[0].count || 1;
     elSqTallyList.innerHTML = '';
 
-    tally.tallyList.forEach((item, idx) => {
+    // Mystery blur mode: during active voting, only show top 4-5 with blurred names!
+    const displayList = (!isRevealed) ? tally.tallyList.slice(0, 5) : tally.tallyList;
+
+    if (!isRevealed) {
+      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'inline-flex';
+    } else {
+      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'none';
+    }
+
+    displayList.forEach((item, idx) => {
       const pct = Math.round((item.count / maxVotes) * 100);
       const row = document.createElement('div');
       row.className = 'tally-item';
+
+      const nameClass = !isRevealed ? 'tally-name mystery-blur-name' : 'tally-name mystery-unblurred';
+
       row.innerHTML = `
         <div class="tally-bar" style="width: ${pct}%"></div>
         <div class="tally-content">
-          <div class="tally-name" style="font-size: 1.25rem;">
+          <div class="${nameClass}" style="font-size: 1.25rem;">
             <span style="color: var(--cyan); margin-right: 8px;">#${idx + 1}</span>
-            ${item.name}
+            <span>${item.name}</span>
           </div>
           <div class="tally-votes" style="font-size: 1.35rem;">${item.count} phiếu</div>
         </div>
@@ -202,12 +287,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function showSpotlight(tally, question, winner) {
+  function showSpotlight(tally, question, winner, winnerDetails) {
+    const theme = (question && question.effectTheme) ? question.effectTheme : 'royal-gold';
+
+    // Apply question-specific theme class
+    spotlightModal.className = `spotlight-overlay theme-${theme}`;
+
     if (window.soundFX) {
-      window.soundFX.playCheer();
-      window.soundFX.playGlassClink();
+      window.soundFX.playTheme(theme);
     }
     if (window.burstCannons) window.burstCannons();
+
+    // Crown / Theme Icon
+    if (spotlightCrown) {
+      spotlightCrown.textContent = (question && question.icon) ? question.icon : '👑';
+    }
+
+    // Title / Badge
+    if (spotlightBadge) {
+      spotlightBadge.textContent = (question && question.title) ? question.title.toUpperCase() : 'NHÂN VẬT ĐƯỢC GỌI TÊN NHIỀU NHẤT';
+    }
 
     if (winner) {
       spotWinnerName.textContent = winner.name.toUpperCase();
@@ -215,6 +314,29 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       spotWinnerName.textContent = 'CHƯA CÓ BÌNH CHỌN';
       spotWinnerVotes.textContent = '0 phiếu';
+    }
+
+    // Role
+    if (spotWinnerRole) {
+      if (winnerDetails && winnerDetails.role) {
+        spotWinnerRole.textContent = winnerDetails.role;
+        spotWinnerRole.style.display = 'block';
+      } else {
+        spotWinnerRole.style.display = 'none';
+      }
+    }
+
+    // Zodiac & Con Giap Display
+    if (spotZodiacCard) {
+      if (winnerDetails && winnerDetails.zodiac) {
+        const { sign, lunar } = winnerDetails.zodiac;
+        const signHtml = sign ? `<div class="spotlight-zodiac-item">✨ Cung ${sign.name} (${sign.icon})</div>` : '';
+        const lunarHtml = lunar ? `<div class="spotlight-zodiac-item">${lunar.icon} ${lunar.fullText}</div>` : '';
+        spotZodiacCard.innerHTML = `${signHtml} <span style="opacity:0.5;">•</span> ${lunarHtml}`;
+        spotZodiacCard.style.display = 'inline-flex';
+      } else {
+        spotZodiacCard.style.display = 'none';
+      }
     }
 
     spotPunishment.textContent = (question && question.punishment) ? question.punishment : 'Uống 1 chén danh dự khai tiệc! 🍻';
@@ -238,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   socket.on('squizz_live_update', ({ tally, totalVotes, totalPlayers }) => {
-    renderSquizzTally(tally);
+    renderSquizzTally(tally, projState.squizz.isRevealed);
     elSqVoted.textContent = totalVotes;
     const totalEl = document.getElementById('proj-sq-total');
     if (totalEl) totalEl.textContent = totalPlayers;
@@ -254,11 +376,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  socket.on('squizz_revealed', ({ tally, question, winner }) => {
-    showSpotlight(tally, question, winner);
+  socket.on('squizz_revealed', ({ tally, question, winner, winnerDetails }) => {
+    projState.squizz.isRevealed = true;
+    renderSquizzTally(tally, true);
+    showSpotlight(tally, question, winner, winnerDetails);
   });
 
-  // Click on spotlight to dismiss if desired
+  // Click on spotlight to dismiss
   spotlightModal.addEventListener('click', () => {
     spotlightModal.style.display = 'none';
   });

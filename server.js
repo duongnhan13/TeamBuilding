@@ -40,6 +40,8 @@ function saveJson(filename, data) {
   }
 }
 
+const zodiacHelper = require('./public/js/zodiac.js');
+
 let squizzQuestions = loadJson('squizz_questions.json');
 let qaQuestions = loadJson('qa_questions.json');
 let membersList = loadJson('members.json');
@@ -123,6 +125,19 @@ app.post('/api/members', (req, res) => {
   res.status(400).json({ error: 'Expected array of member names' });
 });
 
+app.post('/api/members/update', (req, res) => {
+  const { stt, dob, fingerprint, role, name } = req.body;
+  const member = membersList.find(m => String(m.stt) === String(stt));
+  if (!member) return res.status(404).json({ error: 'Member not found' });
+  if (dob !== undefined) member.dob = dob.trim();
+  if (fingerprint !== undefined) member.fingerprint = String(fingerprint).trim();
+  if (role !== undefined) member.role = role.trim();
+  if (name !== undefined) member.name = name.trim();
+  saveJson('members.json', membersList);
+  io.emit('members_updated', membersList);
+  res.json({ success: true, member });
+});
+
 app.get('/api/questions/squizz', (req, res) => {
   res.json(squizzQuestions);
 });
@@ -136,6 +151,28 @@ app.post('/api/questions/squizz', (req, res) => {
   res.status(400).json({ error: 'Invalid format' });
 });
 
+app.post('/api/questions/squizz/add', (req, res) => {
+  const q = req.body;
+  if (!q || !q.question) return res.status(400).json({ error: 'Question content is required' });
+  const newId = squizzQuestions.length > 0 ? Math.max(...squizzQuestions.map(item => item.id || 0)) + 1 : 1;
+  const newQ = {
+    id: newId,
+    type: q.type || 'VOTE_MEMBER',
+    effectTheme: q.effectTheme || 'royal-gold',
+    icon: q.icon || '🎯',
+    title: q.title || `Câu hỏi ${newId}`,
+    question: q.question,
+    target: q.target || '',
+    mcVoice: q.mcVoice || '',
+    punishment: q.punishment || 'Uống 1 chén! 🍻',
+    suggested: q.suggested || ''
+  };
+  squizzQuestions.push(newQ);
+  saveJson('squizz_questions.json', squizzQuestions);
+  io.emit('questions_updated', { type: 'squizz', count: squizzQuestions.length, question: newQ });
+  res.json({ success: true, question: newQ, total: squizzQuestions.length });
+});
+
 app.get('/api/questions/qa', (req, res) => {
   res.json(qaQuestions);
 });
@@ -147,6 +184,27 @@ app.post('/api/questions/qa', (req, res) => {
     return res.json({ success: true, count: qaQuestions.length });
   }
   res.status(400).json({ error: 'Invalid format' });
+});
+
+app.post('/api/questions/qa/add', (req, res) => {
+  const q = req.body;
+  if (!q || !q.question) return res.status(400).json({ error: 'Question content is required' });
+  const newId = qaQuestions.length > 0 ? Math.max(...qaQuestions.map(item => item.id || 0)) + 1 : 1;
+  const newQ = {
+    id: newId,
+    type: q.type || 'MULTIPLE_CHOICE',
+    category: q.category || 'Đố vui',
+    icon: q.icon || '❓',
+    question: q.question,
+    options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'],
+    correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+    explanation: q.explanation || '',
+    timeLimit: parseInt(q.timeLimit, 10) || 20
+  };
+  qaQuestions.push(newQ);
+  saveJson('qa_questions.json', qaQuestions);
+  io.emit('questions_updated', { type: 'qa', count: qaQuestions.length, question: newQ });
+  res.json({ success: true, question: newQ, total: qaQuestions.length });
 });
 
 // GAME ENGINE STATE
@@ -186,9 +244,13 @@ function getConnectedPlayers() {
     if (p.connected) {
       list.push({
         id: p.id,
+        memberId: p.memberId,
         nickname: p.nickname,
+        role: p.role,
         avatar: p.avatar,
-        score: p.score
+        score: p.score,
+        dob: p.dob,
+        zodiacInfo: p.zodiacInfo
       });
     }
   });
@@ -206,9 +268,13 @@ function capitalizeWords(str) {
 }
 
 function calculateSquizzTally() {
+  const currentQ = squizzQuestions[gameState.squizz.currentIndex];
+  const isTextQuestion = currentQ && currentQ.type === 'OPEN_TEXT';
+
   const counts = {};
   const displayNames = {};
   const votersMap = {};
+  const responses = [];
 
   Object.entries(gameState.squizz.votes).forEach(([playerId, normName]) => {
     if (!normName) return;
@@ -218,10 +284,16 @@ function calculateSquizzTally() {
     if (!votersMap[normName]) votersMap[normName] = [];
     votersMap[normName].push(voterNick);
 
+    const raw = gameState.squizz.rawVotes[playerId];
     if (!displayNames[normName]) {
-      const raw = gameState.squizz.rawVotes[playerId];
-      displayNames[normName] = capitalizeWords(raw || normName);
+      displayNames[normName] = isTextQuestion ? raw : capitalizeWords(raw || normName);
     }
+    responses.push({
+      id: playerId,
+      text: raw,
+      voter: voterNick,
+      avatar: player ? player.avatar : '😎'
+    });
   });
 
   const tallyList = Object.keys(counts).map(normName => ({
@@ -234,7 +306,7 @@ function calculateSquizzTally() {
   const totalVotes = Object.keys(gameState.squizz.votes).length;
   const winner = tallyList.length > 0 ? tallyList[0] : null;
 
-  return { tallyList, totalVotes, winner };
+  return { tallyList, totalVotes, winner, responses, isTextQuestion };
 }
 
 function calculateQaStats() {
@@ -268,9 +340,13 @@ function getLeaderboard() {
   gameState.players.forEach(p => {
     list.push({
       id: p.id,
+      memberId: p.memberId,
       nickname: p.nickname,
+      role: p.role,
       avatar: p.avatar,
       score: p.score,
+      dob: p.dob,
+      zodiacInfo: p.zodiacInfo,
       connected: p.connected
     });
   });
@@ -279,22 +355,58 @@ function getLeaderboard() {
 
 // SOCKET.IO LOGIC
 io.on('connection', (socket) => {
-  // Check if player or host
-  socket.on('player_join', ({ id, nickname, avatar }) => {
-    if (!nickname || !nickname.trim()) {
-      return socket.emit('join_error', { message: 'Vui lòng nhập tên của bạn!' });
+  // Biometric Fingerprint Player Join
+  socket.on('player_join', ({ id, nickname, memberId, fingerprint, dob, avatar }) => {
+    // 1. Identify member from official 47 members list
+    let member = null;
+    if (memberId) {
+      member = membersList.find(m => String(m.stt) === String(memberId));
+    }
+    if (!member && nickname) {
+      const normInput = normalizeName(nickname);
+      member = membersList.find(m => normalizeName(m.name) === normInput);
     }
 
-    const playerId = id || ('p_' + Math.random().toString(36).substr(2, 9));
-    const cleanNick = nickname.trim().slice(0, 25);
+    if (!member) {
+      return socket.emit('join_error', {
+        message: 'Bạn chưa chọn tên trong Danh sách 47 cán bộ nhân viên phòng TCKT!'
+      });
+    }
+
+    // 2. Validate Fingerprint Code
+    const inputFp = String(fingerprint || '').trim();
+    const correctFp = String(member.fingerprint || '').trim();
+
+    if (correctFp && inputFp !== correctFp) {
+      return socket.emit('join_error', {
+        message: `Mã vân tay / mã chấm công không chính xác với ${member.name}! Vui lòng nhập lại.`
+      });
+    }
+
+    // 3. Update DOB if provided by player
+    if (dob && dob.trim() && (!member.dob || member.dob !== dob.trim())) {
+      member.dob = dob.trim();
+      saveJson('members.json', membersList);
+      io.emit('members_updated', membersList);
+    }
+
+    // 4. Calculate Zodiac and Lunar animal details
+    const zodiacInfo = member.dob ? zodiacHelper.getZodiacDetails(member.dob) : null;
+
+    const playerId = id || (`m_${member.stt}`);
+    const cleanNick = member.name;
     const cleanAvatar = avatar || '😎';
 
     let player = gameState.players.get(playerId);
     if (!player) {
       player = {
         id: playerId,
+        memberId: member.stt,
         nickname: cleanNick,
+        role: member.role || '',
         avatar: cleanAvatar,
+        dob: member.dob,
+        zodiacInfo,
         score: 0,
         connected: true,
         socketId: socket.id
@@ -304,6 +416,10 @@ io.on('connection', (socket) => {
       player.connected = true;
       player.socketId = socket.id;
       player.nickname = cleanNick;
+      player.memberId = member.stt;
+      player.role = member.role || '';
+      player.dob = member.dob;
+      player.zodiacInfo = zodiacInfo;
       if (avatar) player.avatar = cleanAvatar;
     }
 
@@ -314,9 +430,13 @@ io.on('connection', (socket) => {
     socket.emit('player_joined_success', {
       player: {
         id: player.id,
+        memberId: player.memberId,
         nickname: player.nickname,
+        role: player.role,
         avatar: player.avatar,
-        score: player.score
+        score: player.score,
+        dob: player.dob,
+        zodiacInfo: player.zodiacInfo
       },
       gameState: {
         mode: gameState.mode,
@@ -335,6 +455,7 @@ io.on('connection', (socket) => {
           myAnswer: gameState.qa.answers[playerId] || null,
           question: qaQuestions[gameState.qa.currentIndex] ? {
             id: qaQuestions[gameState.qa.currentIndex].id,
+            type: qaQuestions[gameState.qa.currentIndex].type || 'MULTIPLE_CHOICE',
             category: qaQuestions[gameState.qa.currentIndex].category,
             icon: qaQuestions[gameState.qa.currentIndex].icon,
             question: qaQuestions[gameState.qa.currentIndex].question,
@@ -432,24 +553,45 @@ io.on('connection', (socket) => {
     const tally = calculateSquizzTally();
     const q = squizzQuestions[gameState.squizz.currentIndex];
 
+    // Find winner member info for zodiac & con giap
+    let winnerDetails = null;
+    if (tally.winner && tally.winner.name) {
+      const foundMember = membersList.find(m => normalizeName(m.name) === tally.winner.normalized || normalizeName(m.name).includes(tally.winner.normalized));
+      if (foundMember) {
+        const zodiac = foundMember.dob ? zodiacHelper.getZodiacDetails(foundMember.dob) : null;
+        winnerDetails = {
+          stt: foundMember.stt,
+          name: foundMember.name,
+          role: foundMember.role,
+          dob: foundMember.dob,
+          zodiac
+        };
+      }
+    }
+
     io.emit('squizz_revealed', {
       tally,
       question: q,
       winner: tally.winner,
+      winnerDetails,
       auto
     });
   }
 
   // --- SQUIZZ EVENTS ---
-  socket.on('player_vote_squizz', ({ name }) => {
+  socket.on('player_vote_squizz', ({ name, text }) => {
     const playerId = socket.playerId;
     if (!playerId) return;
     if (gameState.mode !== 'SQUIZZ' || !gameState.squizz.isOpen) {
       return socket.emit('action_error', { message: 'Thời gian bình chọn đã đóng!' });
     }
-    if (!name || !name.trim()) return;
+    const currentQ = squizzQuestions[gameState.squizz.currentIndex];
+    const isText = currentQ && currentQ.type === 'OPEN_TEXT';
 
-    const trimmed = name.trim().slice(0, 30);
+    const submission = (isText ? text : name) || name || text || '';
+    if (!submission || !submission.trim()) return;
+
+    const trimmed = submission.trim().slice(0, 50);
     gameState.squizz.rawVotes[playerId] = trimmed;
     gameState.squizz.votes[playerId] = normalizeName(trimmed);
 
@@ -822,18 +964,32 @@ io.on('connection', (socket) => {
   ];
   const BOT_AVATARS = ['😎', '🦁', '🐯', '🚀', '🍺', '🥳', '👑', '🔥', '⚡', '🍕', '🎯', '💃', '🕺', '🐱', '🦊', '🐉', '🍷', '🦸'];
 
+  const SAMPLE_OPEN_ANSWERS = [
+    'Đoàn kết và nhiệt huyết!', 'Bận rộn nhưng cực kỳ vui vẻ!', 'Đi Phú Quốc nghỉ dưỡng 🏖️',
+    'Tăng lương gấp đôi 💰', 'Gia đình thứ hai ❤️', 'Tuyệt vời số 1 BV Phương Đông!',
+    'Hết mình trong công việc, nhiệt tình trên bàn tiệc! 🍻', 'Đoàn kết là sức mạnh!',
+    'Đi Đà Nẵng tắm biển 🌴', 'Năm mới bùng nổ KPI 🚀', 'Thanh xuân cùng phòng Kế toán ✨',
+    'Yêu sếp và yêu đồng nghiệp 🥰'
+  ];
+
   socket.on('host_add_bots', ({ count = 40 }) => {
-    for (let i = 0; i < count; i++) {
-      const botId = `bot_${i + 1}`;
-      const name = BOT_NAMES[i % BOT_NAMES.length];
+    const num = Math.min(count, membersList.length);
+    for (let i = 0; i < num; i++) {
+      const m = membersList[i];
+      const botId = `bot_${m.stt}`;
       const avatar = BOT_AVATARS[i % BOT_AVATARS.length];
+      const zodiacInfo = m.dob ? zodiacHelper.getZodiacDetails(m.dob) : null;
       gameState.players.set(botId, {
         id: botId,
-        nickname: name,
+        memberId: m.stt,
+        nickname: m.name,
+        role: m.role || '',
         avatar: avatar,
         score: 0,
         connected: true,
         isBot: true,
+        dob: m.dob,
+        zodiacInfo,
         socketId: null
       });
     }
@@ -847,20 +1003,26 @@ io.on('connection', (socket) => {
   socket.on('host_simulate_squizz', () => {
     if (gameState.mode !== 'SQUIZZ') return;
     const currentQ = squizzQuestions[gameState.squizz.currentIndex];
-    const candidatePool = membersList.length > 0 ? membersList : BOT_NAMES.slice(0, 15);
+    const isText = currentQ && currentQ.type === 'OPEN_TEXT';
+    const candidatePool = membersList.map(m => m.name);
     
     // Pick primary winner
-    const preferredWinner = currentQ && currentQ.suggested ? currentQ.suggested : candidatePool[Math.floor(Math.random() * candidatePool.length)];
+    const preferredWinner = currentQ && currentQ.suggested ? currentQ.suggested : (candidatePool[0] || 'Nguyễn Thị Hoài Thanh');
 
     let delay = 0;
     gameState.players.forEach((player, pId) => {
       setTimeout(() => {
         if (gameState.mode !== 'SQUIZZ' || !gameState.squizz.isOpen) return;
 
-        // 60% chance to vote for the target winner, 40% distributed among others
-        let voteChoice = preferredWinner;
-        if (Math.random() > 0.6) {
-          voteChoice = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+        let voteChoice = '';
+        if (isText) {
+          voteChoice = SAMPLE_OPEN_ANSWERS[Math.floor(Math.random() * SAMPLE_OPEN_ANSWERS.length)];
+        } else {
+          // 60% chance to vote for the target winner, 40% distributed among other official members
+          voteChoice = preferredWinner;
+          if (Math.random() > 0.6) {
+            voteChoice = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+          }
         }
 
         gameState.squizz.rawVotes[pId] = voteChoice;

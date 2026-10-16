@@ -123,12 +123,24 @@
           <!-- Live Vote Tally -->
           <div class="glass-panel live-tally-card">
             <div class="tally-title">
-              <span style="font-size: 1.25rem; font-weight: 800;">📊 BẢNG BÌNH CHỌN THỜI GIAN THỰC</span>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.25rem; font-weight: 800;">📊 BẢNG BÌNH CHỌN THỜI GIAN THỰC</span>
+                <span class="mystery-banner" id="proj-sq-mystery-badge">🕵️‍♂️ ĐANG GIẤU DANH TÍNH (HẾT GIỜ BẬT MÍ!)</span>
+              </div>
               <span id="proj-sq-lock-status" style="font-size: 0.95rem; color: var(--emerald); font-weight: 700;">● Đang mở bình chọn</span>
             </div>
+            
+            <!-- Standard Squizz Member Bar Chart -->
             <div class="tally-list" id="proj-sq-tally-list">
               <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
-                Đang chờ anh em gửi tên bình chọn từ điện thoại...
+                Đang chờ anh em gửi bình chọn từ điện thoại...
+              </div>
+            </div>
+
+            <!-- Open-Ended Question Word Wall Grid -->
+            <div id="proj-sq-wordwall" class="open-text-wall" style="display: none;">
+              <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
+                Đang chờ anh em gửi câu trả lời...
               </div>
             </div>
           </div>
@@ -284,11 +296,16 @@
 
     <!-- ================= FULLSCREEN DRAMATIC SPOTLIGHT WINNER POPUP ================= -->
     <div id="spotlight-modal" class="spotlight-overlay" style="display: none;">
-      <div class="spotlight-rays"></div>
-      <div class="spotlight-card">
-        <div class="spotlight-crown">👑</div>
-        <div class="spotlight-badge">NHÂN VẬT ĐƯỢC GỌI TÊN NHIỀU NHẤT</div>
+      <div class="spotlight-rays" id="spotlight-rays"></div>
+      <div class="spotlight-card" id="spotlight-card">
+        <div class="spotlight-crown" id="spotlight-crown">👑</div>
+        <div class="spotlight-badge" id="spotlight-badge">NHÂN VẬT ĐƯỢC GỌI TÊN NHIỀU NHẤT</div>
         <div class="spotlight-name" id="spotlight-winner-name">HỒNG PHƯƠNG</div>
+        <div id="spotlight-winner-role" style="font-size: 1.35rem; color: #38bdf8; font-weight: 800; margin-bottom: 12px;"></div>
+        
+        <!-- Winner Zodiac & Con Giap Display Card -->
+        <div class="spotlight-zodiac-card" id="spotlight-zodiac-card" style="display: none;"></div>
+
         <div class="spotlight-votes" id="spotlight-winner-votes">Đạt 28 / 35 phiếu bình chọn</div>
         <div class="spotlight-punishment" id="spotlight-punishment">
           Uống 1 chén danh dự khai tiệc! 🍻
@@ -305,6 +322,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/audio.js"></script>
   <script src="/js/confetti.js"></script>
+  <script src="/js/zodiac.js"></script>
   <script src="/js/projector.js"></script>
 </body>
 </html>

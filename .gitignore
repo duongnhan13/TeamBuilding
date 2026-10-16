@@ -6,3 +6,5 @@ yarn-error.log*
 Thumbs.db
 *.log
 cloudflared.exe
+~$*
+.env

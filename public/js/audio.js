@@ -104,6 +104,119 @@ class SoundFX {
       this.playTone(freq, 'triangle', 0.05, 0.15, i * speed);
     }
   }
+
+  // Biometric scanner sounds
+  playBiometricScan() {
+    this.playTone(800, 'sine', 0.06, 0.1, 0);
+    this.playTone(1200, 'sine', 0.08, 0.15, 0.08);
+    this.playTone(1600, 'sine', 0.1, 0.2, 0.16);
+    this.playTone(2000, 'triangle', 0.2, 0.25, 0.26);
+  }
+
+  playBiometricSuccess() {
+    this.playTone(523.25, 'triangle', 0.1, 0.2, 0);
+    this.playTone(659.25, 'triangle', 0.12, 0.2, 0.08);
+    this.playTone(783.99, 'triangle', 0.15, 0.25, 0.16);
+    this.playTone(1046.50, 'sine', 0.35, 0.3, 0.24);
+  }
+
+  playBiometricError() {
+    this.playTone(180, 'sawtooth', 0.15, 0.3, 0);
+    this.playTone(140, 'sawtooth', 0.25, 0.3, 0.12);
+  }
+
+  // Question-specific celebration sound themes
+  playTheme(theme) {
+    switch (theme) {
+      case 'royal-gold':
+        // Royal fanfare
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, idx) => {
+          this.playTone(f, 'triangle', 0.3, 0.3, idx * 0.12);
+        });
+        break;
+
+      case 'fish-memory':
+        // Underwater bubbling arpeggio
+        [350, 440, 523, 659, 783, 987].forEach((f, idx) => {
+          this.playTone(f, 'sine', 0.15, 0.25, idx * 0.08);
+        });
+        break;
+
+      case 'shopping-spree':
+        // Cash register cha-ching!
+        this.playTone(987.77, 'square', 0.08, 0.25, 0);
+        this.playTone(1318.51, 'sine', 0.45, 0.35, 0.1);
+        this.playTone(2093.00, 'triangle', 0.6, 0.25, 0.15);
+        break;
+
+      case 'sleeping-cloud':
+        // Lullaby music box chimes
+        [783.99, 659.25, 523.25, 659.25, 783.99].forEach((f, idx) => {
+          this.playTone(f, 'sine', 0.4, 0.2, idx * 0.18);
+        });
+        break;
+
+      case 'music-concert':
+        // Rock guitar synth chords
+        this.playTone(220, 'sawtooth', 0.2, 0.3, 0);
+        this.playTone(277.18, 'sawtooth', 0.2, 0.3, 0.1);
+        this.playTone(329.63, 'sawtooth', 0.25, 0.35, 0.2);
+        this.playTone(440, 'sawtooth', 0.5, 0.4, 0.32);
+        break;
+
+      case 'snack-party':
+        // Whistle & pop
+        this.playTone(600, 'sine', 0.1, 0.2, 0);
+        this.playTone(1200, 'sine', 0.25, 0.3, 0.08);
+        this.playTone(1800, 'triangle', 0.35, 0.25, 0.2);
+        break;
+
+      case 'arctic-freeze':
+        // Shivering ice crystal glide
+        [1200, 1400, 1600, 1900, 2400].forEach((f, idx) => {
+          this.playTone(f, 'sine', 0.3, 0.18, idx * 0.07);
+        });
+        break;
+
+      case 'lightning-neon':
+        // Electric zap & cyber bass
+        this.playTone(1500, 'sawtooth', 0.08, 0.3, 0);
+        this.playTone(800, 'sawtooth', 0.12, 0.35, 0.06);
+        this.playTone(120, 'square', 0.4, 0.4, 0.14);
+        break;
+
+      case 'speed-rocket':
+        // Rocket liftoff acceleration
+        [200, 320, 500, 800, 1200, 1800].forEach((f, idx) => {
+          this.playTone(f, 'triangle', 0.2, 0.25, idx * 0.08);
+        });
+        break;
+
+      case 'party-beer':
+        // Clinking beer mugs + cheering fanfare
+        this.playGlassClink();
+        setTimeout(() => this.playCheer(), 200);
+        break;
+
+      case 'money-rain':
+        // Gold coins cascade
+        [1500, 1650, 1800, 1950, 2100, 2400].forEach((f, idx) => {
+          this.playTone(f, 'triangle', 0.15, 0.2, idx * 0.06);
+        });
+        break;
+
+      case 'rainbow-magic':
+        // Magic twinkle
+        [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98].forEach((f, idx) => {
+          this.playTone(f, 'sine', 0.3, 0.25, idx * 0.09);
+        });
+        break;
+
+      default:
+        this.playCheer();
+    }
+  }
 }
 
 window.soundFX = new SoundFX();
+

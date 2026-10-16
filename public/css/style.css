@@ -1189,3 +1189,346 @@ body {
   line-height: 1.5;
 }
 
+/* Winner Zodiac & Con Giap Spotlight Card */
+.spotlight-zodiac-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 10px 24px;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.spotlight-zodiac-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fef08a;
+}
+
+/* ==========================================================================
+   MYSTERY BLUR ON PROJECTOR (DURING LIVE VOTING)
+   ========================================================================== */
+.mystery-blur-name {
+  filter: blur(8.5px);
+  user-select: none;
+  opacity: 0.85;
+  transition: filter 0.6s ease, opacity 0.6s ease;
+  background: linear-gradient(90deg, #94a3b8 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  pointer-events: none;
+}
+
+.mystery-unblurred {
+  filter: none !important;
+  opacity: 1 !important;
+  background: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+.mystery-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fef08a;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+/* ==========================================================================
+   BIOMETRIC FINGERPRINT SCANNER (MOBILE)
+   ========================================================================== */
+.biometric-scanner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.fingerprint-btn {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.25) 0%, rgba(15, 23, 42, 0.95) 75%);
+  border: 2.5px solid var(--cyan);
+  box-shadow: 0 0 25px var(--cyan-glow), inset 0 0 15px var(--cyan-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  touch-action: manipulation;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.fingerprint-btn:active, .fingerprint-btn.scanning {
+  transform: scale(0.96);
+  border-color: #38bdf8;
+  box-shadow: 0 0 45px rgba(56, 189, 248, 0.8), inset 0 0 25px rgba(56, 189, 248, 0.6);
+}
+
+.fingerprint-icon {
+  width: 58px;
+  height: 58px;
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke 0.2s ease;
+}
+
+.fingerprint-btn.scanning .fingerprint-icon {
+  stroke: #38bdf8;
+}
+
+/* Laser scan line moving up and down */
+.fingerprint-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #38bdf8, #ffffff, #38bdf8, transparent);
+  box-shadow: 0 0 12px #38bdf8;
+  opacity: 0;
+}
+
+.fingerprint-btn.scanning .fingerprint-scan-line {
+  opacity: 1;
+  animation: scanLaser 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes scanLaser {
+  0% { top: 5%; }
+  100% { top: 92%; }
+}
+
+.biometric-label {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--cyan);
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.player-zodiac-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fef08a;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   QUESTION-SPECIFIC CELEBRATION THEMES
+   ========================================================================== */
+
+/* 1. Royal Gold (Thần giữ cửa) */
+.spotlight-overlay.theme-royal-gold {
+  background: radial-gradient(circle at center, rgba(69, 39, 3, 0.98) 0%, rgba(10, 14, 39, 0.99) 100%);
+}
+.theme-royal-gold .spotlight-card {
+  border-color: #f59e0b;
+  box-shadow: 0 0 90px rgba(245, 158, 11, 0.6), inset 0 0 40px rgba(245, 158, 11, 0.2);
+}
+
+/* 2. Fish Memory (Não cá vàng) */
+.spotlight-overlay.theme-fish-memory {
+  background: radial-gradient(circle at center, rgba(6, 78, 99, 0.98) 0%, rgba(8, 28, 48, 0.99) 100%);
+}
+.theme-fish-memory .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(6, 182, 212, 0.18) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-fish-memory .spotlight-card {
+  border-color: #06b6d4;
+  box-shadow: 0 0 90px rgba(6, 182, 212, 0.6), inset 0 0 40px rgba(6, 182, 212, 0.25);
+}
+.theme-fish-memory .spotlight-name {
+  background: linear-gradient(135deg, #ffffff 0%, #67e8f9 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+}
+
+/* 3. Shopping Spree (Khách VIP Shopper) */
+.spotlight-overlay.theme-shopping-spree {
+  background: radial-gradient(circle at center, rgba(124, 45, 18, 0.98) 0%, rgba(20, 10, 35, 0.99) 100%);
+}
+.theme-shopping-spree .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(249, 115, 22, 0.18) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-shopping-spree .spotlight-card {
+  border-color: #f97316;
+  box-shadow: 0 0 90px rgba(249, 115, 22, 0.6), inset 0 0 40px rgba(249, 115, 22, 0.25);
+}
+
+/* 4. Sleeping Cloud (Ngủ quên cả thế giới) */
+.spotlight-overlay.theme-sleeping-cloud {
+  background: radial-gradient(circle at center, rgba(30, 27, 75, 0.98) 0%, rgba(10, 10, 30, 0.99) 100%);
+}
+.theme-sleeping-cloud .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(129, 140, 248, 0.15) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-sleeping-cloud .spotlight-card {
+  border-color: #818cf8;
+  box-shadow: 0 0 90px rgba(129, 140, 248, 0.5), inset 0 0 40px rgba(129, 140, 248, 0.2);
+}
+
+/* 5. Music Concert (Nghệ sĩ âm thanh) */
+.spotlight-overlay.theme-music-concert {
+  background: radial-gradient(circle at center, rgba(88, 28, 135, 0.98) 0%, rgba(20, 10, 40, 0.99) 100%);
+}
+.theme-music-concert .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(217, 70, 239, 0.2) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-music-concert .spotlight-card {
+  border-color: #d946ef;
+  box-shadow: 0 0 90px rgba(217, 70, 239, 0.6), inset 0 0 40px rgba(217, 70, 239, 0.3);
+}
+
+/* 6. Snack Party (Tủ lạnh di động) */
+.spotlight-overlay.theme-snack-party {
+  background: radial-gradient(circle at center, rgba(136, 19, 55, 0.98) 0%, rgba(30, 10, 25, 0.99) 100%);
+}
+.theme-snack-party .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(251, 113, 133, 0.2) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-snack-party .spotlight-card {
+  border-color: #fb7185;
+  box-shadow: 0 0 90px rgba(251, 113, 133, 0.6), inset 0 0 40px rgba(251, 113, 133, 0.25);
+}
+
+/* 7. Arctic Freeze (Mùa đông về viện) */
+.spotlight-overlay.theme-arctic-freeze {
+  background: radial-gradient(circle at center, rgba(12, 74, 110, 0.98) 0%, rgba(8, 25, 45, 0.99) 100%);
+}
+.theme-arctic-freeze .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(186, 230, 253, 0.22) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-arctic-freeze .spotlight-card {
+  border-color: #38bdf8;
+  box-shadow: 0 0 100px rgba(56, 189, 248, 0.7), inset 0 0 50px rgba(186, 230, 253, 0.3);
+}
+
+/* 8. Lightning Neon (Kẻ hủy diệt pin) */
+.spotlight-overlay.theme-lightning-neon {
+  background: radial-gradient(circle at center, rgba(66, 32, 6, 0.98) 0%, rgba(15, 15, 30, 0.99) 100%);
+}
+.theme-lightning-neon .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(250, 204, 21, 0.22) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-lightning-neon .spotlight-card {
+  border-color: #facc15;
+  box-shadow: 0 0 100px rgba(250, 204, 21, 0.7), inset 0 0 50px rgba(250, 204, 21, 0.3);
+}
+
+/* 9. Speed Rocket (Tốc độ 17h30) */
+.spotlight-overlay.theme-speed-rocket {
+  background: radial-gradient(circle at center, rgba(127, 29, 29, 0.98) 0%, rgba(30, 10, 10, 0.99) 100%);
+}
+.theme-speed-rocket .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(239, 68, 68, 0.22) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-speed-rocket .spotlight-card {
+  border-color: #ef4444;
+  box-shadow: 0 0 100px rgba(239, 68, 68, 0.7), inset 0 0 50px rgba(239, 68, 68, 0.3);
+}
+
+/* 10. Party Beer (Tuyên bố hùng hồn) */
+.spotlight-overlay.theme-party-beer {
+  background: radial-gradient(circle at center, rgba(113, 63, 18, 0.98) 0%, rgba(25, 15, 5, 0.99) 100%);
+}
+.theme-party-beer .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(234, 179, 8, 0.22) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-party-beer .spotlight-card {
+  border-color: #eab308;
+  box-shadow: 0 0 100px rgba(234, 179, 8, 0.7), inset 0 0 50px rgba(234, 179, 8, 0.3);
+}
+
+/* 11. Money Rain */
+.spotlight-overlay.theme-money-rain {
+  background: radial-gradient(circle at center, rgba(6, 78, 59, 0.98) 0%, rgba(5, 30, 25, 0.99) 100%);
+}
+.theme-money-rain .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(16, 185, 129, 0.22) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-money-rain .spotlight-card {
+  border-color: #10b981;
+  box-shadow: 0 0 100px rgba(16, 185, 129, 0.7), inset 0 0 50px rgba(16, 185, 129, 0.3);
+}
+
+/* 12. Rainbow Magic */
+.spotlight-overlay.theme-rainbow-magic {
+  background: radial-gradient(circle at center, rgba(49, 46, 129, 0.98) 0%, rgba(10, 10, 30, 0.99) 100%);
+}
+.theme-rainbow-magic .spotlight-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(236, 72, 153, 0.2) 0deg 15deg, transparent 15deg 30deg);
+}
+.theme-rainbow-magic .spotlight-card {
+  border-color: #ec4899;
+  box-shadow: 0 0 100px rgba(236, 72, 153, 0.7), inset 0 0 50px rgba(236, 72, 153, 0.3);
+}
+
+/* ==========================================================================
+   OPEN-ENDED TEXT RESPONSES DISPLAY (WORD WALL)
+   ========================================================================== */
+.open-text-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.open-text-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.35s ease;
+  backdrop-filter: blur(8px);
+}
+
+.open-text-content {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.open-text-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cyan);
+}
+

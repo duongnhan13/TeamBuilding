@@ -56,6 +56,23 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePlayerCount(total);
   });
 
+  socket.on('questions_updated', () => {
+    // Refresh question list
+    Promise.all([
+      fetch('/api/questions/squizz').then(r => r.json()),
+      fetch('/api/questions/qa').then(r => r.json())
+    ]).then(([sqList, qaList]) => {
+      adminState.squizzQuestions = sqList;
+      adminState.qaQuestions = qaList;
+      populateJumpSelect();
+    });
+  });
+
+  socket.on('members_updated', (members) => {
+    adminState.members = members;
+    renderMembersTable(members);
+  });
+
   function updatePlayerCount(total) {
     if (elPlayerCount) elPlayerCount.textContent = total;
     if (elTotalCount) elTotalCount.textContent = total;
@@ -85,11 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (adminState.squizzQuestions.length) {
       const g1 = document.createElement('optgroup');
-      g1.label = '🎭 Bộ 1: Squizz (Bình chọn)';
+      g1.label = '🎭 Bộ 1: Squizz (Bình chọn & Mở)';
       adminState.squizzQuestions.forEach((q, i) => {
         const opt = document.createElement('option');
         opt.value = `SQUIZZ:${i}`;
-        opt.textContent = `Câu ${i + 1}: ${q.title || q.question.slice(0, 30)}`;
+        const typeTag = q.type === 'OPEN_TEXT' ? '[CÂU MỞ] ' : '';
+        opt.textContent = `Câu ${i + 1}: ${typeTag}${q.title || q.question.slice(0, 30)}`;
         g1.appendChild(opt);
       });
       elJumpSelect.appendChild(g1);
@@ -101,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
       adminState.qaQuestions.forEach((q, i) => {
         const opt = document.createElement('option');
         opt.value = `QA:${i}`;
-        opt.textContent = `Câu ${i + 1}: ${q.question.slice(0, 30)}...`;
+        const typeTag = q.type === 'OPEN_TEXT' ? '[CÂU MỞ] ' : '';
+        opt.textContent = `Câu ${i + 1}: ${typeTag}${q.question.slice(0, 30)}...`;
         g2.appendChild(opt);
       });
       elJumpSelect.appendChild(g2);
@@ -123,8 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
     adminState.squizzIndex = index;
     updateModeBadge('SQUIZZ');
 
-    elCurrentQPill.textContent = `CÂU ${index + 1} / ${total || 10} (SQUIZZ)`;
-    elTargetBadge.textContent = `🎯 Mục tiêu: ${q.target || 'Bình chọn vui'}`;
+    const totalCount = total || adminState.squizzQuestions.length || 12;
+    const typeLabel = q.type === 'OPEN_TEXT' ? ' (CÂU HỎI MỞ)' : '';
+    elCurrentQPill.textContent = `CÂU ${index + 1} / ${totalCount}${typeLabel}`;
+    elTargetBadge.textContent = `🎯 Mục tiêu: ${q.target || 'Bình chọn vui nhộn'}`;
     elQText.textContent = q.question;
     elMcVoice.textContent = q.mcVoice ? `"${q.mcVoice}"` : '"Xin chúc mừng đồng chí được nêu tên nhiều nhất!"';
     elPunishment.textContent = q.punishment || 'Uống 1 chén danh dự! 🍻';
@@ -138,31 +159,53 @@ document.addEventListener('DOMContentLoaded', () => {
     adminState.qaIndex = index;
     updateModeBadge('QA');
 
-    elCurrentQPill.textContent = `CÂU ${index + 1} / ${total || 15} (Q&A)`;
+    const totalCount = total || adminState.qaQuestions.length || 15;
+    elCurrentQPill.textContent = `CÂU ${index + 1} / ${totalCount} (Q&A)`;
     elTargetBadge.textContent = `${q.icon || '⚔️'} ${q.category || 'Đố vui'}`;
     elQText.textContent = q.question;
     elMcVoice.textContent = q.explanation ? `💡 Lời giải thích: "${q.explanation}"` : 'Cùng xem ai trả lời đúng và nhanh nhất!';
-    elPunishment.textContent = `Đáp án đúng: Phương án ${String.fromCharCode(65 + (q.correctAnswer || 0))}`;
+    elPunishment.textContent = q.type === 'OPEN_TEXT' ? 'Câu hỏi tự luận mở' : `Đáp án đúng: Phương án ${String.fromCharCode(65 + (q.correctAnswer || 0))}`;
     elVotedCount.textContent = '0';
     btnToggleLock.textContent = '🔒 KHÓA ĐÁP ÁN';
   }
 
   function updateSecretTally(tally) {
-    if (!elSecretTally || !tally || !tally.tallyList) return;
-    elVotedCount.textContent = tally.totalVotes;
+    if (!elSecretTally || !tally) return;
+    elVotedCount.textContent = tally.totalVotes || 0;
 
-    if (tally.tallyList.length === 0) {
+    const isText = (adminState.squizzQuestions[adminState.squizzIndex] && adminState.squizzQuestions[adminState.squizzIndex].type === 'OPEN_TEXT') || tally.isTextQuestion;
+
+    if (isText && tally.responses && tally.responses.length > 0) {
+      elSecretTally.innerHTML = '';
+      tally.responses.forEach(r => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.flexDirection = 'column';
+        row.style.padding = '6px 10px';
+        row.style.background = 'rgba(255, 255, 255, 0.08)';
+        row.style.borderRadius = '8px';
+        row.style.fontSize = '0.9rem';
+        row.innerHTML = `
+          <div style="font-weight: 700; color: #fff;">"${r.text}"</div>
+          <div style="font-size: 0.75rem; color: var(--cyan); margin-top: 2px;">👤 ${r.voter}</div>
+        `;
+        elSecretTally.appendChild(row);
+      });
+      return;
+    }
+
+    if (!tally.tallyList || tally.tallyList.length === 0) {
       elSecretTally.innerHTML = '<div style="color: var(--text-muted); font-style: italic; font-size: 0.9rem;">Chưa có phiếu nào...</div>';
       return;
     }
 
     elSecretTally.innerHTML = '';
-    tally.tallyList.slice(0, 5).forEach((item, idx) => {
+    tally.tallyList.slice(0, 6).forEach((item, idx) => {
       const row = document.createElement('div');
       row.style.display = 'flex';
       row.style.justifyContent = 'space-between';
-      row.style.padding = '4px 8px';
-      row.style.background = idx === 0 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)';
+      row.style.padding = '5px 10px';
+      row.style.background = idx === 0 ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.05)';
       row.style.borderRadius = '6px';
       row.style.fontSize = '0.9rem';
       row.innerHTML = `
@@ -331,36 +374,224 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Settings Modal
+  // --- MODAL 1: ADD QUESTION LOGIC ---
+  const modalAddQ = document.getElementById('modal-add-question');
+  const btnOpenAddQ = document.getElementById('btn-open-add-q');
+  const btnCloseAddQ = document.getElementById('btn-close-add-q');
+  const btnCancelAddQ = document.getElementById('btn-cancel-add-q');
+  const btnSaveAddQ = document.getElementById('btn-save-add-q');
+
+  const addQSection = document.getElementById('add-q-section');
+  const addQType = document.getElementById('add-q-type');
+  const addQaOptionsBox = document.getElementById('add-qa-options-box');
+
+  if (btnOpenAddQ) {
+    btnOpenAddQ.addEventListener('click', () => {
+      modalAddQ.style.display = 'flex';
+      syncAddQTypeOptions();
+    });
+  }
+
+  [btnCloseAddQ, btnCancelAddQ].forEach(b => {
+    if (b) b.addEventListener('click', () => modalAddQ.style.display = 'none');
+  });
+
+  function syncAddQTypeOptions() {
+    const sec = addQSection.value;
+    addQType.innerHTML = '';
+    if (sec === 'SQUIZZ') {
+      addQType.innerHTML = `
+        <option value="OPEN_TEXT">💬 Câu hỏi mở (Nhập văn bản tự do)</option>
+        <option value="VOTE_MEMBER">👤 Bình chọn đồng nghiệp (47 thành viên)</option>
+      `;
+      addQaOptionsBox.style.display = 'none';
+    } else {
+      addQType.innerHTML = `
+        <option value="MULTIPLE_CHOICE">🎯 Trắc nghiệm 4 đáp án (A, B, C, D)</option>
+        <option value="OPEN_TEXT">💬 Câu hỏi mở (Tự luận)</option>
+      `;
+      addQaOptionsBox.style.display = 'block';
+    }
+  }
+
+  if (addQSection) {
+    addQSection.addEventListener('change', syncAddQTypeOptions);
+  }
+
+  if (addQType) {
+    addQType.addEventListener('change', () => {
+      if (addQSection.value === 'QA' && addQType.value === 'MULTIPLE_CHOICE') {
+        addQaOptionsBox.style.display = 'block';
+      } else {
+        addQaOptionsBox.style.display = 'none';
+      }
+    });
+  }
+
+  if (btnSaveAddQ) {
+    btnSaveAddQ.addEventListener('click', () => {
+      const sec = addQSection.value;
+      const type = addQType.value;
+      const title = document.getElementById('add-q-title').value.trim();
+      const text = document.getElementById('add-q-text').value.trim();
+      const theme = document.getElementById('add-q-theme').value;
+      const punishment = document.getElementById('add-q-punishment').value.trim();
+      const time = parseInt(document.getElementById('add-q-time').value, 10) || 30;
+      const mcVoice = document.getElementById('add-q-mcvoice').value.trim();
+
+      if (!text) {
+        alert('Vui lòng nhập nội dung câu hỏi!');
+        return;
+      }
+
+      if (sec === 'SQUIZZ') {
+        fetch('/api/questions/squizz/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type,
+            title: title || 'CÂU HỎI MỚI',
+            question: text,
+            effectTheme: theme,
+            punishment: punishment || 'Uống 1 chén danh dự! 🍻',
+            mcVoice: mcVoice || 'Xin chúc mừng người có câu trả lời hay nhất!',
+            target: 'Gắn kết đồng đội'
+          })
+        })
+        .then(r => r.json())
+        .then(res => {
+          alert('Đã thêm câu hỏi vào Bộ 1: Squizz thành công!');
+          modalAddQ.style.display = 'none';
+        })
+        .catch(() => alert('Lỗi khi thêm câu hỏi'));
+      } else {
+        const opts = [
+          document.getElementById('add-opt-0').value.trim() || 'Đáp án A',
+          document.getElementById('add-opt-1').value.trim() || 'Đáp án B',
+          document.getElementById('add-opt-2').value.trim() || 'Đáp án C',
+          document.getElementById('add-opt-3').value.trim() || 'Đáp án D'
+        ];
+        const correct = parseInt(document.getElementById('add-correct-idx').value, 10) || 0;
+
+        fetch('/api/questions/qa/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type,
+            category: title || 'Đố vui Team Building',
+            question: text,
+            options: opts,
+            correctAnswer: correct,
+            explanation: mcVoice || 'Đáp án chính xác!',
+            timeLimit: time
+          })
+        })
+        .then(r => r.json())
+        .then(res => {
+          alert('Đã thêm câu hỏi vào Bộ 2: Q&A thành công!');
+          modalAddQ.style.display = 'none';
+        })
+        .catch(() => alert('Lỗi khi thêm câu hỏi'));
+      }
+    });
+  }
+
+  // --- MODAL 2: 47 MEMBERS & DOB MANAGEMENT TABLE ---
   const modalSettings = document.getElementById('modal-settings');
-  const txtMembers = document.getElementById('settings-members-input');
+  const memberTableBody = document.getElementById('member-table-body');
+  const memberSearchFilter = document.getElementById('member-search-filter');
 
   document.getElementById('btn-open-settings').addEventListener('click', () => {
-    txtMembers.value = adminState.members.join('\n');
-    modalSettings.style.display = 'flex';
+    fetch('/api/members')
+      .then(r => r.json())
+      .then(members => {
+        adminState.members = members;
+        renderMembersTable(members);
+        modalSettings.style.display = 'flex';
+      });
   });
 
-  document.getElementById('btn-close-settings').addEventListener('click', () => {
-    modalSettings.style.display = 'none';
+  [document.getElementById('btn-close-settings'), document.getElementById('btn-cancel-settings')].forEach(b => {
+    if (b) b.addEventListener('click', () => modalSettings.style.display = 'none');
   });
 
-  document.getElementById('btn-cancel-settings').addEventListener('click', () => {
-    modalSettings.style.display = 'none';
-  });
+  if (memberSearchFilter) {
+    memberSearchFilter.addEventListener('input', () => {
+      const q = memberSearchFilter.value.trim().toLowerCase();
+      renderMembersTable(adminState.members, q);
+    });
+  }
 
-  document.getElementById('btn-save-settings').addEventListener('click', () => {
-    const names = txtMembers.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
-    fetch('/api/members', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(names)
-    })
-    .then(r => r.json())
-    .then(() => {
-      adminState.members = names;
-      alert(`Đã lưu ${names.length} thành viên phòng!`);
-      modalSettings.style.display = 'none';
-    })
-    .catch(() => alert('Lỗi khi lưu danh sách thành viên'));
-  });
+  function renderMembersTable(members, filterText = '') {
+    if (!memberTableBody) return;
+    memberTableBody.innerHTML = '';
+
+    const filtered = filterText
+      ? members.filter(m => (m.name && m.name.toLowerCase().includes(filterText)) || (m.role && m.role.toLowerCase().includes(filterText)))
+      : members;
+
+    filtered.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid rgba(255,255,255,0.06)';
+
+      const zodiacDetails = (window.zodiacHelper && m.dob) ? window.zodiacHelper.getZodiacDetails(m.dob) : null;
+      let zodiacText = '<span style="color: var(--text-muted); font-size: 0.8rem;">Chưa có</span>';
+      if (zodiacDetails && zodiacDetails.sign && zodiacDetails.lunar) {
+        zodiacText = `<span style="color: #fef08a; font-weight: 700; font-size: 0.82rem;">${zodiacDetails.sign.icon} ${zodiacDetails.sign.name}<br>${zodiacDetails.lunar.icon} ${zodiacDetails.lunar.canChi}</span>`;
+      }
+
+      tr.innerHTML = `
+        <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan);">${m.stt}</td>
+        <td style="padding: 10px 12px; font-weight: 700;">${m.name}</td>
+        <td style="padding: 10px 12px; font-size: 0.85rem; color: var(--text-muted);">${m.role || 'Thành viên'}</td>
+        <td style="padding: 8px 10px;">
+          <input type="text" value="${m.fingerprint || ''}" class="input-field inp-fp" style="margin: 0; padding: 4px 8px; font-size: 0.85rem; height: 32px; width: 85px;" placeholder="Mã vân tay">
+        </td>
+        <td style="padding: 8px 10px;">
+          <input type="text" value="${m.dob || ''}" class="input-field inp-dob" style="margin: 0; padding: 4px 8px; font-size: 0.85rem; height: 32px; width: 115px;" placeholder="dd/mm/yyyy">
+        </td>
+        <td style="padding: 8px 10px;" class="zodiac-cell">${zodiacText}</td>
+        <td style="padding: 8px 10px;">
+          <button class="btn btn-emerald btn-sm btn-save-member" style="padding: 4px 10px; font-size: 0.8rem;">Lưu</button>
+        </td>
+      `;
+
+      const btnSave = tr.querySelector('.btn-save-member');
+      const inpFp = tr.querySelector('.inp-fp');
+      const inpDob = tr.querySelector('.inp-dob');
+      const zodiacCell = tr.querySelector('.zodiac-cell');
+
+      inpDob.addEventListener('input', () => {
+        if (window.zodiacHelper && inpDob.value.trim()) {
+          const zd = window.zodiacHelper.getZodiacDetails(inpDob.value.trim());
+          if (zd && zd.sign && zd.lunar) {
+            zodiacCell.innerHTML = `<span style="color: #fef08a; font-weight: 700; font-size: 0.82rem;">${zd.sign.icon} ${zd.sign.name}<br>${zd.lunar.icon} ${zd.lunar.canChi}</span>`;
+          }
+        }
+      });
+
+      btnSave.addEventListener('click', () => {
+        btnSave.textContent = '...';
+        fetch('/api/members/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stt: m.stt,
+            fingerprint: inpFp.value.trim(),
+            dob: inpDob.value.trim()
+          })
+        })
+        .then(r => r.json())
+        .then(() => {
+          btnSave.textContent = '✅ Đã lưu';
+          setTimeout(() => { btnSave.textContent = 'Lưu'; }, 1500);
+        })
+        .catch(() => {
+          btnSave.textContent = '❌ Lỗi';
+        });
+      });
+
+      memberTableBody.appendChild(tr);
+    });
+  }
 });
