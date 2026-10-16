@@ -106,6 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('settings-members-textarea').value = data.membersList.join('\n');
     }
 
+    if (data.squizzQuestions && data.qaQuestions) {
+      populateJumpDropdown(data.squizzQuestions, data.qaQuestions);
+    }
+
     if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
       renderSquizzQuestion(data.squizz.question, data.squizz.currentIndex, data.squizzQuestions.length);
       if (data.squizz.tally) {
@@ -590,4 +594,75 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Đã xóa điểm toàn bộ người chơi về 0!');
     }
   });
+
+  // --- ADMIN TEST & SIMULATION CONTROLS ---
+  document.getElementById('btn-admin-add-bots').addEventListener('click', () => {
+    socket.emit('host_add_bots', { count: 40 });
+  });
+
+  document.getElementById('btn-admin-simulate-round').addEventListener('click', () => {
+    if (hostState.mode === 'SQUIZZ') {
+      socket.emit('host_simulate_squizz');
+    } else if (hostState.mode === 'QA') {
+      socket.emit('host_simulate_qa');
+    } else {
+      alert('Vui lòng bấm Bắt đầu Bộ 1 (Squizz) hoặc Bộ 2 (Q&A) trước khi bấm giả lập vote/trả lời nhé!');
+    }
+  });
+
+  document.getElementById('btn-admin-reset-q').addEventListener('click', () => {
+    socket.emit('host_reset_current_q');
+  });
+
+  document.getElementById('btn-admin-reset-all').addEventListener('click', () => {
+    socket.emit('host_back_to_lobby');
+    switchView('lobby');
+  });
+
+  document.getElementById('btn-admin-clear-players').addEventListener('click', () => {
+    if (confirm('Bạn có chắc muốn xóa toàn bộ người chơi (cả người thật và bot) khỏi phòng?')) {
+      socket.emit('host_clear_all_players');
+    }
+  });
+
+  // Populate Jump Dropdown
+  function populateJumpDropdown(squizzList, qaList) {
+    const select = document.getElementById('select-jump-q');
+    if (!select) return;
+    select.innerHTML = '<option value="">-- Nhảy tới câu --</option>';
+
+    if (squizzList && squizzList.length) {
+      const g1 = document.createElement('optgroup');
+      g1.label = '🎭 Bộ 1: Squizz (Bình chọn)';
+      squizzList.forEach((q, i) => {
+        const opt = document.createElement('option');
+        opt.value = `SQUIZZ:${i}`;
+        opt.textContent = `Câu ${i + 1}: ${q.title || q.question.slice(0, 30)}`;
+        g1.appendChild(opt);
+      });
+      select.appendChild(g1);
+    }
+
+    if (qaList && qaList.length) {
+      const g2 = document.createElement('optgroup');
+      g2.label = '🧠 Bộ 2: Đấu Trí Q&A';
+      qaList.forEach((q, i) => {
+        const opt = document.createElement('option');
+        opt.value = `QA:${i}`;
+        opt.textContent = `Câu ${i + 1}: ${q.question.slice(0, 30)}...`;
+        g2.appendChild(opt);
+      });
+      select.appendChild(g2);
+    }
+
+    select.addEventListener('change', () => {
+      const val = select.value;
+      if (!val) return;
+      const [mode, idxStr] = val.split(':');
+      const idx = parseInt(idxStr, 10);
+      socket.emit('host_jump_to_q', { mode, index: idx });
+      switchView(mode === 'SQUIZZ' ? 'squizz' : 'qa');
+      select.value = '';
+    });
+  }
 });

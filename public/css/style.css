@@ -144,11 +144,31 @@ body {
   background: rgba(255, 255, 255, 0.18);
 }
 
-.btn-icon {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: 12px;
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.admin-test-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-test-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* ==========================================================================

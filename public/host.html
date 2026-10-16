@@ -48,6 +48,32 @@
       </div>
     </header>
 
+    <!-- Admin Quick Testing & Reset Toolbar -->
+    <div class="admin-test-bar" id="admin-test-bar">
+      <div class="admin-test-title">🛠️ TEST & RESET:</div>
+      <button class="btn btn-primary btn-sm" id="btn-admin-add-bots" title="Tạo ngay 40 người chơi ảo để thử nghiệm">
+        🤖 Thêm 40 Người Ảo
+      </button>
+      <button class="btn btn-emerald btn-sm" id="btn-admin-simulate-round" title="Cho 40 người ảo tự động vote hoặc trả lời câu này">
+        ⚡ Tự Động Vote / Trả Lời (40 người)
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btn-admin-reset-q" title="Reset câu này để bình chọn lại từ đầu">
+        🔄 Reset Câu Này
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btn-admin-reset-all" title="Reset ván chơi quay về Sảnh chờ">
+        🧹 Về Sảnh Chờ
+      </button>
+      <button class="btn btn-rose btn-sm" id="btn-admin-clear-players" title="Xóa toàn bộ người chơi (cả bot)">
+        🗑️ Xóa Hết Người Chơi
+      </button>
+      <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Nhảy tới:</span>
+        <select id="select-jump-q" class="input-field" style="margin: 0; padding: 4px 10px; font-size: 0.85rem; width: auto; height: 34px; background: rgba(0,0,0,0.6);">
+          <option value="">-- Chọn câu --</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Main Stage Container -->
     <main class="host-main-stage">
       

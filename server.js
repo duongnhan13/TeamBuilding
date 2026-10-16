@@ -732,17 +732,214 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('host_kick_player', ({ playerId }) => {
-    const player = gameState.players.get(playerId);
-    if (player) {
-      if (player.socketId) {
-        io.to(player.socketId).emit('player_kicked');
-      }
-      gameState.players.delete(playerId);
-      io.to('host').emit('player_list_updated', {
-        players: getConnectedPlayers(),
-        total: getConnectedPlayers().length
+  // --- ADMIN RESET & BOT SIMULATION (TESTING FEATURES) ---
+  const BOT_NAMES = [
+    "Hồng Phương", "Hoài Thanh", "Tô Châu", "Minh Hạnh", "Thu Trang",
+    "Hải Yến", "Thanh Hương", "Ngọc Anh", "Đức Huy", "Tuấn Anh",
+    "Văn Dũng", "Thị Mai", "Khánh Linh", "Quỳnh Nga", "Thành Nam",
+    "Bảo Ngọc", "Hoàng Long", "Huyền Trang", "Phương Linh", "Việt Hoàng",
+    "Quang Minh", "Thái Sơn", "Bích Ngọc", "Lan Anh", "Trọng Tấn",
+    "Hà My", "Xuân Bắc", "Vân Anh", "Thế Anh", "Tiến Dũng",
+    "Như Quỳnh", "Thùy Dung", "Hồng Hạnh", "Minh Quân", "Bảo Châu",
+    "Gia Huy", "Tú Anh", "Thanh Tùng", "Diệu Linh", "Kim Ngân"
+  ];
+  const BOT_AVATARS = ['😎', '🦁', '🐯', '🚀', '🍺', '🥳', '👑', '🔥', '⚡', '🍕', '🎯', '💃', '🕺', '🐱', '🦊', '🐉', '🍷', '🦸'];
+
+  socket.on('host_add_bots', ({ count = 40 }) => {
+    for (let i = 0; i < count; i++) {
+      const botId = `bot_${i + 1}`;
+      const name = BOT_NAMES[i % BOT_NAMES.length];
+      const avatar = BOT_AVATARS[i % BOT_AVATARS.length];
+      gameState.players.set(botId, {
+        id: botId,
+        nickname: name,
+        avatar: avatar,
+        score: 0,
+        connected: true,
+        isBot: true,
+        socketId: null
       });
+    }
+
+    io.to('host').emit('player_list_updated', {
+      players: getConnectedPlayers(),
+      total: getConnectedPlayers().length
+    });
+  });
+
+  socket.on('host_simulate_squizz', () => {
+    if (gameState.mode !== 'SQUIZZ') return;
+    const currentQ = squizzQuestions[gameState.squizz.currentIndex];
+    const candidatePool = membersList.length > 0 ? membersList : BOT_NAMES.slice(0, 15);
+    
+    // Pick primary winner
+    const preferredWinner = currentQ && currentQ.suggested ? currentQ.suggested : candidatePool[Math.floor(Math.random() * candidatePool.length)];
+
+    let delay = 0;
+    gameState.players.forEach((player, pId) => {
+      setTimeout(() => {
+        if (gameState.mode !== 'SQUIZZ' || !gameState.squizz.isOpen) return;
+
+        // 60% chance to vote for the target winner, 40% distributed among others
+        let voteChoice = preferredWinner;
+        if (Math.random() > 0.6) {
+          voteChoice = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+        }
+
+        gameState.squizz.rawVotes[pId] = voteChoice;
+        gameState.squizz.votes[pId] = normalizeName(voteChoice);
+
+        const tally = calculateSquizzTally();
+        io.to('host').emit('squizz_live_update', {
+          tally,
+          totalVotes: tally.totalVotes,
+          totalPlayers: getConnectedPlayers().length
+        });
+      }, delay);
+      delay += 40; // 40ms stagger so votes count up live
+    });
+  });
+
+  socket.on('host_simulate_qa', () => {
+    if (gameState.mode !== 'QA') return;
+    const currentQ = qaQuestions[gameState.qa.currentIndex];
+    if (!currentQ) return;
+
+    let delay = 0;
+    gameState.players.forEach((player, pId) => {
+      setTimeout(() => {
+        if (gameState.mode !== 'QA' || !gameState.qa.isOpen) return;
+        if (gameState.qa.answers[pId]) return;
+
+        // 70% chance to answer correctly
+        let chosenOpt = currentQ.correctAnswer;
+        if (Math.random() > 0.7) {
+          const wrongOptions = [0, 1, 2, 3].filter(o => o !== currentQ.correctAnswer);
+          chosenOpt = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+        }
+
+        const isCorrect = (chosenOpt === currentQ.correctAnswer);
+        const timeTakenMs = Math.round(1500 + Math.random() * 8000);
+        
+        let points = 0;
+        if (isCorrect) {
+          const timeLimitMs = (currentQ.timeLimit || 20) * 1000;
+          const speedFraction = Math.max(0, 1 - (timeTakenMs / timeLimitMs) / 2);
+          points = Math.round(500 + 500 * speedFraction);
+        }
+
+        player.score += points;
+        gameState.qa.answers[pId] = {
+          optionIndex: chosenOpt,
+          isCorrect,
+          points,
+          timeTakenMs
+        };
+
+        const stats = calculateQaStats();
+        io.to('host').emit('qa_live_update', {
+          stats,
+          totalAnswered: stats.totalAnswered,
+          totalPlayers: getConnectedPlayers().length
+        });
+      }, delay);
+      delay += 50; // stagger answers
+    });
+  });
+
+  socket.on('host_reset_current_q', () => {
+    if (gameState.mode === 'SQUIZZ') {
+      gameState.squizz.isOpen = true;
+      gameState.squizz.isRevealed = false;
+      gameState.squizz.votes = {};
+      gameState.squizz.rawVotes = {};
+      const q = squizzQuestions[gameState.squizz.currentIndex];
+      io.emit('squizz_question_started', {
+        currentIndex: gameState.squizz.currentIndex,
+        total: squizzQuestions.length,
+        question: q
+      });
+      io.to('host').emit('squizz_live_update', {
+        tally: calculateSquizzTally(),
+        totalVotes: 0,
+        totalPlayers: getConnectedPlayers().length
+      });
+    } else if (gameState.mode === 'QA') {
+      gameState.qa.isOpen = true;
+      gameState.qa.isRevealed = false;
+      gameState.qa.answers = {};
+      const q = qaQuestions[gameState.qa.currentIndex];
+      gameState.qa.timeLimit = q ? (q.timeLimit || 20) : 20;
+      gameState.qa.timeRemaining = gameState.qa.timeLimit;
+      gameState.qa.startTime = Date.now();
+
+      io.emit('qa_question_started', {
+        currentIndex: gameState.qa.currentIndex,
+        total: qaQuestions.length,
+        timeLimit: gameState.qa.timeLimit,
+        question: q
+      });
+      io.to('host').emit('qa_live_update', {
+        stats: calculateQaStats(),
+        totalAnswered: 0,
+        totalPlayers: getConnectedPlayers().length
+      });
+      startQaTimer();
+    }
+  });
+
+  socket.on('host_clear_all_players', () => {
+    gameState.players.clear();
+    gameState.squizz.votes = {};
+    gameState.squizz.rawVotes = {};
+    gameState.qa.answers = {};
+    io.emit('scores_reset');
+    io.to('host').emit('player_list_updated', {
+      players: [],
+      total: 0
+    });
+  });
+
+  socket.on('host_jump_to_q', ({ mode, index }) => {
+    if (mode === 'SQUIZZ') {
+      gameState.squizz.currentIndex = Math.max(0, Math.min(squizzQuestions.length - 1, index));
+      gameState.squizz.isOpen = true;
+      gameState.squizz.isRevealed = false;
+      gameState.squizz.votes = {};
+      gameState.squizz.rawVotes = {};
+      const q = squizzQuestions[gameState.squizz.currentIndex];
+      io.emit('squizz_question_started', {
+        currentIndex: gameState.squizz.currentIndex,
+        total: squizzQuestions.length,
+        question: q
+      });
+      io.to('host').emit('squizz_live_update', {
+        tally: calculateSquizzTally(),
+        totalVotes: 0,
+        totalPlayers: getConnectedPlayers().length
+      });
+    } else if (mode === 'QA') {
+      gameState.qa.currentIndex = Math.max(0, Math.min(qaQuestions.length - 1, index));
+      gameState.qa.isOpen = true;
+      gameState.qa.isRevealed = false;
+      gameState.qa.answers = {};
+      const q = qaQuestions[gameState.qa.currentIndex];
+      gameState.qa.timeLimit = q ? (q.timeLimit || 20) : 20;
+      gameState.qa.timeRemaining = gameState.qa.timeLimit;
+      gameState.qa.startTime = Date.now();
+
+      io.emit('qa_question_started', {
+        currentIndex: gameState.qa.currentIndex,
+        total: qaQuestions.length,
+        timeLimit: gameState.qa.timeLimit,
+        question: q
+      });
+      io.to('host').emit('qa_live_update', {
+        stats: calculateQaStats(),
+        totalAnswered: 0,
+        totalPlayers: getConnectedPlayers().length
+      });
+      startQaTimer();
     }
   });
 
