@@ -146,8 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activation.missingMembers.forEach(m => {
       const chip = document.createElement('div');
       chip.className = 'missing-chip';
-      const roleStr = m.role ? ` (${m.role})` : '';
-      chip.innerHTML = `<span class="chip-stt">#${m.stt}</span> <span>${escapeHtml(m.name)}${escapeHtml(roleStr)}</span>`;
+      chip.innerHTML = `<span class="chip-stt">#${m.stt}</span> <span>${escapeHtml(m.name)}</span>`;
       elMissingGrid.appendChild(chip);
     });
   }
@@ -354,15 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
       spotWinnerVotes.textContent = '0 phiếu';
     }
 
-    // Role
-    if (spotWinnerRole) {
-      if (winnerDetails && winnerDetails.role) {
-        spotWinnerRole.textContent = winnerDetails.role;
-        spotWinnerRole.style.display = 'block';
-      } else {
-        spotWinnerRole.style.display = 'none';
-      }
-    }
+
 
     // Zodiac & Con Giap Display
     if (spotZodiacCard) {

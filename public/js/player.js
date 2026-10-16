@@ -93,24 +93,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const memberQuickFilter = document.getElementById('member-quick-filter');
   const memberProfileCard = document.getElementById('member-profile-card');
   const cardMemberName = document.getElementById('card-member-name');
-  const cardMemberRole = document.getElementById('card-member-role');
   const cardMemberAvatar = document.getElementById('card-member-avatar');
   const cardMemberZodiac = document.getElementById('card-member-zodiac');
 
   function populateMemberSelect(members, filterText = '') {
     if (!selectMember) return;
-    selectMember.innerHTML = '<option value="">-- Chọn tên bạn (47 cán bộ nhân viên) --</option>';
+    selectMember.innerHTML = '<option value="">-- Chọn tên bạn (47 thành viên) --</option>';
     
     const filtered = filterText 
-      ? members.filter(m => (m.name && m.name.toLowerCase().includes(filterText)) || (m.role && m.role.toLowerCase().includes(filterText)) || String(m.stt) === filterText)
+      ? members.filter(m => (m.name && m.name.toLowerCase().includes(filterText)) || String(m.stt) === filterText)
       : members;
 
     filtered.forEach(m => {
       const opt = document.createElement('option');
       opt.value = m.stt;
-      opt.textContent = `${m.stt}. ${m.name} ${m.role ? '(' + m.role + ')' : ''}`;
+      opt.textContent = `${m.stt}. ${m.name}`;
       opt.dataset.name = m.name;
-      opt.dataset.role = m.role || '';
       opt.dataset.dob = m.dob || '';
       opt.dataset.fingerprint = m.fingerprint || '';
       if (playerState.memberId && String(m.stt) === String(playerState.memberId)) {
@@ -139,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const name = selectedOpt.dataset.name;
-    const role = selectedOpt.dataset.role || 'Phòng TCKT';
     const dob = selectedOpt.dataset.dob || '';
     const fp = selectedOpt.dataset.fingerprint || '';
 
@@ -147,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inputDob) inputDob.value = dob;
 
     if (cardMemberName) cardMemberName.textContent = name;
-    if (cardMemberRole) cardMemberRole.textContent = role;
     if (cardMemberAvatar) cardMemberAvatar.textContent = selectedAvatar;
 
     if (cardMemberZodiac) {
@@ -255,12 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update Header
     elMyAvatar.textContent = player.avatar;
     elMyNickname.textContent = player.nickname;
-    if (elMyRoleText) elMyRoleText.textContent = player.role || 'Phòng TCKT';
+    if (elMyRoleText) elMyRoleText.style.display = 'none';
     elMyScoreTag.textContent = `${player.score.toLocaleString()} điểm`;
     elWaitAvatar.textContent = player.avatar;
 
     if (elWaitMemberInfo) {
-      elWaitMemberInfo.textContent = `${player.nickname} • ${player.role || 'Phòng TCKT'}`;
+      elWaitMemberInfo.textContent = player.nickname;
     }
 
     // Zodiac Badge
@@ -294,9 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elMissingCount) elMissingCount.textContent = activation.missingCount;
       if (elMissingNames) {
         if (activation.missingCount === 0) {
-          elMissingNames.innerHTML = `<span style="color: #6ee7b7; font-weight: 800;">🎉 Toàn thể 47 cán bộ nhân viên đã có mặt đầy đủ!</span>`;
+          elMissingNames.innerHTML = `<span style="color: #6ee7b7; font-weight: 800;">🎉 Toàn thể 47 thành viên đã có mặt đầy đủ!</span>`;
         } else {
-          const names = activation.missingMembers.map(m => `${m.name}${m.role ? ' (' + m.role + ')' : ''}`);
+          const names = activation.missingMembers.map(m => m.name);
           elMissingNames.textContent = names.join(', ');
         }
       }
@@ -327,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const list = members || [];
     const filtered = filterText
-      ? list.filter(m => (m.name && m.name.toLowerCase().includes(filterText)) || (m.role && m.role.toLowerCase().includes(filterText)))
+      ? list.filter(m => m.name && m.name.toLowerCase().includes(filterText))
       : list;
 
     if (filtered.length === 0) {
@@ -337,8 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filtered.forEach(m => {
       const tag = document.createElement('div');
-      tag.className = 'sugg-tag' + (currentlySelectedColleague === m.name ? ' selected-colleague' : '');
-      tag.innerHTML = `<strong>${m.name}</strong> <span style="font-size: 0.75rem; opacity: 0.8;">(${m.role || 'TCKT'})</span>`;
+      tag.className = 'sugg-tag party-sugg-tag' + (currentlySelectedColleague === m.name ? ' selected-colleague' : '');
+      tag.innerHTML = `<strong>${m.name}</strong>`;
       tag.addEventListener('click', () => {
         currentlySelectedColleague = m.name;
         document.querySelectorAll('.sugg-tag').forEach(t => t.classList.remove('selected-colleague'));

@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
     memberTableBody.innerHTML = '';
 
     const filtered = filterText
-      ? members.filter(m => (m.name && m.name.toLowerCase().includes(filterText)) || (m.role && m.role.toLowerCase().includes(filterText)))
+      ? members.filter(m => (m.name && m.name.toLowerCase().includes(filterText)) || (m.stt && String(m.stt).includes(filterText)))
       : members;
 
     filtered.forEach(m => {
@@ -573,7 +573,6 @@ document.addEventListener('DOMContentLoaded', () => {
       tr.innerHTML = `
         <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan);">${m.stt}</td>
         <td style="padding: 10px 12px; font-weight: 700;">${m.name}</td>
-        <td style="padding: 10px 12px; font-size: 0.85rem; color: var(--text-muted);">${m.role || 'Thành viên'}</td>
         <td style="padding: 8px 10px;">
           <input type="text" value="${m.fingerprint || ''}" class="input-field inp-fp" style="margin: 0; padding: 4px 8px; font-size: 0.85rem; height: 32px; width: 85px;" placeholder="Mã vân tay">
         </td>
@@ -704,14 +703,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (query) {
       listToRender = listToRender.filter(m =>
         (m.name && m.name.toLowerCase().includes(query)) ||
-        (m.role && m.role.toLowerCase().includes(query)) ||
         (m.stt && String(m.stt).includes(query))
       );
     }
 
     if (listToRender.length === 0) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted); font-style: italic;">Không có thành viên nào phù hợp...</td>`;
+      tr.innerHTML = `<td colspan="5" style="padding: 24px; text-align: center; color: var(--text-muted); font-style: italic;">Không có thành viên nào phù hợp...</td>`;
       activationTableBody.appendChild(tr);
       return;
     }
@@ -735,7 +733,6 @@ document.addEventListener('DOMContentLoaded', () => {
       tr.innerHTML = `
         <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan);">${m.stt}</td>
         <td style="padding: 10px 12px; font-weight: 800; font-size: 0.95rem; color: #fff;">${m.name}</td>
-        <td style="padding: 10px 12px; font-size: 0.85rem; color: var(--text-muted);">${m.role || 'Thành viên'}</td>
         <td style="padding: 10px 12px; font-family: monospace; font-size: 0.9rem; color: var(--gold);">${m.fingerprint || '--'}</td>
         <td style="padding: 10px 12px;">${zodiacBadge}</td>
         <td style="padding: 10px 12px; text-align: center;">${statusBadge}</td>

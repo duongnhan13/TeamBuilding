@@ -49,7 +49,6 @@
         <span class="player-avatar-mini" id="my-avatar">😎</span>
         <div>
           <div class="player-name-text" id="my-nickname">Đang tải...</div>
-          <div id="my-role-text" style="font-size: 0.75rem; color: var(--cyan); font-weight: 700;">Phòng TCKT</div>
           <div id="my-zodiac-badge" class="player-zodiac-pill" style="display: none;"></div>
         </div>
       </div>
@@ -58,91 +57,102 @@
       </div>
     </header>
 
-    <!-- SCREEN 1: BIOMETRIC FINGERPRINT LOGIN -->
-    <section class="glass-panel player-card" id="screen-join">
-      <div style="text-align: center; margin-bottom: 16px;">
-        <div style="font-size: 2.8rem; margin-bottom: 4px;">🎪</div>
-        <h1 style="font-size: 1.45rem; font-weight: 900;" class="gold-gradient-text">
-          TEAM BUILDING TCKT
+    <!-- SCREEN 1: FESTIVE PARTY CHECK-IN -->
+    <section class="glass-panel player-card party-entry-card" id="screen-join">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 3.2rem; margin-bottom: 4px; animation: bounce 2s infinite;">🎉</div>
+        <h1 style="font-size: 1.6rem; font-weight: 900;" class="gold-gradient-text">
+          GALA DINNER TCKT 2026
         </h1>
-        <p style="font-size: 0.85rem; color: #38bdf8; font-weight: 800; margin-top: 2px;">
-          ĐIỂM DANH SINH TRẮC HỌC (47 CÁN BỘ NHÂN VIÊN)
+        <p style="font-size: 0.95rem; color: #fef08a; font-weight: 800; margin-top: 4px;">
+          Bệnh viện ĐK Phương Đông • Đêm Hội Gắn Kết 🥂
         </p>
       </div>
 
       <!-- Error Toast Box -->
-      <div id="join-error-box" style="display: none; background: rgba(244, 63, 94, 0.2); border: 1.5px solid var(--rose); border-radius: 12px; padding: 12px; margin-bottom: 14px; color: #fecdd3; font-size: 0.9rem; text-align: center; font-weight: 700;">
+      <div id="join-error-box" style="display: none; background: rgba(244, 63, 94, 0.25); border: 1.5px solid var(--rose); border-radius: 14px; padding: 12px; margin-bottom: 14px; color: #fecdd3; font-size: 0.95rem; text-align: center; font-weight: 800;">
       </div>
 
       <!-- Quick Name Selector -->
-      <div style="margin-bottom: 8px;">
-        <label style="font-weight: 800; font-size: 0.95rem; color: var(--cyan); display: block; margin-bottom: 6px;">
-          👉 1. Chọn tên của bạn (47 cán bộ nhân viên):
+      <div style="margin-bottom: 12px;">
+        <label style="font-weight: 800; font-size: 1rem; color: #fef08a; display: block; margin-bottom: 8px;">
+          👉 Chọn tên của bạn để nhận vé vào tiệc:
         </label>
-        <input type="text" id="member-quick-filter" class="input-field" placeholder="🔍 Gõ tên bạn để tìm nhanh..." style="margin-bottom: 8px; font-size: 0.95rem;">
-        <select id="select-member" class="input-field" style="font-size: 1rem; font-weight: 800; height: 50px; margin-bottom: 12px;">
-          <option value="">-- Đang nạp danh sách 47 thành viên... --</option>
+        <input type="text" id="member-quick-filter" class="input-field party-search-input" placeholder="🔍 Gõ tên bạn để tìm nhanh trong 1 giây..." style="margin-bottom: 10px; font-size: 1rem;">
+        <select id="select-member" class="input-field party-select-input" style="font-size: 1.05rem; font-weight: 800; height: 52px; margin-bottom: 14px;">
+          <option value="">-- Bấm vào đây để chọn tên bạn --</option>
         </select>
       </div>
 
       <!-- Auto Profile Card (Pops up when selected) -->
-      <div class="member-quick-card" id="member-profile-card" style="display: none;">
+      <div class="member-quick-card party-vip-badge" id="member-profile-card" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <div class="member-quick-name" id="card-member-name">Nguyễn Thị Thùy Dung</div>
-            <div class="member-quick-role" id="card-member-role">Trưởng phòng</div>
+            <div style="font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">⭐ THÀNH VIÊN THAM DỰ:</div>
+            <div class="member-quick-name" id="card-member-name" style="font-size: 1.45rem; font-weight: 900; color: #fff;">Nguyễn Thị Thùy Dung</div>
           </div>
-          <div style="font-size: 2.5rem;" id="card-member-avatar">😎</div>
+          <div style="font-size: 2.8rem; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6));" id="card-member-avatar">😎</div>
         </div>
-        <div class="member-quick-zodiac" id="card-member-zodiac"></div>
+        <div class="member-quick-zodiac" id="card-member-zodiac" style="margin-top: 10px;"></div>
       </div>
 
-      <!-- Massive Glowing Biometric Touch Scanner -->
-      <div class="biometric-scanner-container" style="margin-top: 6px;">
-        <button type="button" class="fingerprint-btn" id="btn-fingerprint-scan" title="Chạm để xác thực vân tay">
-          <div class="fingerprint-scan-line"></div>
-          <svg class="fingerprint-icon" viewBox="0 0 24 24">
-            <path d="M12 2a10 10 0 0 0-7.07 17.07M12 6a6 6 0 0 0-4.24 10.24M12 10a2 2 0 0 0-1.41 3.41M12 14a2 2 0 0 1 1.41-.59M12 18a6 6 0 0 1 4.24-1.76M12 22a10 10 0 0 1 7.07-2.93"/>
-            <path d="M7 11.5a5 5 0 0 1 10 0M9 13.5a3 3 0 0 1 6 0M10.5 15.5a1.5 1.5 0 0 1 3 0"/>
-          </svg>
+      <!-- Festive Check-in Button (No more security code vibe!) -->
+      <div class="party-checkin-wrapper">
+        <button type="button" class="btn-party-checkin" id="btn-fingerprint-scan" title="Bấm để vào tiệc">
+          <div class="party-checkin-icon">🎟️</div>
+          <div class="party-checkin-label" id="scanner-status-text">
+            BẤM VÀO ĐÂY ĐỂ VÀO TIỆC NGAY 🚀
+          </div>
         </button>
-        <div class="biometric-label" id="scanner-status-text">CHẠM ĐỂ XÁC THỰC VÂN TAY 👆</div>
       </div>
 
       <!-- Advanced Optional Accordion -->
-      <details style="margin-top: 14px; font-size: 0.85rem; color: var(--text-muted); text-align: left;">
-        <summary style="cursor: pointer; color: var(--cyan); font-weight: 700;">⚙️ Tùy chọn nâng cao (Avatar / Mã chấm công)</summary>
-        <div style="margin-top: 10px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px;">
-          <div style="margin-bottom: 6px; font-weight: 700;">Chọn biểu tượng đại diện:</div>
+      <details style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted); text-align: left;">
+        <summary style="cursor: pointer; color: var(--cyan); font-weight: 700; text-align: center;">⚙️ Tùy chọn đổi Avatar biểu tượng</summary>
+        <div style="margin-top: 10px; background: rgba(255,255,255,0.04); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="margin-bottom: 8px; font-weight: 800; color: #fff;">Chọn biểu tượng đại diện của bạn:</div>
           <div class="avatar-selector" id="avatar-list"></div>
-          <div style="margin: 8px 0 4px; font-weight: 700;">Mã chấm công:</div>
-          <input type="password" id="input-fingerprint" class="input-field" placeholder="Mã chấm công..." inputmode="numeric" style="margin-bottom: 6px;">
-          <div style="margin: 8px 0 4px; font-weight: 700;">Ngày sinh (dd/mm/yyyy):</div>
-          <input type="text" id="input-dob" class="input-field" placeholder="dd/mm/yyyy...">
+          <div style="display: none;">
+            <input type="password" id="input-fingerprint" class="input-field" placeholder="Mã...">
+            <input type="text" id="input-dob" class="input-field" placeholder="dd/mm/yyyy...">
+          </div>
         </div>
       </details>
 
-      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 12px;">
-        🔒 Hệ thống điểm danh sinh trắc học BVĐK Phương Đông
+      <div style="font-size: 0.85rem; color: #94a3b8; text-align: center; margin-top: 14px; font-weight: 600;">
+        🥂 Chúc bạn có một buổi tối thật bùng nổ và nhiều tiếng cười!
       </div>
     </section>
 
     <!-- SCREEN 2: WAITING IN LOBBY -->
-    <section class="glass-panel player-card" id="screen-waiting" style="display: none; text-align: center;">
-      <div class="waiting-pulse-circle" id="wait-avatar">😎</div>
-      <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">
-        Điểm danh vân tay thành công!
+    <section class="glass-panel player-card party-entry-card" id="screen-waiting" style="display: none; text-align: center;">
+      <div class="waiting-pulse-circle" id="wait-avatar" style="border-color: var(--gold); box-shadow: 0 0 35px rgba(245, 158, 11, 0.4);">😎</div>
+      <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 6px;" class="gold-gradient-text">
+        ✨ BẠN ĐÃ VÀO BÀN TIỆC!
       </h2>
-      <div id="wait-member-info" style="font-size: 1.15rem; font-weight: 900; color: #fef08a; margin-bottom: 6px;"></div>
-      <div id="wait-zodiac-info" style="margin-bottom: 16px;"></div>
+      <div id="wait-member-info" style="font-size: 1.3rem; font-weight: 900; color: #ffffff; margin-bottom: 8px;"></div>
+      <div id="wait-zodiac-info" style="margin-bottom: 18px;"></div>
       
-      <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
-        Hãy chú ý lên màn hình máy chiếu hội trường.<br>
+      <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 18px; line-height: 1.6;">
+        🍸 Hãy cùng nâng ly với đồng đội và hướng mắt lên màn hình lớn nhé!<br>
         MC sẽ khởi động trò chơi trong giây lát!
       </p>
 
       <!-- Missing Colleagues Banner (Nhắc nhau) -->
-      <div class="missing-members-box" id="player-missing-box" style="margin-bottom: 16px; text-align: left; padding: 14px 16px;">
+      <div class="missing-members-box" id="player-missing-box" style="margin-bottom: 16px; text-align: left; padding: 14px 18px;">
+        <div style="font-weight: 800; font-size: 0.92rem; color: #fecdd3; margin-bottom: 8px; display: flex; justify-content: space-between;">
+          <span>📢 Còn <span id="player-missing-count" style="color: var(--gold); font-weight: 900;">0</span> đồng đội chưa vào:</span>
+          <span style="font-size: 0.75rem; color: #fca5a5;">(Nhắc nhau vào bàn tiệc)</span>
+        </div>
+        <div id="player-missing-names" style="font-size: 0.85rem; color: #ffe4e6; line-height: 1.5; max-height: 90px; overflow-y: auto;">
+          Đang tải danh sách...
+        </div>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.06); padding: 12px; border-radius: 14px; font-size: 0.9rem; color: var(--gold); font-weight: 700;">
+        ⏳ Đang kết nối trực tiếp với Màn Chiếu Sân Khấu 🎪
+      </div>
+    </section>
         <div style="font-weight: 800; font-size: 0.92rem; color: #fecdd3; margin-bottom: 6px; display: flex; justify-content: space-between;">
           <span>📢 Còn <span id="player-missing-count" style="color: var(--gold); font-weight: 900;">0</span> đồng nghiệp chưa vào:</span>
           <span style="font-size: 0.75rem; color: #fca5a5;">(Nhắc nhau vào nhanh)</span>
