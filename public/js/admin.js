@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-mode-qa').addEventListener('click', () => {
-    socket.emit('host_qa_start', { questionIndex: 0, timeLimit: adminState.timerLimit });
+    socket.emit('host_qa_start', { questionIndex: 0, timeLimit: 15 });
   });
 
   document.getElementById('btn-mode-podium').addEventListener('click', () => {
@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const opt3 = document.getElementById('add-opt-3').value.trim();
         const correct = parseInt(document.getElementById('add-correct-idx').value, 10) || 0;
         const explanation = document.getElementById('add-qa-explanation').value.trim();
-        const time = parseInt(document.getElementById('add-q-time-qa').value, 10) || 20;
+        const time = parseInt(document.getElementById('add-q-time-qa').value, 10) || 15;
 
         if (!opt0 || !opt1 || !opt2 || !opt3) {
           btnSaveAddQ.textContent = '💾 Lưu & Đưa Vào Trò Chơi Ngay';
@@ -747,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="font-size: 0.9rem; color: #e2e8f0; margin-bottom: 6px;">${escapeHtml(q.question)}</div>
             <div style="margin-bottom: 4px;">${optsHtml}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">
-              ⏱️ ${q.timeLimit || 20}s • 💡 Giải thích: ${escapeHtml(q.explanation || '--')}
+              ⏱️ ${q.timeLimit || 15}s • 💡 Giải thích: ${escapeHtml(q.explanation || '--')}
             </div>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px; min-width: 110px;">

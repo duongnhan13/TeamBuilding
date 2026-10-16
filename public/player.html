@@ -73,25 +73,53 @@
       <div id="join-error-box" style="display: none; background: rgba(244, 63, 94, 0.25); border: 1.5px solid var(--rose); border-radius: 14px; padding: 12px; margin-bottom: 14px; color: #fecdd3; font-size: 0.95rem; text-align: center; font-weight: 800;">
       </div>
 
-      <!-- Quick Name Selector -->
-      <div style="margin-bottom: 12px;">
-        <label style="font-weight: 800; font-size: 1rem; color: #fef08a; display: block; margin-bottom: 8px;">
-          👉 Chọn tên của bạn để nhận vé vào tiệc:
+      <!-- METHOD 1: FINGERPRINT CODE (FIRST & FASTEST) -->
+      <div class="login-method-card" style="background: rgba(251, 191, 36, 0.08); border: 1.5px solid rgba(251, 191, 36, 0.35); border-radius: 18px; padding: 16px; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <label for="input-fingerprint-quick" style="font-weight: 900; font-size: 1rem; color: #fef08a; display: flex; align-items: center; gap: 6px;">
+            <span>👆</span> Nhập mã vân tay (chấm công):
+          </label>
+          <span style="background: rgba(16, 185, 129, 0.25); border: 1px solid var(--emerald); color: #6ee7b7; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">
+            ⚡ Nhanh nhất
+          </span>
+        </div>
+        <input type="tel" id="input-fingerprint-quick" class="input-field party-search-input" 
+               placeholder="Gõ mã (ví dụ: 6, 2310, 1770...)" 
+               autocomplete="off"
+               style="font-size: 1.25rem; font-weight: 900; text-align: center; letter-spacing: 2px; height: 50px; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(251, 191, 36, 0.5); color: #fef08a;">
+        
+        <!-- Instant feedback when matching member found -->
+        <div id="fp-match-badge" style="display: none; margin-top: 10px; padding: 10px 14px; background: rgba(16, 185, 129, 0.25); border: 1.5px solid var(--emerald); border-radius: 12px; text-align: center; font-weight: 900; color: #6ee7b7; font-size: 1.05rem; animation: popIn 0.3s ease;">
+          ✨ Xin chào: <span id="fp-match-name" style="color: #ffffff; text-decoration: underline;"></span> 🥂
+        </div>
+      </div>
+
+      <!-- OR SEPARATOR -->
+      <div style="display: flex; align-items: center; margin: 12px 0; text-align: center;">
+        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
+        <span style="padding: 0 12px; color: #94a3b8; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Hoặc chọn tên</span>
+        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
+      </div>
+
+      <!-- METHOD 2: SELECT NAME FROM LIST -->
+      <div style="margin-bottom: 14px;">
+        <label for="select-member" style="font-weight: 700; font-size: 0.92rem; color: #cbd5e1; display: block; margin-bottom: 6px;">
+          📋 Danh sách 47 cán bộ nhân viên phòng TCKT:
         </label>
-        <input type="text" id="member-quick-filter" class="input-field party-search-input" placeholder="🔍 Gõ tên bạn để tìm nhanh trong 1 giây..." style="margin-bottom: 10px; font-size: 1rem;">
-        <select id="select-member" class="input-field party-select-input" style="font-size: 1.05rem; font-weight: 800; height: 52px; margin-bottom: 14px;">
+        <input type="text" id="member-quick-filter" class="input-field party-search-input" placeholder="🔍 Gõ tên bạn để tìm nhanh..." style="margin-bottom: 8px; font-size: 0.95rem;">
+        <select id="select-member" class="input-field party-select-input" style="font-size: 1rem; font-weight: 800; height: 48px;">
           <option value="">-- Bấm vào đây để chọn tên bạn --</option>
         </select>
       </div>
 
       <!-- Auto Profile Card (Pops up when selected) -->
-      <div class="member-quick-card party-vip-badge" id="member-profile-card" style="display: none;">
+      <div class="member-quick-card party-vip-badge" id="member-profile-card" style="display: none; margin-bottom: 14px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div style="font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">⭐ THÀNH VIÊN THAM DỰ:</div>
-            <div class="member-quick-name" id="card-member-name" style="font-size: 1.45rem; font-weight: 900; color: #fff;">Nguyễn Thị Thùy Dung</div>
+            <div class="member-quick-name" id="card-member-name" style="font-size: 1.35rem; font-weight: 900; color: #fff;">Nguyễn Thị Thùy Dung</div>
           </div>
-          <div style="font-size: 2.8rem; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6));" id="card-member-avatar">😎</div>
+          <div style="font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6));" id="card-member-avatar">😎</div>
         </div>
       </div>
 
@@ -150,19 +178,6 @@
 
       <div style="background: rgba(255, 255, 255, 0.06); padding: 12px; border-radius: 14px; font-size: 0.9rem; color: var(--gold); font-weight: 700;">
         ⏳ Đang kết nối trực tiếp với Màn Chiếu Sân Khấu 🎪
-      </div>
-    </section>
-        <div style="font-weight: 800; font-size: 0.92rem; color: #fecdd3; margin-bottom: 6px; display: flex; justify-content: space-between;">
-          <span>📢 Còn <span id="player-missing-count" style="color: var(--gold); font-weight: 900;">0</span> đồng nghiệp chưa vào:</span>
-          <span style="font-size: 0.75rem; color: #fca5a5;">(Nhắc nhau vào nhanh)</span>
-        </div>
-        <div id="player-missing-names" style="font-size: 0.82rem; color: #ffe4e6; line-height: 1.5; max-height: 90px; overflow-y: auto;">
-          Đang tải danh sách...
-        </div>
-      </div>
-
-      <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 12px; font-size: 0.85rem; color: var(--cyan);">
-        ⏳ Trạng thái: Đã kết nối trực tiếp với MC & Màn Chiếu
       </div>
     </section>
 
@@ -226,7 +241,10 @@
     <section class="glass-panel player-card" id="screen-qa" style="display: none; padding: 16px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <span class="qa-category-tag" id="player-qa-cat" style="font-size: 0.8rem;">⚔️ Lịch sử</span>
-        <span class="q-badge" id="player-qa-index">CÂU 1 / 15</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="player-qa-timer" style="background: rgba(244, 63, 94, 0.25); border: 1px solid var(--rose); color: #fecdd3; font-weight: 900; font-size: 0.85rem; padding: 3px 10px; border-radius: 999px;">⏱️ 15s</span>
+          <span class="q-badge" id="player-qa-index">CÂU 1 / 15</span>
+        </div>
       </div>
 
       <h2 style="font-size: 1.15rem; font-weight: 800; line-height: 1.35; margin-bottom: 14px;" id="player-qa-question">

@@ -270,7 +270,7 @@ app.post('/api/questions/qa/add', (req, res) => {
     options: opts,
     correctAnswer: correct,
     explanation: q.explanation || 'Đáp án chính xác!',
-    timeLimit: parseInt(q.timeLimit, 10) || 20
+    timeLimit: parseInt(q.timeLimit, 10) || 15
   };
   qaQuestions.push(newQ);
   saveJson('qa_questions.json', qaQuestions);
@@ -298,7 +298,7 @@ app.post('/api/questions/qa/delete', (req, res) => {
 // GAME ENGINE STATE
 const gameState = {
   mode: 'LOBBY', // 'LOBBY', 'SQUIZZ', 'QA'
-  players: new Map(), // playerId -> { id, nickname, avatar, score, squizzVotes: {}, qaAnswers: {}, connected: true, socketId }
+  players: new Map(), // playerId -> { id, nickname, avatar, score, squizzVotes: {}, qaAnswers: {}, connected: true, hasJoined: true, socketId }
   
   // SQUIZZ state
   squizz: {
@@ -319,8 +319,8 @@ const gameState = {
     isOpen: false,
     isRevealed: false,
     startTime: 0,
-    timeLimit: 20,
-    timeRemaining: 20,
+    timeLimit: 15, // 15s tự động đếm ngược & công bố
+    timeRemaining: 15,
     timer: null,
     answers: {} // playerId -> { optionIndex, isCorrect, points, timeTakenMs }
   }
@@ -334,7 +334,7 @@ function getConnectedPlayers() {
         id: p.id,
         memberId: p.memberId,
         nickname: p.nickname,
-        role: p.role,
+        role: '',
         avatar: p.avatar,
         score: p.score,
         dob: p.dob,
@@ -346,22 +346,23 @@ function getConnectedPlayers() {
 }
 
 function getMemberActivationStatus() {
-  const connected = getConnectedPlayers();
-  const connectedMemberIds = new Set(
-    connected
-      .filter(p => p.memberId)
-      .map(p => String(p.memberId))
-  );
+  // Thành viên được tính là ĐÃ VÀO TIỆC khi đã check-in (hasJoined = true hoặc đang online)
+  const activatedMemberIds = new Set();
+  gameState.players.forEach(p => {
+    if (p.memberId && (p.hasJoined || p.connected)) {
+      activatedMemberIds.add(String(p.memberId));
+    }
+  });
 
   const activatedMembers = [];
   const missingMembers = [];
 
   membersList.forEach(m => {
-    const isAct = connectedMemberIds.has(String(m.stt));
+    const isAct = activatedMemberIds.has(String(m.stt));
     const obj = {
       stt: m.stt,
       name: m.name,
-      role: m.role || '',
+      role: '',
       dob: m.dob || '',
       fingerprint: m.fingerprint || '',
       zodiacInfo: m.dob ? zodiacHelper.getZodiacDetails(m.dob) : null
@@ -387,7 +388,8 @@ function broadcastPlayerList() {
   const activation = getMemberActivationStatus();
   io.emit('player_list_updated', {
     players,
-    total: players.length,
+    total: activation.activatedCount, // Luôn gửi số người đã vào tiệc chính xác, không bị rớt khi tắt màn hình
+    onlineCount: players.length,
     activation
   });
 }
@@ -490,45 +492,58 @@ function getLeaderboard() {
 
 // SOCKET.IO LOGIC
 io.on('connection', (socket) => {
-  // Biometric Fingerprint Player Join
+  // Biometric Fingerprint / Name Player Join
   socket.on('player_join', ({ id, nickname, memberId, fingerprint, dob, avatar }) => {
-    // 1. Identify member from official 47 members list
     let member = null;
+    const inputFp = String(fingerprint || '').trim();
+
+    // 1. Identify by memberId if provided
     if (memberId) {
       member = membersList.find(m => String(m.stt) === String(memberId));
     }
+
+    // 2. Identify by fingerprint if member not identified yet, or user entered fingerprint
+    if (!member && inputFp) {
+      member = membersList.find(m => String(m.fingerprint || '').trim() === inputFp);
+    }
+
+    // 3. Identify by nickname
     if (!member && nickname) {
       const normInput = normalizeName(nickname);
       member = membersList.find(m => normalizeName(m.name) === normInput);
     }
 
     if (!member) {
+      if (inputFp) {
+        return socket.emit('join_error', {
+          message: `Không tìm thấy mã vân tay "${inputFp}" trong danh sách 47 cán bộ nhân viên! Vui lòng kiểm tra lại hoặc chọn tên từ danh sách.`
+        });
+      }
       return socket.emit('join_error', {
-        message: 'Bạn chưa chọn tên trong Danh sách 47 cán bộ nhân viên phòng TCKT!'
+        message: 'Vui lòng nhập mã vân tay chấm công hoặc chọn tên của bạn trong Danh sách 47 cán bộ nhân viên phòng TCKT!'
       });
     }
 
-    // 2. Validate Fingerprint Code
-    const inputFp = String(fingerprint || '').trim();
+    // Validate fingerprint if both member and fingerprint provided and member has fingerprint
     const correctFp = String(member.fingerprint || '').trim();
-
-    if (correctFp && inputFp !== correctFp) {
+    if (correctFp && inputFp && inputFp !== correctFp) {
       return socket.emit('join_error', {
-        message: `Mã vân tay / mã chấm công không chính xác với ${member.name}! Vui lòng nhập lại.`
+        message: `Mã vân tay / mã chấm công chưa chính xác với ${member.name}! Vui lòng nhập lại.`
       });
     }
 
-    // 3. Update DOB if provided by player
+    // Update DOB if provided by player
     if (dob && dob.trim() && (!member.dob || member.dob !== dob.trim())) {
       member.dob = dob.trim();
       saveJson('members.json', membersList);
       io.emit('members_updated', membersList);
     }
 
-    // 4. Calculate Zodiac and Lunar animal details
+    // Calculate Zodiac and Lunar animal details
     const zodiacInfo = member.dob ? zodiacHelper.getZodiacDetails(member.dob) : null;
 
-    const playerId = id || (`m_${member.stt}`);
+    // Use canonical ID per member to prevent duplicate counts
+    const playerId = `m_${member.stt}`;
     const cleanNick = member.name;
     const cleanAvatar = avatar || '😎';
 
@@ -538,21 +553,23 @@ io.on('connection', (socket) => {
         id: playerId,
         memberId: member.stt,
         nickname: cleanNick,
-        role: member.role || '',
+        role: '',
         avatar: cleanAvatar,
         dob: member.dob,
         zodiacInfo,
         score: 0,
         connected: true,
+        hasJoined: true,
         socketId: socket.id
       };
       gameState.players.set(playerId, player);
     } else {
       player.connected = true;
+      player.hasJoined = true;
       player.socketId = socket.id;
       player.nickname = cleanNick;
       player.memberId = member.stt;
-      player.role = member.role || '';
+      player.role = '';
       player.dob = member.dob;
       player.zodiacInfo = zodiacInfo;
       if (avatar) player.avatar = cleanAvatar;
@@ -612,11 +629,13 @@ io.on('connection', (socket) => {
   });
 
   function sendHostInit(targetSocket) {
+    const activation = getMemberActivationStatus();
     targetSocket.emit('host_init', {
       mode: gameState.mode,
       players: getConnectedPlayers(),
-      totalPlayers: getConnectedPlayers().length,
-      activation: getMemberActivationStatus(),
+      totalPlayers: activation.activatedCount,
+      onlinePlayers: getConnectedPlayers().length,
+      activation,
       squizz: {
         currentIndex: gameState.squizz.currentIndex,
         isOpen: gameState.squizz.isOpen,
@@ -631,7 +650,7 @@ io.on('connection', (socket) => {
         isOpen: gameState.qa.isOpen,
         isRevealed: gameState.qa.isRevealed,
         timeRemaining: gameState.qa.timeRemaining,
-        timeLimit: gameState.qa.timeLimit,
+        timeLimit: gameState.qa.timeLimit || 15,
         question: qaQuestions[gameState.qa.currentIndex] || null,
         stats: calculateQaStats(),
         leaderboard: getLeaderboard()
@@ -853,7 +872,7 @@ io.on('connection', (socket) => {
     // Scoring formula: Kahoot style (up to 1000 points based on speed)
     let points = 0;
     if (isCorrect) {
-      const timeLimitMs = (currentQ.timeLimit || 20) * 1000;
+      const timeLimitMs = (currentQ.timeLimit || 15) * 1000;
       const speedFraction = Math.max(0, 1 - (timeTakenMs / timeLimitMs) / 2);
       points = Math.round(500 + 500 * speedFraction);
     }
@@ -941,7 +960,7 @@ io.on('connection', (socket) => {
     gameState.qa.isRevealed = false;
     gameState.qa.answers = {};
     const q = qaQuestions[gameState.qa.currentIndex];
-    gameState.qa.timeLimit = timeLimit !== undefined ? timeLimit : (q ? (q.timeLimit || 20) : 20);
+    gameState.qa.timeLimit = timeLimit !== undefined ? timeLimit : (q ? (q.timeLimit || 15) : 15);
     gameState.qa.timeRemaining = gameState.qa.timeLimit;
     gameState.qa.startTime = Date.now();
 
@@ -980,7 +999,7 @@ io.on('connection', (socket) => {
       gameState.qa.isRevealed = false;
       gameState.qa.answers = {};
       const q = qaQuestions[gameState.qa.currentIndex];
-      gameState.qa.timeLimit = q ? (q.timeLimit || 20) : 20;
+      gameState.qa.timeLimit = q ? (q.timeLimit || 15) : 15;
       gameState.qa.timeRemaining = gameState.qa.timeLimit;
       gameState.qa.startTime = Date.now();
 
@@ -994,7 +1013,7 @@ io.on('connection', (socket) => {
           icon: q.icon,
           question: q.question,
           options: q.options,
-          timeLimit: q.timeLimit
+          timeLimit: q.timeLimit || 15
         }
       });
 
@@ -1015,7 +1034,7 @@ io.on('connection', (socket) => {
       gameState.qa.isRevealed = false;
       gameState.qa.answers = {};
       const q = qaQuestions[gameState.qa.currentIndex];
-      gameState.qa.timeLimit = q ? (q.timeLimit || 20) : 20;
+      gameState.qa.timeLimit = q ? (q.timeLimit || 15) : 15;
       gameState.qa.timeRemaining = gameState.qa.timeLimit;
       gameState.qa.startTime = Date.now();
 
@@ -1029,7 +1048,7 @@ io.on('connection', (socket) => {
           icon: q.icon,
           question: q.question,
           options: q.options,
-          timeLimit: q.timeLimit
+          timeLimit: q.timeLimit || 15
         }
       });
 
@@ -1104,10 +1123,11 @@ io.on('connection', (socket) => {
         id: botId,
         memberId: m.stt,
         nickname: m.name,
-        role: m.role || '',
+        role: '',
         avatar: avatar,
         score: 0,
         connected: true,
+        hasJoined: true,
         isBot: true,
         dob: m.dob,
         zodiacInfo,
@@ -1180,7 +1200,7 @@ io.on('connection', (socket) => {
         
         let points = 0;
         if (isCorrect) {
-          const timeLimitMs = (currentQ.timeLimit || 20) * 1000;
+          const timeLimitMs = (currentQ.timeLimit || 15) * 1000;
           const speedFraction = Math.max(0, 1 - (timeTakenMs / timeLimitMs) / 2);
           points = Math.round(500 + 500 * speedFraction);
         }
@@ -1226,7 +1246,7 @@ io.on('connection', (socket) => {
       gameState.qa.isRevealed = false;
       gameState.qa.answers = {};
       const q = qaQuestions[gameState.qa.currentIndex];
-      gameState.qa.timeLimit = q ? (q.timeLimit || 20) : 20;
+      gameState.qa.timeLimit = q ? (q.timeLimit || 15) : 15;
       gameState.qa.timeRemaining = gameState.qa.timeLimit;
       gameState.qa.startTime = Date.now();
 
@@ -1282,7 +1302,7 @@ io.on('connection', (socket) => {
       gameState.qa.isRevealed = false;
       gameState.qa.answers = {};
       const q = qaQuestions[gameState.qa.currentIndex];
-      gameState.qa.timeLimit = q ? (q.timeLimit || 20) : 20;
+      gameState.qa.timeLimit = q ? (q.timeLimit || 15) : 15;
       gameState.qa.timeRemaining = gameState.qa.timeLimit;
       gameState.qa.startTime = Date.now();
 

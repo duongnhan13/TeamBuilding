@@ -42,11 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const elWaitZodiacInfo = document.getElementById('wait-zodiac-info');
 
   const selectMember = document.getElementById('select-member');
+  const inputFpQuick = document.getElementById('input-fingerprint-quick');
+  const fpMatchBadge = document.getElementById('fp-match-badge');
+  const fpMatchName = document.getElementById('fp-match-name');
   const inputFingerprint = document.getElementById('input-fingerprint');
   const inputDob = document.getElementById('input-dob');
   const btnFingerprintScan = document.getElementById('btn-fingerprint-scan');
   const scannerStatusText = document.getElementById('scanner-status-text');
   const joinErrorBox = document.getElementById('join-error-box');
+  const elPlayerQaTimer = document.getElementById('player-qa-timer');
 
   function showScreen(name) {
     Object.keys(screens).forEach(key => {
@@ -56,6 +60,25 @@ document.addEventListener('DOMContentLoaded', () => {
       elPlayerHeader.style.display = (name === 'join') ? 'none' : 'flex';
     }
   }
+
+  // Socket auto-reconnect logic
+  socket.on('connect', () => {
+    const savedMemberId = localStorage.getItem('tckt_player_member_id') || playerState.memberId;
+    const savedFp = localStorage.getItem('tckt_player_fp') || playerState.fingerprint;
+    const savedNick = localStorage.getItem('tckt_player_nick') || playerState.nickname;
+    const savedDob = localStorage.getItem('tckt_player_dob') || playerState.dob;
+
+    if (savedMemberId || savedFp) {
+      socket.emit('player_join', {
+        id: localStorage.getItem('tckt_player_id') || playerState.id,
+        memberId: savedMemberId,
+        nickname: savedNick,
+        fingerprint: savedFp,
+        dob: savedDob,
+        avatar: selectedAvatar
+      });
+    }
+  });
 
   // Populate Avatar Selector
   const avatarListContainer = document.getElementById('avatar-list');
@@ -83,8 +106,18 @@ document.addEventListener('DOMContentLoaded', () => {
       populateMemberSelect(members);
       renderMemberSuggestions(members);
 
+      // Restore saved fingerprint into quick input if available
+      if (inputFpQuick && playerState.fingerprint) {
+        inputFpQuick.value = playerState.fingerprint;
+        const matched = members.find(m => String(m.fingerprint || '').trim() === String(playerState.fingerprint).trim());
+        if (matched && fpMatchBadge) {
+          fpMatchBadge.style.display = 'block';
+          fpMatchName.textContent = matched.name;
+        }
+      }
+
       // Auto-reconnect if already logged in
-      if (playerState.memberId && playerState.fingerprint) {
+      if (playerState.memberId || playerState.fingerprint) {
         attemptLogin(playerState.memberId, playerState.nickname, playerState.fingerprint, playerState.dob, false);
       }
     })
@@ -94,7 +127,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const memberProfileCard = document.getElementById('member-profile-card');
   const cardMemberName = document.getElementById('card-member-name');
   const cardMemberAvatar = document.getElementById('card-member-avatar');
-  const cardMemberZodiac = document.getElementById('card-member-zodiac');
+
+  // Real-time fingerprint code match
+  if (inputFpQuick) {
+    inputFpQuick.addEventListener('input', () => {
+      const code = inputFpQuick.value.trim();
+      if (!code) {
+        if (fpMatchBadge) fpMatchBadge.style.display = 'none';
+        return;
+      }
+      const matched = playerState.members.find(m => String(m.fingerprint || '').trim() === code);
+      if (matched) {
+        if (fpMatchBadge) {
+          fpMatchBadge.style.display = 'block';
+          fpMatchName.textContent = matched.name;
+        }
+        if (selectMember) {
+          selectMember.value = matched.stt;
+          updateProfileCardFromSelect();
+        }
+        if (joinErrorBox) joinErrorBox.style.display = 'none';
+      } else {
+        if (fpMatchBadge) fpMatchBadge.style.display = 'none';
+      }
+    });
+
+    inputFpQuick.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btnFingerprintScan.click();
+      }
+    });
+  }
 
   function populateMemberSelect(members, filterText = '') {
     if (!selectMember) return;
@@ -154,23 +218,39 @@ document.addEventListener('DOMContentLoaded', () => {
     if (joinErrorBox) joinErrorBox.style.display = 'none';
   });
 
-  // Biometric Touch Login (1-Touch Effortless Login!)
+  // Priority Check-in (Fingerprint code or Select Name)
   btnFingerprintScan.addEventListener('click', () => {
-    const memberId = selectMember.value;
-    const selectedOpt = selectMember.selectedOptions[0];
+    const fpCode = (inputFpQuick && inputFpQuick.value.trim()) ? inputFpQuick.value.trim() : '';
+    let memberId = selectMember ? selectMember.value : '';
+    let selectedOpt = selectMember ? selectMember.selectedOptions[0] : null;
 
-    if (!memberId || !selectedOpt) {
-      showJoinError('Vui lòng chọn tên của bạn trong danh sách 47 cán bộ nhân viên!');
-      selectMember.focus();
+    // 1. If fingerprint code entered, find member
+    if (fpCode) {
+      const matchedByFp = playerState.members.find(m => String(m.fingerprint || '').trim() === fpCode);
+      if (matchedByFp) {
+        memberId = matchedByFp.stt;
+        const nickname = matchedByFp.name;
+        const dob = matchedByFp.dob || '';
+        attemptLogin(memberId, nickname, fpCode, dob, true);
+        return;
+      } else if (!memberId) {
+        showJoinError(`Không tìm thấy mã vân tay "${fpCode}" trong danh sách 47 cán bộ nhân viên! Vui lòng kiểm tra lại hoặc chọn tên từ danh sách.`);
+        if (inputFpQuick) inputFpQuick.focus();
+        return;
+      }
+    }
+
+    // 2. If name was selected from list
+    if (memberId && selectedOpt && selectedOpt.value) {
+      const nickname = selectedOpt.dataset.name || '';
+      const fingerprint = fpCode || selectedOpt.dataset.fingerprint || '';
+      const dob = (inputDob && inputDob.value.trim()) ? inputDob.value.trim() : (selectedOpt.dataset.dob || '');
+      attemptLogin(memberId, nickname, fingerprint, dob, true);
       return;
     }
 
-    const nickname = selectedOpt.dataset.name || '';
-    // Use pre-registered fingerprint if input is empty
-    const fingerprint = (inputFingerprint && inputFingerprint.value.trim()) ? inputFingerprint.value.trim() : (selectedOpt.dataset.fingerprint || '');
-    const dob = (inputDob && inputDob.value.trim()) ? inputDob.value.trim() : (selectedOpt.dataset.dob || '');
-
-    attemptLogin(memberId, nickname, fingerprint, dob, true);
+    showJoinError('Vui lòng nhập mã vân tay chấm công hoặc chọn tên của bạn để nhận vé vào tiệc!');
+    if (inputFpQuick) inputFpQuick.focus();
   });
 
   function attemptLogin(memberId, nickname, fingerprint, dob, withAnimation) {
@@ -178,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (withAnimation) {
       btnFingerprintScan.classList.add('scanning');
-      scannerStatusText.textContent = 'ĐANG QUÉT VÂN TAY SINH TRẮC HỌC... ⚡';
+      scannerStatusText.textContent = 'ĐANG XÁC THỰC VÀO TIỆC... ⚡';
       if (window.soundFX) window.soundFX.playBiometricScan();
       if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
     }
@@ -192,12 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
         dob,
         avatar: selectedAvatar
       });
-    }, withAnimation ? 550 : 50);
+    }, withAnimation ? 400 : 50);
   }
 
   function showJoinError(msg) {
     if (btnFingerprintScan) btnFingerprintScan.classList.remove('scanning');
-    if (scannerStatusText) scannerStatusText.textContent = 'CHẠM ĐỂ XÁC THỰC VÂN TAY 👆';
+    if (scannerStatusText) scannerStatusText.textContent = 'BẤM VÀO ĐÂY ĐỂ VÀO TIỆC NGAY 🚀';
     if (window.soundFX) window.soundFX.playBiometricError();
     if (navigator.vibrate) navigator.vibrate([150, 80, 150]);
 
@@ -211,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   socket.on('join_error', ({ message }) => {
-    showJoinError(message || 'Mã vân tay / mã chấm công không chính xác!');
+    showJoinError(message || 'Mã vân tay / mã chấm công chưa chính xác!');
   });
 
   socket.on('player_joined_success', ({ player, gameState, members }) => {
@@ -232,10 +312,11 @@ document.addEventListener('DOMContentLoaded', () => {
     playerState.members = members || playerState.members;
 
     // Save to local storage
+    const savedFp = (inputFpQuick && inputFpQuick.value.trim()) || (inputFingerprint ? inputFingerprint.value.trim() : '') || (player.fingerprint || '');
     localStorage.setItem('tckt_player_id', player.id);
     localStorage.setItem('tckt_player_member_id', player.memberId);
     localStorage.setItem('tckt_player_nick', player.nickname);
-    localStorage.setItem('tckt_player_fp', inputFingerprint ? inputFingerprint.value.trim() : '');
+    localStorage.setItem('tckt_player_fp', savedFp);
     localStorage.setItem('tckt_player_dob', player.dob || '');
     localStorage.setItem('tckt_player_avatar', player.avatar);
 
@@ -495,10 +576,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  socket.on('qa_question_started', ({ currentIndex, total, question }) => {
+  socket.on('qa_question_started', ({ currentIndex, total, timeLimit, question }) => {
     renderPlayerQa(question, currentIndex, total);
+    if (elPlayerQaTimer) elPlayerQaTimer.textContent = `⏱️ ${timeLimit || 15}s`;
     showScreen('qa');
     if (navigator.vibrate) navigator.vibrate(50);
+  });
+
+  socket.on('qa_timer_tick', ({ timeRemaining }) => {
+    if (elPlayerQaTimer) {
+      elPlayerQaTimer.textContent = `⏱️ ${timeRemaining}s`;
+      if (timeRemaining <= 5) {
+        elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.45)';
+      } else {
+        elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.25)';
+      }
+    }
   });
 
   document.querySelectorAll('.mobile-opt-btn').forEach(btn => {

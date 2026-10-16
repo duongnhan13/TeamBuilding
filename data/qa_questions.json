@@ -12,7 +12,7 @@
     ],
     "correctAnswer": 2,
     "explanation": "Năm 938, Ngô Quyền đã dùng kế cắm cọc nhọn trên sông Bạch Đằng đánh tan quân xâm lược Nam Hán, chấm dứt hơn 1000 năm Bắc thuộc.",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 2,
@@ -27,7 +27,7 @@
     ],
     "correctAnswer": 2,
     "explanation": "Chiến dịch Hồ Chí Minh lịch sử (từ 26/4 đến 30/4/1975) đã giải phóng hoàn toàn miền Nam, non sông thu về một mối.",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 3,
@@ -42,7 +42,7 @@
     ],
     "correctAnswer": 1,
     "explanation": "Trần Quốc Toản khi ấy mới 16 tuổi, vì chưa đủ tuổi dự Hội nghị Bình Than nên căm tức bóp nát quả cam trong tay lúc nào không hay.",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 4,
@@ -57,7 +57,7 @@
     ],
     "correctAnswer": 2,
     "explanation": "Chiến dịch Điện Biên Phủ diễn ra trong 56 ngày đêm 'Khoét núi, ngủ hầm, mưa dầm, cơm vắt, máu trộn bùn non' từ 13/3 đến 7/5/1954.",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 5,
@@ -72,7 +72,7 @@
     ],
     "correctAnswer": 0,
     "explanation": "Thiếu tướng Nguyễn Thị Định - Phó Tổng Tư lệnh Quân Giải phóng miền Nam Việt Nam, người gắn liền với phong trào 'Đội quân tóc dài' Bến Tre.",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 6,
@@ -237,7 +237,7 @@
     ],
     "correctAnswer": 1,
     "explanation": "Nhà toán học người Ý Luca Pacioli đã xuất bản công trình đầu tiên về phương pháp kế toán kép vào năm 1494 tại Venice!",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 17,
@@ -297,7 +297,7 @@
     ],
     "correctAnswer": 2,
     "explanation": "Theo Thông tư 45/2013/TT-BTC, Quyền sử dụng đất lâu dài là tài sản cố định vô hình đặc biệt KHÔNG trích khấu hao!",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 21,
@@ -327,7 +327,7 @@
     ],
     "correctAnswer": 0,
     "explanation": "Hóa đơn điện tử hợp pháp bắt buộc phải có chữ ký số/chữ ký điện tử hợp lệ của bên bán!",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 23,
@@ -417,7 +417,7 @@
     ],
     "correctAnswer": 1,
     "explanation": "Kiệt tác 'Salvator Mundi' của Leonardo da Vinci được bán đấu giá tại Christie's năm 2017 với mức giá kỷ lục 450.3 triệu USD!",
-    "timeLimit": 20
+    "timeLimit": 15
   },
   {
     "id": 29,

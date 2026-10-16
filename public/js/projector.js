@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
       currentIndex: 0,
       total: 15,
       question: null,
-      timeLimit: 20,
-      timeRemaining: 20
+      timeLimit: 15,
+      timeRemaining: 15
     }
   };
 
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderQa(q, index, total, timeLimit) {
     projState.qa.currentIndex = index;
     projState.qa.question = q;
-    projState.qa.timeLimit = timeLimit || 20;
+    projState.qa.timeLimit = timeLimit || 15;
     projState.qa.timeRemaining = projState.qa.timeLimit;
 
     elQaCat.textContent = `${q.icon || '⚔️'} ${q.category || 'Đố vui'}`;
