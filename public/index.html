@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Building TCKT - Cổng Trò Chơi</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .portal-hero {
+      text-align: center;
+      max-width: 800px;
+      margin: 40px auto 30px;
+      padding: 0 20px;
+    }
+    .portal-title {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .portal-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+    .portal-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+    .portal-card {
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .portal-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(99, 102, 241, 0.3);
+      border-color: var(--cyan);
+    }
+    .card-icon {
+      font-size: 4rem;
+      margin-bottom: 18px;
+    }
+    .card-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .network-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--emerald);
+      color: #6ee7b7;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 768px) {
+      .portal-cards {
+        grid-template-columns: 1fr;
+      }
+      .portal-title {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="portal-hero">
+    <div class="network-badge" id="net-badge">
+      <span style="font-size: 1.2rem;">📡</span> Đang kết nối mạng nội bộ...
+    </div>
+    <h1 class="portal-title">
+      🎪 TEAM BUILDING <span class="gold-gradient-text">PHÒNG KẾ TOÁN</span>
+    </h1>
+    <p class="portal-subtitle">
+      Đấu trường tương tác thời gian thực dành cho 40+ người chơi: Bóc phốt vui nhộn & Đấu trí đỉnh cao!
+    </p>
+  </div>
+
+  <div class="portal-cards">
+    <!-- Card Host / MC -->
+    <a href="/host.html" class="glass-panel portal-card">
+      <div class="card-icon">🖥️</div>
+      <div class="card-name gradient-text">Màn Hình Trình Chiếu (MC / Host)</div>
+      <p class="card-desc">
+        Dành cho Laptop kết nối Máy Chiếu hoặc TV lớn. Hiển thị mã QR để 40 người quét tham gia, điều khiển câu hỏi, bình chọn thời gian thực, bảng xếp hạng và âm thanh kịch tính.
+      </p>
+      <button class="btn btn-primary" style="width: 100%;">
+        MỞ MÀN HÌNH MÁY CHIẾU 🚀
+      </button>
+    </a>
+
+    <!-- Card Mobile Player -->
+    <a href="/player.html" class="glass-panel portal-card">
+      <div class="card-icon">📱</div>
+      <div class="card-name gold-gradient-text">Người Chơi (Điện Thoại)</div>
+      <p class="card-desc">
+        Dành cho anh chị em tham gia bằng điện thoại smartphone (quét QR hoặc bấm link). Nhập tên đồng nghiệp để bóc phốt, bấm đáp án trắc nghiệm nhanh tay giành điểm cao!
+      </p>
+      <button class="btn btn-gold" style="width: 100%;">
+        VÀO CHƠI TRÊN ĐIỆN THOẠI 🎯
+      </button>
+    </a>
+  </div>
+
+  <!-- QR Quick View Box -->
+  <div style="max-width: 500px; margin: 0 auto 50px; text-align: center;" class="glass-panel">
+    <div style="padding: 24px;">
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px;">📲 Quét Mã QR Này Để Vào Chơi Nhanh:</h3>
+      <img id="portal-qr" src="" alt="Mã QR Tham Gia" style="width: 200px; height: 200px; border-radius: 12px; background: white; padding: 6px; margin-bottom: 12px; display: inline-block;">
+      <div id="join-url-text" style="font-family: monospace; color: var(--cyan); font-weight: 700; word-break: break-all;"></div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
+        💡 Điện thoại cần kết nối cùng mạng Wi-Fi với máy tính này để truy cập.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    fetch('/api/info')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('net-badge').innerHTML = `📡 Máy chủ nội bộ: <strong>http://${data.localIp}:${data.port}</strong>`;
+        if (data.qrCodeData) {
+          document.getElementById('portal-qr').src = data.qrCodeData;
+        }
+        document.getElementById('join-url-text').textContent = data.joinUrl;
+      })
+      .catch(err => {
+        document.getElementById('net-badge').innerHTML = `⚠️ Đang chạy chế độ cục bộ (localhost)`;
+      });
+  </script>
+</body>
+</html>

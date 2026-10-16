@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "title": "Thần giữ cửa Phương Đông",
+    "question": "Ai là người luôn luôn có mặt ở phòng làm việc sớm nhất, chuyên nhận trọng trách mở cửa, bật đèn và bật điều hòa đón anh em?",
+    "target": "Tôn vinh người chăm chỉ nhất phòng",
+    "mcVoice": "Xin chúc mừng đồng chí có tên to nhất trên màn hình! Mời đồng chí đứng lên nhận chén rượu danh dự của người khai mở văn phòng!",
+    "punishment": "Uống 1 chén danh dự khai tiệc! 🍻",
+    "suggested": "Hồng Phương"
+  },
+  {
+    "id": 2,
+    "title": "Não cá vàng chấm công",
+    "question": "Ai là người hay quên bấm vân tay chấm công nhất, tháng nào cũng phải làm đơn giải trình cứu vớt?",
+    "target": "Bóc phốt người hay quên chấm công",
+    "mcVoice": "Có mặt ở viện từ 7h sáng nhưng trên hệ thống lúc nào cũng vắng mặt không lý do! Mời 'thánh giải trình' cạn 1 chén cho tỉnh táo trí nhớ!",
+    "punishment": "Cạn 1 chén tăng cường trí nhớ! 🍷",
+    "suggested": ""
+  },
+  {
+    "id": 3,
+    "title": "Khách VIP của Shipper",
+    "question": "Ai là người có tần suất nhận bưu phẩm Shopee / TikTok Shop tại sảnh viện nhiều nhất, shipper quen mặt đến mức không cần gọi điện?",
+    "target": "Tín đồ shopping online đỉnh cao",
+    "mcVoice": "Nhà tài trợ vàng cho ngành vận tải và thương mại điện tử! Mời 'chiến thần săn deal' cạn 1 chén mừng đơn hàng mới về!",
+    "punishment": "Cạn 1 chén mừng siêu sale freeship! 🛍️🍺",
+    "suggested": ""
+  },
+  {
+    "id": 4,
+    "title": "Ngủ quên cả thế giới",
+    "question": "Ai là người ngủ trưa say sưa nhất, chuông báo thức réo inh ỏi hoặc cả phòng bật đèn dậy làm việc rồi vẫn trùm chăn ngủ ngon lành?",
+    "target": "Người có giấc ngủ trưa sâu nhất vũ trụ",
+    "mcVoice": "Động đất hay tiếng máy in gầm rú cũng không lay chuyển được giấc ngủ này! Mời bạn cạn 1 chén để chính thức tỉnh ngủ!",
+    "punishment": "Uống 1 chén giải rượu đánh thức giác quan! 😴🍻",
+    "suggested": ""
+  },
+  {
+    "id": 5,
+    "title": "Nghệ sĩ âm thanh giờ trưa",
+    "question": "Ai là người sở hữu 'dàn âm thanh' phát ra khi ngủ trưa ấn tượng nhất (ngáy to, thở dốc, nói mớ hoặc nghiến răng)?",
+    "target": "Khoảnh khắc cười ra nước mắt giờ nghỉ trưa",
+    "mcVoice": "Tiếng thở thể hiện một tâm hồn không vướng bận âu lo! Xin mời giọng ca vàng trong làng ngủ trưa cạn 1 chén giải thích trước tập thể!",
+    "punishment": "Cạn 1 chén thanh lọc thanh quản! 🎤🍷",
+    "suggested": ""
+  },
+  {
+    "id": 6,
+    "title": "Tủ lạnh di động của phòng",
+    "question": "Ai là người hay mang đồ ăn vặt từ nhà đến nhất (hoa quả, bánh kẹo, đồ ăn quê...) để cứu đói cho cả phòng mỗi buổi chiều?",
+    "target": "Nhà hảo tâm, cứu tinh đói lòng của cả phòng",
+    "mcVoice": "Nhà tài trợ vàng cho vòng eo của chị em phòng Kế toán! Cả phòng cùng nâng chén cảm ơn tấm lòng của nhân vật này!",
+    "punishment": "Cả phòng nâng ly tri ân nhà hảo tâm! 🍰🥂",
+    "suggested": ""
+  },
+  {
+    "id": 7,
+    "title": "Người mang mùa đông về viện",
+    "question": "Ai là người sợ lạnh nhất phòng, mùa hè 40 độ bước vào văn phòng là trùm chăn bông, mặc áo khoác gió và luôn đòi chỉnh điều hòa lên 28 độ?",
+    "target": "Bóc phốt chiến thần sợ điều hòa",
+    "mcVoice": "Người đem mùa đông Bắc cực vào giữa tháng 6 Phương Đông! Mời bạn cạn 1 chén rượu nồng để làm ấm cơ thể!",
+    "punishment": "Cạn 1 chén rượu nồng sưởi ấm tâm hồn! ❄️🔥",
+    "suggested": "Hoài Thanh"
+  },
+  {
+    "id": 8,
+    "title": "Kẻ hủy diệt pin điện thoại",
+    "question": "Ai là người điện thoại luôn trong tình trạng 1% pin và đi mượn củ sạc, dây sạc khắp các bàn từ sáng tới chiều?",
+    "target": "Người hay mượn sạc nhất phòng",
+    "mcVoice": "Quản lý dòng tiền hàng trăm tỷ nhưng không quản lý nổi 100% pin điện thoại! Cạn 1 chén nạp năng lượng ngay!",
+    "punishment": "Cạn 1 chén nạp 100% năng lượng pin sinh học! 🔋⚡",
+    "suggested": ""
+  },
+  {
+    "id": 9,
+    "title": "Tốc độ ánh sáng 17h30",
+    "question": "Ai là người thu dọn đồ đạc thần tốc nhất, chuông 17h30 vừa điểm là đã thấy xách túi đứng ở cửa thang máy?",
+    "target": "Tác phong tan làm chuẩn xác từng giây",
+    "mcVoice": "Kỷ luật quân đội tuyệt đối chính xác! Mời chiến thần tan ca cạn 1 chén vì tốc độ xuất sắc!",
+    "punishment": "Cạn 1 chén thần tốc như lúc tan ca! 🏃‍♂️💨",
+    "suggested": "Tô châu"
+  },
+  {
+    "id": 10,
+    "title": "Tuyên bố 'hùng hồn' nhưng hành động ngược lại",
+    "question": "Trước khi lên xe đi chơi ai bảo: 'Em không biết uống rượu / Nay em chỉ uống nước ngọt', nhưng nãy giờ đang cầm chén nhiệt tình nhất?",
+    "target": "Bắt quả tang những tay nhậu giấu nghề siêu hạng",
+    "mcVoice": "Sổ sách có thể treo nợ, chứ rượu trên bàn tiệc thì tuyệt đối không thể giấu nghề! Xin mời gương mặt vàng trong làng giả vờ đứng lên cạn 100% chén phạt!",
+    "punishment": "Phạt cạn 100% chén rượu giấu nghề! 🍻👑",
+    "suggested": ""
+  }
+]

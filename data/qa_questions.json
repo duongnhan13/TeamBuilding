@@ -1,0 +1,227 @@
+[
+  {
+    "id": 1,
+    "category": "Lịch sử Việt Nam",
+    "icon": "⚔️",
+    "question": "Ai là người chỉ huy trận chiến sông Bạch Đằng năm 938 đánh tan quân Nam Hán?",
+    "options": [
+      "Đinh Bộ Lĩnh",
+      "Lý Bí",
+      "Ngô Quyền",
+      "Lê Lợi"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Năm 938, Ngô Quyền đã dùng kế cắm cọc nhọn trên sông Bạch Đằng đánh tan quân xâm lược Nam Hán, chấm dứt hơn 1000 năm Bắc thuộc.",
+    "timeLimit": 20
+  },
+  {
+    "id": 2,
+    "category": "Lịch sử Việt Nam",
+    "icon": "🚩",
+    "question": "Chiến dịch nào đã toàn thắng giải phóng hoàn toàn miền Nam, thống nhất đất nước?",
+    "options": [
+      "Chiến dịch Điện Biên Phủ",
+      "Chiến dịch Mậu Thân 1968",
+      "Chiến dịch Hồ Chí Minh",
+      "Chiến dịch Hà Nội 12 ngày đêm"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Chiến dịch Hồ Chí Minh lịch sử (từ 26/4 đến 30/4/1975) đã giải phóng hoàn toàn miền Nam, non sông thu về một mối.",
+    "timeLimit": 20
+  },
+  {
+    "id": 3,
+    "category": "Lịch sử Việt Nam",
+    "icon": "🍊",
+    "question": "Vị tướng trẻ tuổi nào đã bóp nát quả cam vì căm giận quân Nguyên Mông và không được dự bàn việc nước?",
+    "options": [
+      "Trần Quốc Tuấn",
+      "Trần Quốc Toản",
+      "Phạm Ngũ Lão",
+      "Yết Kiêu"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Trần Quốc Toản khi ấy mới 16 tuổi, vì chưa đủ tuổi dự Hội nghị Bình Than nên căm tức bóp nát quả cam trong tay lúc nào không hay.",
+    "timeLimit": 20
+  },
+  {
+    "id": 4,
+    "category": "Lịch sử Việt Nam",
+    "icon": "🎖️",
+    "question": "Chiến thắng Điện Biên Phủ lừng lẫy năm châu năm 1954 diễn ra trong bao nhiêu ngày đêm?",
+    "options": [
+      "12 ngày đêm",
+      "45 ngày đêm",
+      "56 ngày đêm",
+      "60 ngày đêm"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Chiến dịch Điện Biên Phủ diễn ra trong 56 ngày đêm 'Khoét núi, ngủ hầm, mưa dầm, cơm vắt, máu trộn bùn non' từ 13/3 đến 7/5/1954.",
+    "timeLimit": 20
+  },
+  {
+    "id": 5,
+    "category": "Lịch sử Việt Nam",
+    "icon": "⭐",
+    "question": "Ai là nữ tướng đầu tiên và duy nhất của Quân đội Nhân dân Việt Nam trong thời kỳ kháng chiến chống Mỹ?",
+    "options": [
+      "Nguyễn Thị Định",
+      "Nguyễn Thị Minh Khai",
+      "Võ Thị Sáu",
+      "Nguyễn Thị Bình"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Thiếu tướng Nguyễn Thị Định - Phó Tổng Tư lệnh Quân Giải phóng miền Nam Việt Nam, người gắn liền với phong trào 'Đội quân tóc dài' Bến Tre.",
+    "timeLimit": 20
+  },
+  {
+    "id": 6,
+    "category": "Đố vui hại não",
+    "icon": "⚡",
+    "question": "Ăn gì nhanh nhất?",
+    "options": [
+      "Ăn vội",
+      "Ăn cướp",
+      "Ăn quà",
+      "Ăn nhanh như chớp"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Đó chính là 'Ăn cướp' - vừa giật là chạy mất tăm!",
+    "timeLimit": 15
+  },
+  {
+    "id": 7,
+    "category": "Đố vui hại não",
+    "icon": "🌿",
+    "question": "Cây gì ai cũng gọi bằng mẹ?",
+    "options": [
+      "Cây mẹ bồng con",
+      "Cây tre trăm đốt",
+      "Rau má",
+      "Cây xoan"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Rau 'má' - Má trong tiếng miền Nam nghĩa là Mẹ!",
+    "timeLimit": 15
+  },
+  {
+    "id": 8,
+    "category": "Đố vui hại não",
+    "icon": "🧼",
+    "question": "Cái gì càng rửa thì lại càng bẩn?",
+    "options": [
+      "Cái giẻ lau sàn",
+      "Nước",
+      "Cái chậu giặt",
+      "Bàn tay bám mực"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Nước mang đi rửa đồ khác thì nước sẽ trở nên bẩn!",
+    "timeLimit": 15
+  },
+  {
+    "id": 9,
+    "category": "Đố vui hại não",
+    "icon": "🐭",
+    "question": "Con gì đầu chuột mà đuôi lại là heo?",
+    "options": [
+      "Con chuột túi",
+      "Con dơi khổng lồ",
+      "Con chuột lang",
+      "Con Giáp"
+    ],
+    "correctAnswer": 3,
+    "explanation": "12 Con Giáp: Bắt đầu bằng Tý (Chuột) và kết thúc bằng Hợi (Heo/Lợn)!",
+    "timeLimit": 15
+  },
+  {
+    "id": 10,
+    "category": "Đố vui hại não",
+    "icon": "🏔️",
+    "question": "Đồi nào tuyệt đối không bao giờ trồng được cây?",
+    "options": [
+      "Đồi cát trắng",
+      "Đồi mồi",
+      "Đồi sỏi đá",
+      "Đồi trọc"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Đồi mồi (trên da hoặc rùa biển đồi mồi) thì làm sao trồng cây được!",
+    "timeLimit": 15
+  },
+  {
+    "id": 11,
+    "category": "Đố vui hại não",
+    "icon": "✋",
+    "question": "Cái gì tay trái cầm được mà tay phải cầm không được?",
+    "options": [
+      "Cổ tay trái",
+      "Tay phải (hoặc cùi chỏ phải)",
+      "Ngón tay cái bàn tay trái",
+      "Cốc bia bên trái"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Tay phải không thể tự cầm lấy chính bàn tay phải hay cùi chỏ tay phải của mình!",
+    "timeLimit": 15
+  },
+  {
+    "id": 12,
+    "category": "Đố vui hại não",
+    "icon": "🌽",
+    "question": "Bỏ ngoài nướng trong, ăn ngoài bỏ trong là gì?",
+    "options": [
+      "Củ khoai lang nướng",
+      "Bắp ngô (Trái bắp)",
+      "Quả dừa xiêm",
+      "Bánh mì que"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Bóc vỏ ngoài bỏ đi -> nướng hạt ngô bên trong -> khi ăn thì ăn hạt bên ngoài, bỏ cùi lõi bên trong!",
+    "timeLimit": 15
+  },
+  {
+    "id": 13,
+    "category": "Đố vui hại não",
+    "icon": "📅",
+    "question": "Lịch nào dài nhất vũ trụ?",
+    "options": [
+      "Lịch vạn niên",
+      "Lịch sử",
+      "Lịch bloc treo tường",
+      "Lịch âm dương"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Lịch sử kéo dài từ hàng triệu năm trước đến tận tương lai!",
+    "timeLimit": 15
+  },
+  {
+    "id": 14,
+    "category": "Đố vui hại não",
+    "icon": "⛰️",
+    "question": "Núi nào mà bị chặt ra từng khúc?",
+    "options": [
+      "Núi Fansipan",
+      "Núi Ngũ Hành Sơn",
+      "Núi Thái Sơn",
+      "Núi Ba Vì"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Núi Thái Sơn (Thái là thái thịt, cắt ra từng khúc)!",
+    "timeLimit": 15
+  },
+  {
+    "id": 15,
+    "category": "Đố vui hại não",
+    "icon": "❤️",
+    "question": "Con gì đập thì sống, không đập thì chết?",
+    "options": [
+      "Con tim (Trái tim)",
+      "Con muỗi",
+      "Con cá mắc cạn",
+      "Con lật đật"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Trái tim đập thì người sống, ngừng đập là toi ngay!",
+    "timeLimit": 15
+  }
+]

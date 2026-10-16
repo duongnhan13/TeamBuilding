@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Màn Hình Máy Chiếu (Host) - Team Building TCKT</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="host-container">
+    <!-- Top Header -->
+    <header class="glass-panel host-header">
+      <div class="host-brand">
+        <div class="host-logo-icon">🎪</div>
+        <div>
+          <div class="host-title">
+            TEAM BUILDING <span class="gold-gradient-text">PHÒNG KẾ TOÁN</span>
+          </div>
+          <div class="host-subtitle">Bệnh viện ĐK Phương Đông • Đấu trường 2026</div>
+        </div>
+      </div>
+
+      <div class="host-stats-pill">
+        <div class="stat-item">
+          <span>Phòng:</span>
+          <span style="color: var(--gold); font-weight: 800;">TCKT</span>
+        </div>
+        <div class="stat-item">
+          <span>Người chơi:</span>
+          <span class="stat-num" id="host-player-count">0</span>
+          <span style="color: var(--text-muted); font-size: 0.85rem;">/ 40</span>
+        </div>
+      </div>
+
+      <div class="ctrl-btn-group">
+        <button class="btn btn-secondary btn-icon" id="btn-sound-toggle" title="Bật/Tắt Âm Thanh">
+          🔊
+        </button>
+        <button class="btn btn-secondary btn-icon" id="btn-fullscreen" title="Toàn Màn Hình (F11)">
+          ⛶
+        </button>
+        <button class="btn btn-secondary" id="btn-open-editor" title="Quản lý thành viên & câu hỏi">
+          ⚙️ Cài Đặt
+        </button>
+        <button class="btn btn-secondary" id="btn-lobby-return" style="display: none;">
+          🏠 Về Sảnh
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Stage Container -->
+    <main class="host-main-stage">
+      
+      <!-- ================= VIEW 1: LOBBY ================= -->
+      <section id="view-lobby" class="lobby-screen">
+        <!-- Left: QR Code to Join -->
+        <div class="glass-panel qr-card">
+          <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 6px;">QUÉT MÃ ĐỂ VÀO PHÒNG</h2>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+            Dùng Camera điện thoại quét mã QR hoặc mở link:
+          </p>
+          <img id="host-qr-img" class="qr-code-img" src="" alt="QR Code">
+          <div class="join-link-box" id="host-join-url">Đang tạo liên kết...</div>
+          <div style="font-size: 0.85rem; color: var(--emerald); font-weight: 700; margin-top: 6px;">
+            ● Mạng nội bộ kết nối trực tiếp - Tốc độ cực nhanh
+          </div>
+        </div>
+
+        <!-- Right: Connected Players -->
+        <div class="glass-panel lobby-players-card">
+          <div class="lobby-players-header">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 800;">DANH SÁCH NGƯỜI CHƠI ĐÃ VÀO PHÒNG</h2>
+              <p style="font-size: 0.9rem; color: var(--text-muted);">
+                Hãy nhắc mọi người quét mã trước khi bắt đầu
+              </p>
+            </div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--cyan);">
+              <span id="lobby-ready-count">0</span> đã sẵn sàng
+            </div>
+          </div>
+
+          <div class="player-grid" id="lobby-player-grid">
+            <!-- Player chips will be appended here dynamically -->
+            <div style="color: var(--text-muted); font-style: italic; margin: auto;" id="empty-player-hint">
+              Đang chờ các thành viên quét mã QR tham gia...
+            </div>
+          </div>
+
+          <!-- Lobby Action Buttons -->
+          <div class="lobby-actions">
+            <button class="btn btn-rose" id="btn-start-squizz" style="flex: 1; font-size: 1.15rem; padding: 16px;">
+              🚀 BẮT ĐẦU BỘ 1: SQUIZZ (BÓC PHỐT)
+            </button>
+            <button class="btn btn-primary" id="btn-start-qa" style="flex: 1; font-size: 1.15rem; padding: 16px;">
+              🧠 BẮT ĐẦU BỘ 2: ĐẤU TRÍ (LỊCH SỬ & ĐỐ VUI)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW 2: SQUIZZ (BÓC PHỐT & BÌNH CHỌN) ================= -->
+      <section id="view-squizz" class="squizz-stage" style="display: none;">
+        <!-- Question Card -->
+        <div class="glass-panel question-header-card">
+          <div class="q-badge-row">
+            <div class="q-badge" id="squizz-q-index">CÂU 1 / 10</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--gold);" id="squizz-q-title">
+              Thần giữ cửa Phương Đông
+            </div>
+          </div>
+          <h1 class="q-title" id="squizz-q-text">
+            Ai là người luôn luôn có mặt ở phòng làm việc sớm nhất, chuyên nhận trọng trách mở cửa, bật đèn và bật điều hòa đón anh em?
+          </h1>
+          <div class="q-target" id="squizz-q-target">
+            🎯 Mục tiêu: Tôn vinh người chăm chỉ nhất
+          </div>
+        </div>
+
+        <!-- MC Script Box -->
+        <div class="mc-script-box">
+          <div class="mc-icon">🎙️</div>
+          <div style="flex: 1;">
+            <span class="mc-script-label">KỊCH BẢN MC XƯỚNG TÊN:</span>
+            <div class="mc-script-text" id="squizz-mc-voice">
+              "Xin chúc mừng đồng chí có tên to nhất trên màn hình! Mời đồng chí đứng lên nhận chén rượu danh dự của người khai mở văn phòng!"
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Tally & Sidebar -->
+        <div class="squizz-live-area">
+          <!-- Live Vote Tally -->
+          <div class="glass-panel live-tally-card">
+            <div class="tally-title">
+              <span>📊 BẢNG BÌNH CHỌN THỜI GIAN THỰC</span>
+              <span id="squizz-lock-status" style="font-size: 0.85rem; color: var(--emerald);">● Đang mở bình chọn</span>
+            </div>
+            <div class="tally-list" id="squizz-tally-list">
+              <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 30px;">
+                Đang chờ anh em gửi tên bình chọn từ điện thoại...
+              </div>
+            </div>
+          </div>
+
+          <!-- Counter Card -->
+          <div class="squizz-sidebar">
+            <div class="glass-panel vote-counter-card">
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted);">
+                SỐ NGƯỜI ĐÃ BÌNH CHỌN
+              </div>
+              <div class="vote-counter-num" id="squizz-voted-count">0</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: #fff;">
+                / <span id="squizz-total-players">0</span> người chơi
+              </div>
+            </div>
+
+            <!-- Quick Cheer Sound Button -->
+            <button class="btn btn-gold" id="btn-cheer-cheers" style="padding: 16px; font-size: 1.1rem; width: 100%;">
+              🍻 100% CẠN CHÉN! (ZÔ!)
+            </button>
+          </div>
+        </div>
+
+        <!-- Squizz Winner Reveal Overlay/Box (hidden by default) -->
+        <div id="squizz-reveal-container" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+          <div class="glass-panel winner-card-revealed" style="max-width: 650px; width: 90%;">
+            <div class="winner-crown">👑</div>
+            <div style="font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800;">
+              NHÂN VẬT ĐƯỢC GỌI TÊN NHIỀU NHẤT
+            </div>
+            <div class="winner-name" id="squizz-winner-name">HỒNG PHƯƠNG</div>
+            <div class="winner-votes" id="squizz-winner-votes">Đạt 28 / 35 phiếu bầu</div>
+            <div class="punishment-banner" id="squizz-winner-punishment">
+              Uống 1 chén danh dự khai tiệc! 🍻
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 12px; justify-content: center;">
+              <button class="btn btn-gold" id="btn-winner-toast" style="font-size: 1.2rem; padding: 14px 28px;">
+                🍻 CẢ PHÒNG NÂNG LY ZÔ!
+              </button>
+              <button class="btn btn-secondary" id="btn-close-winner">
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Squizz Bottom Bar Controls -->
+        <div class="glass-panel host-bottom-bar">
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" id="btn-squizz-prev">⬅️ Câu trước</button>
+            <button class="btn btn-secondary" id="btn-squizz-next">Câu tiếp ➡️</button>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn btn-secondary" id="btn-squizz-toggle-lock">🔒 Khóa bình chọn</button>
+            <button class="btn btn-rose" id="btn-squizz-reveal" style="font-size: 1.1rem;">
+              👑 CÔNG BỐ KẾT QUẢ
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW 3: BỘ Q&A (KAHOOT STYLE) ================= -->
+      <section id="view-qa" class="qa-stage" style="display: none;">
+        <!-- QA Header Card -->
+        <div class="glass-panel qa-header-card">
+          <div class="qa-question-box">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span class="qa-category-tag" id="qa-category-badge">⚔️ Lịch sử Việt Nam</span>
+              <span class="q-badge" id="qa-index-badge">CÂU 1 / 15</span>
+            </div>
+            <h1 class="qa-question-text" id="qa-question-text">
+              Ai là người chỉ huy trận chiến sông Bạch Đằng năm 938 đánh tan quân Nam Hán?
+            </h1>
+          </div>
+
+          <!-- Circular Countdown Timer -->
+          <div class="timer-container">
+            <div class="timer-circle" id="qa-timer-ring">
+              <div class="timer-inner" id="qa-timer-num">20</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Options Grid (4 Cards A, B, C, D) -->
+        <div class="qa-options-grid">
+          <!-- Option A (Red) -->
+          <div class="qa-option-card opt-a" id="qa-card-0">
+            <div class="qa-option-icon">▲</div>
+            <div class="qa-option-label" id="qa-text-0">Đinh Bộ Lĩnh</div>
+            <div class="qa-option-count" id="qa-count-0" style="display: none;">0</div>
+          </div>
+
+          <!-- Option B (Blue) -->
+          <div class="qa-option-card opt-b" id="qa-card-1">
+            <div class="qa-option-icon">◆</div>
+            <div class="qa-option-label" id="qa-text-1">Lý Bí</div>
+            <div class="qa-option-count" id="qa-count-1" style="display: none;">0</div>
+          </div>
+
+          <!-- Option C (Yellow) -->
+          <div class="qa-option-card opt-c" id="qa-card-2">
+            <div class="qa-option-icon">●</div>
+            <div class="qa-option-label" id="qa-text-2">Ngô Quyền</div>
+            <div class="qa-option-count" id="qa-count-2" style="display: none;">0</div>
+          </div>
+
+          <!-- Option D (Green) -->
+          <div class="qa-option-card opt-d" id="qa-card-3">
+            <div class="qa-option-icon">■</div>
+            <div class="qa-option-label" id="qa-text-3">Lê Lợi</div>
+            <div class="qa-option-count" id="qa-count-3" style="display: none;">0</div>
+          </div>
+        </div>
+
+        <!-- Explanation Card (Shown on reveal) -->
+        <div class="qa-explanation-box" id="qa-explanation-box" style="display: none;">
+          <span style="font-size: 1.5rem;">💡</span>
+          <div id="qa-explanation-text">Giải thích chi tiết...</div>
+        </div>
+
+        <!-- QA Bottom Bar Controls -->
+        <div class="glass-panel host-bottom-bar">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="font-weight: 700; color: var(--cyan);">
+              Đã trả lời: <span id="qa-answered-count">0</span> / <span id="qa-total-players">0</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" id="btn-qa-prev">⬅️ Câu trước</button>
+            <button class="btn btn-emerald" id="btn-qa-reveal" style="font-size: 1.05rem;">
+              🎯 CÔNG BỐ ĐÁP ÁN
+            </button>
+            <button class="btn btn-gold" id="btn-qa-show-rank">
+              🏆 BẢNG XẾP HẠNG
+            </button>
+            <button class="btn btn-secondary" id="btn-qa-next">Câu tiếp ➡️</button>
+            <button class="btn btn-rose" id="btn-qa-podium" style="display: none;">
+              🥇 TRAO GIẢI PODIUM
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW 4: LEADERBOARD ================= -->
+      <section id="view-leaderboard" class="glass-panel" style="display: none; height: 100%; flex-direction: column; padding: 24px 36px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="font-size: 2rem; font-weight: 900;" class="gold-gradient-text">
+            🏆 BẢNG XẾP HẠNG ĐIỂM SỐ
+          </h2>
+          <button class="btn btn-primary" id="btn-lb-continue">
+            TIẾP TỤC TRÒ CHƠI ➡️
+          </button>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto;" id="leaderboard-table-container">
+          <!-- Dynamically filled with top ranks -->
+        </div>
+      </section>
+
+      <!-- ================= VIEW 5: FINAL PODIUM ================= -->
+      <section id="view-podium" class="podium-container" style="display: none;">
+        <h1 style="font-size: 3rem; font-weight: 900; text-align: center;" class="gold-gradient-text">
+          👑 VINH DANH NHÀ VÔ ĐỊCH 👑
+        </h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted); margin-top: 8px;">
+          Đấu trường Trí Tuệ Team Building TCKT 2026
+        </p>
+
+        <div class="podium-stage">
+          <!-- 2nd Place -->
+          <div class="podium-pedestal">
+            <div class="podium-player-card">
+              <div class="podium-avatar" id="podium-avatar-2">🥈</div>
+              <div class="podium-name" id="podium-name-2">Người về nhì</div>
+              <div class="podium-score" id="podium-score-2">0 điểm</div>
+            </div>
+            <div class="pedestal-block pedestal-2">2</div>
+          </div>
+
+          <!-- 1st Place (Champion) -->
+          <div class="podium-pedestal">
+            <div class="podium-player-card">
+              <div style="font-size: 2.5rem; animation: bounce 1.2s infinite;">👑</div>
+              <div class="podium-avatar" id="podium-avatar-1">🥇</div>
+              <div class="podium-name" style="font-size: 1.6rem; color: #fef08a;" id="podium-name-1">QUÁN QUÂN</div>
+              <div class="podium-score" style="font-size: 1.35rem;" id="podium-score-1">0 điểm</div>
+            </div>
+            <div class="pedestal-block pedestal-1">1</div>
+          </div>
+
+          <!-- 3rd Place -->
+          <div class="podium-pedestal">
+            <div class="podium-player-card">
+              <div class="podium-avatar" id="podium-avatar-3">🥉</div>
+              <div class="podium-name" id="podium-name-3">Người về ba</div>
+              <div class="podium-score" id="podium-score-3">0 điểm</div>
+            </div>
+            <div class="pedestal-block pedestal-3">3</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px;">
+          <button class="btn btn-gold" id="btn-podium-confetti" style="font-size: 1.2rem; padding: 14px 28px;">
+            🎉 BẮN PHÁO HOA ĂN MỪNG
+          </button>
+          <button class="btn btn-secondary" id="btn-podium-restart">
+            🏠 Quay lại sảnh chính
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Modal Question & Member Editor -->
+    <div id="modal-settings" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center;">
+      <div class="glass-panel" style="max-width: 700px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="font-size: 1.4rem; font-weight: 800;">⚙️ Quản Lý Danh Sách Thành Viên & Cài Đặt</h2>
+          <button class="btn btn-secondary btn-icon" id="btn-close-settings">✕</button>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; margin-bottom: 20px;">
+          <label style="font-weight: 700; margin-bottom: 6px; display: block;">
+            Danh sách nhân viên phòng (mỗi tên một dòng):
+          </label>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+            Khi các thành viên bình chọn ở Bộ 1 (Squizz), danh sách này sẽ hiện ra dưới dạng nút gợi ý bấm chọn nhanh để không cần gõ chữ.
+          </p>
+          <textarea id="settings-members-textarea" class="input-field" style="height: 200px; font-family: inherit; font-size: 1rem; line-height: 1.5;"></textarea>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--bg-card-border);">
+            <div>
+              <div style="font-weight: 700;">Đặt lại điểm số người chơi:</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">Xóa toàn bộ điểm về 0 để chơi lại ván mới</div>
+            </div>
+            <button class="btn btn-rose" id="btn-reset-scores">
+              🔄 Đặt lại điểm
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button class="btn btn-secondary" id="btn-cancel-settings">Hủy</button>
+          <button class="btn btn-emerald" id="btn-save-settings">Lưu Thay Đổi</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Audio & Confetti dependencies -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/js/confetti.js"></script>
+  <script src="/js/host.js"></script>
+</body>
+</html>
