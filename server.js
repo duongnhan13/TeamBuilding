@@ -70,6 +70,10 @@ function getLocalIp() {
 
 const LOCAL_IP = getLocalIp();
 
+const { spawn } = require('child_process');
+let publicTunnelUrl = null;
+let cloudflaredProc = null;
+
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -78,7 +82,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/info', async (req, res) => {
   const host = req.headers.host || `${LOCAL_IP}:${PORT}`;
   const protocol = req.protocol || 'http';
-  const joinUrl = `${protocol}://${host}/player.html`;
+  // If Cloudflare tunnel is active, prioritize tunnel URL
+  const joinUrl = publicTunnelUrl ? `${publicTunnelUrl}/player.html` : `${protocol}://${host}/player.html`;
   
   let qrCodeData = '';
   try {
@@ -96,6 +101,8 @@ app.get('/api/info', async (req, res) => {
     port: PORT,
     joinUrl,
     qrCodeData,
+    isTunnel: !!publicTunnelUrl,
+    tunnelUrl: publicTunnelUrl,
     squizzCount: squizzQuestions.length,
     qaCount: qaQuestions.length,
     memberCount: membersList.length
@@ -754,6 +761,63 @@ io.on('connection', (socket) => {
   });
 });
 
+// Cloudflare Quick Tunnel Manager
+function startCloudflareTunnel(port) {
+  const binaryPath = path.join(__dirname, 'cloudflared.exe');
+  if (!fs.existsSync(binaryPath)) {
+    console.log('ℹ️ Không tìm thấy file cloudflared.exe. Chạy ở chế độ Wi-Fi nội bộ.');
+    return;
+  }
+
+  console.log('⚡ Đang kết nối Cloudflare Tunnel để tạo link công khai toàn cầu...');
+  cloudflaredProc = spawn(binaryPath, ['tunnel', '--url', `http://localhost:${port}`]);
+
+  cloudflaredProc.stderr.on('data', async (data) => {
+    const text = data.toString();
+    const match = text.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/);
+    if (match && !publicTunnelUrl) {
+      publicTunnelUrl = match[0];
+      const playerUrl = `${publicTunnelUrl}/player.html`;
+      console.log(`=======================================================`);
+      console.log(`🌐 CLOUDFLARE TUNNEL ĐÃ KẾT NỐI THÀNH CÔNG!`);
+      console.log(`🔗 Link tham gia toàn cầu (4G/5G/bất kỳ Wi-Fi):`);
+      console.log(`👉 ${playerUrl}`);
+      console.log(`=======================================================`);
+
+      try {
+        const qrCodeData = await QRCode.toDataURL(playerUrl, {
+          width: 320,
+          margin: 1,
+          color: { dark: '#0f172a', light: '#ffffff' }
+        });
+        io.to('host').emit('tunnel_ready', {
+          joinUrl: playerUrl,
+          qrCodeData,
+          tunnelUrl: publicTunnelUrl
+        });
+      } catch (err) {
+        console.error('Error generating tunnel QR:', err);
+      }
+    }
+  });
+
+  cloudflaredProc.on('error', (err) => {
+    console.error('Cloudflare Tunnel error:', err.message);
+  });
+}
+
+function cleanup() {
+  if (cloudflaredProc) {
+    try { cloudflaredProc.kill(); } catch (e) {}
+  }
+  process.exit();
+}
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);
+process.on('exit', () => {
+  if (cloudflaredProc) cloudflaredProc.kill();
+});
+
 // Start server with automatic port retry if busy
 function startListening(port) {
   server.listen(port, '0.0.0.0', () => {
@@ -764,6 +828,9 @@ function startListening(port) {
     console.log(`🖥️  Host / Projector:  http://${LOCAL_IP}:${PORT}/host.html`);
     console.log(`📱 Mobile Players:    http://${LOCAL_IP}:${PORT}/player.html`);
     console.log(`=======================================================`);
+
+    // Launch Cloudflare Tunnel
+    startCloudflareTunnel(PORT);
   });
 }
 
@@ -778,4 +845,5 @@ server.on('error', (err) => {
 });
 
 startListening(PORT);
+
 

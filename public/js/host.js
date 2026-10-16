@@ -63,8 +63,26 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(data => {
       if (data.qrCodeData) elHostQrImg.src = data.qrCodeData;
       elHostJoinUrl.textContent = data.joinUrl;
+      if (data.isTunnel) {
+        const netStatus = document.getElementById('host-net-status');
+        if (netStatus) {
+          netStatus.innerHTML = `🌐 <strong>ĐÃ NỐI CLOUDFLARE TOÀN CẦU</strong> (4G / 5G / Wi-Fi quét là vào!)`;
+          netStatus.style.color = '#38bdf8';
+        }
+      }
     })
     .catch(console.error);
+
+  // Cloudflare Tunnel dynamic update
+  socket.on('tunnel_ready', ({ joinUrl, qrCodeData, tunnelUrl }) => {
+    if (elHostQrImg && qrCodeData) elHostQrImg.src = qrCodeData;
+    if (elHostJoinUrl) elHostJoinUrl.textContent = joinUrl;
+    const netStatus = document.getElementById('host-net-status');
+    if (netStatus) {
+      netStatus.innerHTML = `🌐 <strong>ĐÃ NỐI CLOUDFLARE TOÀN CẦU</strong> (4G / 5G / Wi-Fi quét là vào!)`;
+      netStatus.style.color = '#38bdf8';
+    }
+  });
 
   // Load members
   fetch('/api/members')
