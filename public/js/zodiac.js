@@ -64,16 +64,16 @@
   ];
 
   const CAN_STEMS = [
-    { name: 'Giáp', element: 'Mộc 🌲', color: '#22c55e' },
-    { name: 'Ất', element: 'Mộc 🌲', color: '#16a34a' },
-    { name: 'Bính', element: 'Hỏa 🔥', color: '#ef4444' },
-    { name: 'Đinh', element: 'Hỏa 🔥', color: '#dc2626' },
-    { name: 'Mậu', element: 'Thổ ⛰️', color: '#eab308' },
-    { name: 'Kỷ', element: 'Thổ ⛰️', color: '#ca8a04' },
-    { name: 'Canh', element: 'Kim ⚔️', color: '#f59e0b' },
-    { name: 'Tân', element: 'Kim ⚔️', color: '#d97706' },
-    { name: 'Nhâm', element: 'Thủy 🌊', color: '#06b6d4' },
-    { name: 'Quý', element: 'Thủy 🌊', color: '#0284c7' }
+    { name: 'Giáp' },
+    { name: 'Ất' },
+    { name: 'Bính' },
+    { name: 'Đinh' },
+    { name: 'Mậu' },
+    { name: 'Kỷ' },
+    { name: 'Canh' },
+    { name: 'Tân' },
+    { name: 'Nhâm' },
+    { name: 'Quý' }
   ];
 
   function getLunarZodiac(year) {
@@ -84,10 +84,10 @@
     const branch = LUNAR_ANIMALS[branchIdx >= 0 ? branchIdx : branchIdx + 12];
     
     return {
+      year,
       canChi: `${stem.name} ${branch.name}`,
       animal: branch.animal,
       icon: branch.icon,
-      element: stem.element,
       color: branch.color,
       trait: branch.desc,
       fullText: `Tuổi ${stem.name} ${branch.name} (${branch.animal} ${branch.icon})`
@@ -102,37 +102,24 @@
     return { sign, lunar, parts };
   }
 
-  // Generate glowing badges HTML for UI rendering
-  function generateZodiacBadgesHtml(zodiacInfo, size = 'normal') {
-    if (!zodiacInfo) return '';
-    const { sign, lunar } = zodiacInfo;
-    const isSmall = size === 'small';
+  // Generate glowing Năm Tuổi badge HTML for Game 1 winner announcement
+  function generateZodiacBadgesHtml(zodiacInfo) {
+    if (!zodiacInfo || !zodiacInfo.lunar) return '';
+    const { lunar, parts } = zodiacInfo;
 
-    let html = '<div class="zodiac-badges-container">';
-    if (sign) {
-      html += `
-        <div class="zodiac-badge-card zodiac-sign-pill" style="border-color: ${sign.color};">
-          <span class="zodiac-badge-icon">${sign.icon}</span>
-          <div class="zodiac-badge-text">
-            <span class="zodiac-badge-title">${sign.name}</span>
-            ${!isSmall ? `<span class="zodiac-badge-sub">${sign.trait}</span>` : ''}
+    return `
+      <div class="spotlight-nam-tuoi-card" style="display: inline-flex; align-items: center; justify-content: center; gap: 12px; background: rgba(245, 158, 11, 0.15); border: 2px solid var(--gold); border-radius: 999px; padding: 10px 24px; box-shadow: 0 4px 25px rgba(245, 158, 11, 0.4); margin-bottom: 14px;">
+        <span style="font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.8));">${lunar.icon}</span>
+        <div style="text-align: left;">
+          <div style="font-size: 1.3rem; font-weight: 900; color: #fef08a; letter-spacing: 0.5px;">
+            Tuổi ${lunar.canChi} (${lunar.animal})
+          </div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; font-weight: 600;">
+            ${parts && parts.year ? `Năm sinh: ${parts.year} • ` : ''}${lunar.trait}
           </div>
         </div>
-      `;
-    }
-    if (lunar) {
-      html += `
-        <div class="zodiac-badge-card lunar-animal-pill" style="border-color: ${lunar.color};">
-          <span class="zodiac-badge-icon">${lunar.icon}</span>
-          <div class="zodiac-badge-text">
-            <span class="zodiac-badge-title">${lunar.canChi} (${lunar.animal})</span>
-            ${!isSmall ? `<span class="zodiac-badge-sub">${lunar.element} • ${lunar.trait}</span>` : ''}
-          </div>
-        </div>
-      `;
-    }
-    html += '</div>';
-    return html;
+      </div>
+    `;
   }
 
   if (typeof module !== 'undefined' && module.exports) {

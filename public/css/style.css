@@ -1587,29 +1587,17 @@ body {
   opacity: 0.85;
 }
 
-/* Spot Zodiac Container in Winner Spotlight */
-.spotlight-zodiac-banner {
+/* Spot Zodiac / Năm Tuổi Container in Winner Spotlight */
+.spotlight-zodiac-card {
   display: flex;
-  gap: 12px;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
   margin: 10px 0 16px;
+  width: 100%;
 }
 
-.spotlight-zodiac-banner .zodiac-badge-card {
-  padding: 8px 18px;
-  border-radius: 14px;
-}
-.spotlight-zodiac-banner .zodiac-badge-icon {
-  font-size: 1.8rem;
-}
-.spotlight-zodiac-banner .zodiac-badge-title {
-  font-size: 1.05rem;
-  font-weight: 900;
-}
-.spotlight-zodiac-banner .zodiac-badge-sub {
-  font-size: 0.82rem;
+.spotlight-nam-tuoi-card {
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ==========================================================================

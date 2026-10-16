@@ -736,16 +736,6 @@ io.on('connection', (socket) => {
       totalVotes: tally.totalVotes,
       totalPlayers: getConnectedPlayers().length
     });
-
-    // Auto-reveal if all connected players finished voting!
-    const connectedCount = getConnectedPlayers().length;
-    if (tally.totalVotes >= connectedCount && connectedCount > 0) {
-      setTimeout(() => {
-        if (!gameState.squizz.isRevealed && gameState.mode === 'SQUIZZ') {
-          revealSquizzWinner(true);
-        }
-      }, 1000);
-    }
   });
 
   // Host squizz controls
@@ -893,8 +883,9 @@ io.on('connection', (socket) => {
       totalPlayers: getConnectedPlayers().length
     });
 
-    // If everyone answered, stop timer and reveal
-    if (stats.totalAnswered >= getConnectedPlayers().length && getConnectedPlayers().length > 0) {
+    // If everyone in a full room (10+ players) has answered, reveal early; otherwise let the timer finish or MC control
+    const connectedCount = getConnectedPlayers().length;
+    if (connectedCount >= 10 && stats.totalAnswered >= connectedCount) {
       endQaQuestion();
       setTimeout(() => {
         if (!gameState.qa.isRevealed && gameState.mode === 'QA') {

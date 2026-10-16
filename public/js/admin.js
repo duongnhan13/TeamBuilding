@@ -819,8 +819,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const zodiacDetails = (window.zodiacHelper && m.dob) ? window.zodiacHelper.getZodiacDetails(m.dob) : null;
       let zodiacText = '<span style="color: var(--text-muted); font-size: 0.8rem;">Chưa có</span>';
-      if (zodiacDetails && zodiacDetails.sign && zodiacDetails.lunar) {
-        zodiacText = `<span style="color: #fef08a; font-weight: 700; font-size: 0.82rem;">${zodiacDetails.sign.icon} ${zodiacDetails.sign.name}<br>${zodiacDetails.lunar.icon} ${zodiacDetails.lunar.canChi}</span>`;
+      if (zodiacDetails && zodiacDetails.lunar) {
+        zodiacText = `<span style="color: #fef08a; font-weight: 700; font-size: 0.85rem;">${zodiacDetails.lunar.icon} Tuổi ${zodiacDetails.lunar.canChi} (${zodiacDetails.lunar.animal})</span>`;
       }
 
       tr.innerHTML = `
@@ -846,8 +846,8 @@ document.addEventListener('DOMContentLoaded', () => {
       inpDob.addEventListener('input', () => {
         if (window.zodiacHelper && inpDob.value.trim()) {
           const zd = window.zodiacHelper.getZodiacDetails(inpDob.value.trim());
-          if (zd && zd.sign && zd.lunar) {
-            zodiacCell.innerHTML = `<span style="color: #fef08a; font-weight: 700; font-size: 0.82rem;">${zd.sign.icon} ${zd.sign.name}<br>${zd.lunar.icon} ${zd.lunar.canChi}</span>`;
+          if (zd && zd.lunar) {
+            zodiacCell.innerHTML = `<span style="color: #fef08a; font-weight: 700; font-size: 0.85rem;">${zd.lunar.icon} Tuổi ${zd.lunar.canChi} (${zd.lunar.animal})</span>`;
           }
         }
       });
@@ -975,8 +975,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const zodiacDetails = (window.zodiacHelper && m.dob) ? window.zodiacHelper.getZodiacDetails(m.dob) : null;
       let zodiacBadge = '<span style="color: var(--text-muted); font-size: 0.8rem;">Chưa có</span>';
-      if (zodiacDetails && zodiacDetails.sign && zodiacDetails.lunar) {
-        zodiacBadge = `<span style="font-size: 0.82rem; font-weight: 700; color: #fef08a;">${zodiacDetails.sign.icon} ${zodiacDetails.sign.name} • ${zodiacDetails.lunar.icon} ${zodiacDetails.lunar.canChi}</span>`;
+      if (zodiacDetails && zodiacDetails.lunar) {
+        zodiacBadge = `<span style="font-size: 0.85rem; font-weight: 700; color: #fef08a;">${zodiacDetails.lunar.icon} Tuổi ${zodiacDetails.lunar.canChi} (${zodiacDetails.lunar.animal})</span>`;
       }
 
       const statusBadge = isJoined

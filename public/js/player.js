@@ -146,15 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cardMemberName) cardMemberName.textContent = name;
     if (cardMemberAvatar) cardMemberAvatar.textContent = selectedAvatar;
 
-    if (cardMemberZodiac) {
-      if (window.zodiacHelper && dob) {
-        const zd = window.zodiacHelper.getZodiacDetails(dob);
-        cardMemberZodiac.innerHTML = window.zodiacHelper.generateZodiacBadgesHtml(zd, 'normal');
-      } else {
-        cardMemberZodiac.innerHTML = '';
-      }
-    }
-
     if (memberProfileCard) memberProfileCard.style.display = 'block';
   }
 
