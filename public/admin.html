@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Điều Khiển Quản Lý (Admin / MC) - Team Building TCKT</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .mc-teleprompter {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08));
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .teleprompter-label {
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .teleprompter-script {
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #fef08a;
+      font-style: italic;
+    }
+    .soundboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .timer-badge {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--cyan);
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    
+    <!-- Top Admin Header -->
+    <header class="glass-panel host-header" style="margin-bottom: 16px;">
+      <div class="host-brand">
+        <div class="host-logo-icon">🎛️</div>
+        <div>
+          <div class="host-title">
+            BẢNG ĐIỀU KHIỂN MC <span class="gold-gradient-text">(ADMIN CONTROLLER)</span>
+          </div>
+          <div class="host-subtitle">Điều khiển màn hình máy chiếu từ xa • Team Building TCKT</div>
+        </div>
+      </div>
+
+      <div class="host-stats-pill">
+        <div class="stat-item">
+          <span>Người chơi:</span>
+          <span class="stat-num" id="admin-player-count">0</span>
+          <span style="color: var(--text-muted); font-size: 0.85rem;">người</span>
+        </div>
+        <div class="stat-item">
+          <span>Trạng thái:</span>
+          <span id="admin-mode-badge" style="color: var(--cyan); font-weight: 800;">SẢNH CHỜ</span>
+        </div>
+      </div>
+
+      <div class="ctrl-btn-group">
+        <button class="btn btn-secondary btn-icon" id="btn-sound-toggle" title="Âm thanh MC">
+          🔊
+        </button>
+        <button class="btn btn-secondary" id="btn-open-settings">
+          ⚙️ Cài Đặt
+        </button>
+      </div>
+    </header>
+
+    <!-- Admin Quick Testing & Simulation Bar -->
+    <div class="admin-test-bar" style="margin-bottom: 20px;">
+      <div class="admin-test-title">🛠️ TEST & GIẢ LẬP:</div>
+      <button class="btn btn-primary btn-sm" id="btn-add-bots-20" title="Thêm 20 người ảo để test">
+        🤖 +20 Bot
+      </button>
+      <button class="btn btn-primary btn-sm" id="btn-add-bots-50" title="Thêm 50 người ảo để test">
+        🤖 +50 Bot
+      </button>
+      <button class="btn btn-emerald btn-sm" id="btn-admin-simulate" title="Mô phỏng tất cả người chơi tự động bình chọn / trả lời">
+        ⚡ Tự Động Vote / Trả Lời
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btn-admin-reset-q" title="Xóa dữ liệu câu này để test lại">
+        🔄 Reset Câu Này
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btn-admin-reset-lobby" title="Reset trò chơi về sảnh chờ">
+        🧹 Về Sảnh
+      </button>
+      <button class="btn btn-rose btn-sm" id="btn-admin-clear-players" title="Xóa toàn bộ người chơi">
+        🗑️ Xóa Hết Người Chơi
+      </button>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="admin-grid">
+      
+      <!-- LEFT COLUMN: GAME CONTROLLER & TELEPROMPTER -->
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <!-- Mode Switcher Buttons -->
+        <div class="glass-panel" style="padding: 14px 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" id="btn-mode-lobby" style="flex: 1;">
+            🏠 Sảnh Chờ
+          </button>
+          <button class="btn btn-rose" id="btn-mode-squizz" style="flex: 1.5; font-weight: 800;">
+            🚀 BỘ 1: SQUIZZ (BÓC PHỐT)
+          </button>
+          <button class="btn btn-primary" id="btn-mode-qa" style="flex: 1.5; font-weight: 800;">
+            🧠 BỘ 2: ĐẤU TRÍ Q&A
+          </button>
+          <button class="btn btn-gold" id="btn-mode-podium" style="flex: 1;">
+            🥇 Trao Giải
+          </button>
+        </div>
+
+        <!-- Question Navigation Bar -->
+        <div class="glass-panel" style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" id="btn-prev-q">
+            ⬅️ Câu Trước
+          </button>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 800; color: var(--gold);" id="admin-current-q-pill">CÂU 1 / 10</span>
+            <select id="admin-jump-select" class="input-field" style="margin: 0; padding: 6px 12px; width: auto; font-size: 0.95rem; height: 38px;">
+              <option value="">-- Nhảy tới câu bất kỳ --</option>
+            </select>
+          </div>
+
+          <button class="btn btn-secondary" id="btn-next-q">
+            Câu Tiếp ➡️
+          </button>
+        </div>
+
+        <!-- MC Teleprompter Box -->
+        <div class="mc-teleprompter" id="mc-teleprompter-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="teleprompter-label">🎙️ KỊCH BẢN XƯỚNG TÊN MC CẦM MIC ĐỌC:</div>
+            <span id="admin-target-badge" style="font-size: 0.9rem; color: var(--cyan); font-weight: 700;">
+              🎯 Mục tiêu: Bóc phốt
+            </span>
+          </div>
+
+          <div style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 12px;" id="admin-q-text">
+            Ai là người luôn luôn có mặt ở phòng làm việc sớm nhất, chuyên nhận trọng trách mở cửa, bật đèn và bật điều hòa đón anh em?
+          </div>
+
+          <div class="teleprompter-script" id="admin-mc-voice">
+            "Xin chúc mừng đồng chí có tên to nhất trên màn hình! Mời đồng chí đứng lên nhận chén rượu danh dự của người khai mở văn phòng!"
+          </div>
+
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(245, 158, 11, 0.4); display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 0.85rem; font-weight: 800; color: var(--rose); text-transform: uppercase;">Hình phạt:</span>
+            <span style="font-size: 1.15rem; font-weight: 800; color: #fef08a;" id="admin-punishment">
+              Uống 1 chén danh dự khai tiệc! 🍻
+            </span>
+          </div>
+        </div>
+
+        <!-- Master Action Buttons -->
+        <div class="glass-panel" style="padding: 20px; display: flex; gap: 16px;">
+          <button class="btn btn-secondary" id="btn-toggle-lock" style="flex: 1; font-size: 1.1rem; padding: 16px;">
+            🔒 CHỐT / KHÓA BÌNH CHỌN
+          </button>
+          <button class="btn btn-rose" id="btn-reveal-action" style="flex: 1.8; font-size: 1.25rem; font-weight: 900; padding: 16px; box-shadow: 0 0 25px rgba(244, 63, 94, 0.5);">
+            👑 CÔNG BỐ KẾT QUẢ & XƯỚNG TÊN
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: LIVE MONITOR & SOUNDBOARD -->
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <!-- Live Voting / Answer Status Card -->
+        <div class="glass-panel" style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800;">📊 THEO DÕI TRỰC TIẾP</h3>
+            <span class="timer-badge" id="admin-timer-display">--</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 0.95rem;">
+            <span>Tiến độ nộp bài:</span>
+            <span style="font-weight: 800; color: var(--cyan);">
+              <span id="admin-voted-count">0</span> / <span id="admin-total-count">0</span>
+            </span>
+          </div>
+
+          <!-- Secret Live Tally Preview for MC -->
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-bottom: 6px;">
+            Top người được bình chọn nhiều nhất hiện tại:
+          </div>
+          <div id="admin-secret-tally" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+            <div style="color: var(--text-muted); font-style: italic; font-size: 0.9rem;">
+              Chưa có phiếu nào...
+            </div>
+          </div>
+        </div>
+
+        <!-- Timer Setting Presets -->
+        <div class="glass-panel" style="padding: 16px 20px;">
+          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 10px;">⏱️ CÀI ĐẶT THỜI GIAN ĐẾM NGƯỢC</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="15">15s</button>
+            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="20">20s</button>
+            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="30">30s</button>
+            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="45">45s</button>
+            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="60">60s</button>
+            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="0">Thủ công</button>
+          </div>
+        </div>
+
+        <!-- MC Soundboard -->
+        <div class="glass-panel" style="padding: 20px;">
+          <h3 style="font-size: 1.1rem; font-weight: 800;">🔊 ÂM THANH SÂN KHẤU</h3>
+          <div class="soundboard-grid">
+            <button class="btn btn-gold btn-sm" id="snd-cheers">
+              🍻 100% Cạn Chén!
+            </button>
+            <button class="btn btn-emerald btn-sm" id="snd-confetti">
+              🎉 Bắn Pháo Hoa
+            </button>
+            <button class="btn btn-secondary btn-sm" id="snd-applause">
+              👏 Tiếng Vỗ Tay
+            </button>
+            <button class="btn btn-secondary btn-sm" id="snd-drumroll">
+              🥁 Hồi Hộp
+            </button>
+            <button class="btn btn-secondary btn-sm" id="snd-correct">
+              🔔 Ting Ting
+            </button>
+            <button class="btn btn-secondary btn-sm" id="snd-wrong">
+              ❌ Sai Rồi
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="modal-settings" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center;">
+      <div class="glass-panel" style="max-width: 650px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="font-size: 1.4rem; font-weight: 800;">⚙️ Quản Lý Thành Viên Phòng Kế Toán</h2>
+          <button class="btn btn-secondary btn-icon" id="btn-close-settings">✕</button>
+        </div>
+        <textarea id="settings-members-input" class="input-field" style="height: 220px; font-size: 1rem; line-height: 1.5;"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+          <button class="btn btn-secondary" id="btn-cancel-settings">Hủy</button>
+          <button class="btn btn-emerald" id="btn-save-settings">Lưu Danh Sách</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/js/confetti.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

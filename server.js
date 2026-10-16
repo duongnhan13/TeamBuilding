@@ -159,6 +159,10 @@ const gameState = {
     currentIndex: 0,
     isOpen: false,
     isRevealed: false,
+    startTime: 0,
+    timeLimit: 30, // 30s mặc định hoặc 0 cho thủ công
+    timeRemaining: 30,
+    timer: null,
     votes: {}, // playerId -> normalizedName
     rawVotes: {} // playerId -> rawName
   },
@@ -354,9 +358,8 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('host_join', () => {
-    socket.join('host');
-    socket.emit('host_init', {
+  function sendHostInit(targetSocket) {
+    targetSocket.emit('host_init', {
       mode: gameState.mode,
       players: getConnectedPlayers(),
       totalPlayers: getConnectedPlayers().length,
@@ -364,6 +367,8 @@ io.on('connection', (socket) => {
         currentIndex: gameState.squizz.currentIndex,
         isOpen: gameState.squizz.isOpen,
         isRevealed: gameState.squizz.isRevealed,
+        timeRemaining: gameState.squizz.timeRemaining,
+        timeLimit: gameState.squizz.timeLimit,
         question: squizzQuestions[gameState.squizz.currentIndex] || null,
         tally: calculateSquizzTally()
       },
@@ -372,6 +377,7 @@ io.on('connection', (socket) => {
         isOpen: gameState.qa.isOpen,
         isRevealed: gameState.qa.isRevealed,
         timeRemaining: gameState.qa.timeRemaining,
+        timeLimit: gameState.qa.timeLimit,
         question: qaQuestions[gameState.qa.currentIndex] || null,
         stats: calculateQaStats(),
         leaderboard: getLeaderboard()
@@ -380,7 +386,59 @@ io.on('connection', (socket) => {
       qaQuestions,
       membersList
     });
+  }
+
+  socket.on('host_join', () => {
+    socket.join('host');
+    sendHostInit(socket);
   });
+
+  socket.on('projector_join', () => {
+    socket.join('host');
+    socket.join('projector');
+    sendHostInit(socket);
+  });
+
+  socket.on('admin_join', () => {
+    socket.join('host');
+    socket.join('admin');
+    sendHostInit(socket);
+  });
+
+  // Squizz Timer & Auto-Reveal
+  function startSquizzTimer() {
+    if (gameState.squizz.timer) clearInterval(gameState.squizz.timer);
+    if (!gameState.squizz.timeLimit || gameState.squizz.timeLimit <= 0) return;
+    gameState.squizz.timeRemaining = gameState.squizz.timeLimit;
+    gameState.squizz.startTime = Date.now();
+    gameState.squizz.timer = setInterval(() => {
+      gameState.squizz.timeRemaining--;
+      io.emit('squizz_timer_tick', { timeRemaining: gameState.squizz.timeRemaining });
+      if (gameState.squizz.timeRemaining <= 0) {
+        clearInterval(gameState.squizz.timer);
+        gameState.squizz.timer = null;
+        revealSquizzWinner(true);
+      }
+    }, 1000);
+  }
+
+  function revealSquizzWinner(auto = false) {
+    if (gameState.squizz.timer) {
+      clearInterval(gameState.squizz.timer);
+      gameState.squizz.timer = null;
+    }
+    gameState.squizz.isOpen = false;
+    gameState.squizz.isRevealed = true;
+    const tally = calculateSquizzTally();
+    const q = squizzQuestions[gameState.squizz.currentIndex];
+
+    io.emit('squizz_revealed', {
+      tally,
+      question: q,
+      winner: tally.winner,
+      auto
+    });
+  }
 
   // --- SQUIZZ EVENTS ---
   socket.on('player_vote_squizz', ({ name }) => {
@@ -403,16 +461,27 @@ io.on('connection', (socket) => {
       totalVotes: tally.totalVotes,
       totalPlayers: getConnectedPlayers().length
     });
+
+    // Auto-reveal if all connected players finished voting!
+    const connectedCount = getConnectedPlayers().length;
+    if (tally.totalVotes >= connectedCount && connectedCount > 0) {
+      setTimeout(() => {
+        if (!gameState.squizz.isRevealed && gameState.mode === 'SQUIZZ') {
+          revealSquizzWinner(true);
+        }
+      }, 1000);
+    }
   });
 
   // Host squizz controls
-  socket.on('host_squizz_start', ({ questionIndex = 0 }) => {
+  socket.on('host_squizz_start', ({ questionIndex = 0, timeLimit }) => {
     gameState.mode = 'SQUIZZ';
     gameState.squizz.currentIndex = questionIndex;
     gameState.squizz.isOpen = true;
     gameState.squizz.isRevealed = false;
     gameState.squizz.votes = {};
     gameState.squizz.rawVotes = {};
+    if (timeLimit !== undefined) gameState.squizz.timeLimit = timeLimit;
 
     const q = squizzQuestions[gameState.squizz.currentIndex];
 
@@ -420,6 +489,7 @@ io.on('connection', (socket) => {
     io.emit('squizz_question_started', {
       currentIndex: gameState.squizz.currentIndex,
       total: squizzQuestions.length,
+      timeLimit: gameState.squizz.timeLimit,
       question: q
     });
 
@@ -428,24 +498,21 @@ io.on('connection', (socket) => {
       totalVotes: 0,
       totalPlayers: getConnectedPlayers().length
     });
+
+    startSquizzTimer();
   });
 
   socket.on('host_squizz_toggle_lock', ({ open }) => {
     gameState.squizz.isOpen = open;
+    if (!open && gameState.squizz.timer) {
+      clearInterval(gameState.squizz.timer);
+      gameState.squizz.timer = null;
+    }
     io.emit('squizz_lock_changed', { isOpen: open });
   });
 
   socket.on('host_squizz_reveal', () => {
-    gameState.squizz.isOpen = false;
-    gameState.squizz.isRevealed = true;
-    const tally = calculateSquizzTally();
-    const q = squizzQuestions[gameState.squizz.currentIndex];
-
-    io.emit('squizz_revealed', {
-      tally,
-      question: q,
-      winner: tally.winner
-    });
+    revealSquizzWinner(false);
   });
 
   socket.on('host_squizz_next', () => {
@@ -548,9 +615,14 @@ io.on('connection', (socket) => {
       totalPlayers: getConnectedPlayers().length
     });
 
-    // If everyone answered, stop timer early
+    // If everyone answered, stop timer and reveal
     if (stats.totalAnswered >= getConnectedPlayers().length && getConnectedPlayers().length > 0) {
       endQaQuestion();
+      setTimeout(() => {
+        if (!gameState.qa.isRevealed && gameState.mode === 'QA') {
+          revealQaAnswer(true);
+        }
+      }, 1000);
     }
   });
 
@@ -563,6 +635,7 @@ io.on('connection', (socket) => {
         clearInterval(gameState.qa.timer);
         gameState.qa.timer = null;
         endQaQuestion();
+        revealQaAnswer(true);
       }
     }, 1000);
   }
@@ -576,14 +649,30 @@ io.on('connection', (socket) => {
     io.emit('qa_time_up');
   }
 
-  socket.on('host_qa_start', ({ questionIndex = 0 }) => {
+  function revealQaAnswer(auto = false) {
+    endQaQuestion();
+    gameState.qa.isRevealed = true;
+    const stats = calculateQaStats();
+    const currentQ = qaQuestions[gameState.qa.currentIndex];
+    const leaderboard = getLeaderboard();
+
+    io.emit('qa_revealed', {
+      correctAnswer: currentQ ? currentQ.correctAnswer : 0,
+      explanation: currentQ ? currentQ.explanation : '',
+      stats,
+      leaderboard: leaderboard.slice(0, 10),
+      auto
+    });
+  }
+
+  socket.on('host_qa_start', ({ questionIndex = 0, timeLimit }) => {
     gameState.mode = 'QA';
     gameState.qa.currentIndex = questionIndex;
     gameState.qa.isOpen = true;
     gameState.qa.isRevealed = false;
     gameState.qa.answers = {};
     const q = qaQuestions[gameState.qa.currentIndex];
-    gameState.qa.timeLimit = q ? (q.timeLimit || 20) : 20;
+    gameState.qa.timeLimit = timeLimit !== undefined ? timeLimit : (q ? (q.timeLimit || 20) : 20);
     gameState.qa.timeRemaining = gameState.qa.timeLimit;
     gameState.qa.startTime = Date.now();
 
@@ -598,7 +687,7 @@ io.on('connection', (socket) => {
         icon: q.icon,
         question: q.question,
         options: q.options,
-        timeLimit: q.timeLimit
+        timeLimit: gameState.qa.timeLimit
       }
     });
 
@@ -612,19 +701,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('host_qa_reveal', () => {
-    endQaQuestion();
-    gameState.qa.isRevealed = true;
-    const stats = calculateQaStats();
-    const currentQ = qaQuestions[gameState.qa.currentIndex];
-    const leaderboard = getLeaderboard();
-
-    // Send reveal to all
-    io.emit('qa_revealed', {
-      correctAnswer: currentQ.correctAnswer,
-      explanation: currentQ.explanation,
-      stats,
-      leaderboard: leaderboard.slice(0, 10)
-    });
+    revealQaAnswer(false);
   });
 
   socket.on('host_qa_next', () => {
