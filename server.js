@@ -201,20 +201,38 @@ app.post('/api/questions/squizz/add', (req, res) => {
   const newId = squizzQuestions.length > 0 ? Math.max(...squizzQuestions.map(item => item.id || 0)) + 1 : 1;
   const newQ = {
     id: newId,
-    type: q.type || 'VOTE_MEMBER',
+    // Quy tắc Bộ 1: Bắt buộc là bình chọn thành viên trong chuyến đi (VOTE_MEMBER)
+    type: 'VOTE_MEMBER',
     effectTheme: q.effectTheme || 'royal-gold',
     icon: q.icon || '🎯',
     title: q.title || `Câu hỏi ${newId}`,
-    question: q.question,
-    target: q.target || '',
-    mcVoice: q.mcVoice || '',
-    punishment: q.punishment || 'Uống 1 chén! 🍻',
-    suggested: q.suggested || ''
+    question: q.question.trim(),
+    target: q.target || 'Bình chọn đồng nghiệp trong chuyến đi',
+    mcVoice: q.mcVoice || 'Xin chúc mừng đồng chí được anh em bình chọn nhiều nhất!',
+    punishment: q.punishment || 'Uống 1 chén danh dự! 🍻',
+    timeLimit: parseInt(q.timeLimit, 10) || 30
   };
   squizzQuestions.push(newQ);
   saveJson('squizz_questions.json', squizzQuestions);
   io.emit('questions_updated', { type: 'squizz', count: squizzQuestions.length, question: newQ });
   res.json({ success: true, question: newQ, total: squizzQuestions.length });
+});
+
+app.post('/api/questions/squizz/delete', (req, res) => {
+  const { index, id } = req.body;
+  let targetIdx = -1;
+  if (typeof index === 'number' && index >= 0 && index < squizzQuestions.length) {
+    targetIdx = index;
+  } else if (id !== undefined) {
+    targetIdx = squizzQuestions.findIndex(q => q.id === id);
+  }
+  if (targetIdx >= 0) {
+    squizzQuestions.splice(targetIdx, 1);
+    saveJson('squizz_questions.json', squizzQuestions);
+    io.emit('questions_updated', { type: 'squizz', count: squizzQuestions.length });
+    return res.json({ success: true, count: squizzQuestions.length });
+  }
+  res.status(400).json({ error: 'Không tìm thấy câu hỏi để xóa' });
 });
 
 app.get('/api/questions/qa', (req, res) => {
@@ -234,21 +252,47 @@ app.post('/api/questions/qa/add', (req, res) => {
   const q = req.body;
   if (!q || !q.question) return res.status(400).json({ error: 'Question content is required' });
   const newId = qaQuestions.length > 0 ? Math.max(...qaQuestions.map(item => item.id || 0)) + 1 : 1;
+  
+  const opts = Array.isArray(q.options) && q.options.length === 4
+    ? q.options.map((opt, i) => String(opt || `Đáp án ${String.fromCharCode(65 + i)}`).trim())
+    : ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'];
+
+  let correct = parseInt(q.correctAnswer, 10);
+  if (isNaN(correct) || correct < 0 || correct > 3) correct = 0;
+
   const newQ = {
     id: newId,
-    type: q.type || 'MULTIPLE_CHOICE',
-    category: q.category || 'Đố vui',
+    // Quy tắc Bộ 2: Bắt buộc là câu hỏi trắc nghiệm 4 đáp án (MULTIPLE_CHOICE)
+    type: 'MULTIPLE_CHOICE',
+    category: q.category || 'Đố vui Team Building',
     icon: q.icon || '❓',
-    question: q.question,
-    options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'],
-    correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
-    explanation: q.explanation || '',
+    question: q.question.trim(),
+    options: opts,
+    correctAnswer: correct,
+    explanation: q.explanation || 'Đáp án chính xác!',
     timeLimit: parseInt(q.timeLimit, 10) || 20
   };
   qaQuestions.push(newQ);
   saveJson('qa_questions.json', qaQuestions);
   io.emit('questions_updated', { type: 'qa', count: qaQuestions.length, question: newQ });
   res.json({ success: true, question: newQ, total: qaQuestions.length });
+});
+
+app.post('/api/questions/qa/delete', (req, res) => {
+  const { index, id } = req.body;
+  let targetIdx = -1;
+  if (typeof index === 'number' && index >= 0 && index < qaQuestions.length) {
+    targetIdx = index;
+  } else if (id !== undefined) {
+    targetIdx = qaQuestions.findIndex(q => q.id === id);
+  }
+  if (targetIdx >= 0) {
+    qaQuestions.splice(targetIdx, 1);
+    saveJson('qa_questions.json', qaQuestions);
+    io.emit('questions_updated', { type: 'qa', count: qaQuestions.length });
+    return res.json({ success: true, count: qaQuestions.length });
+  }
+  res.status(400).json({ error: 'Không tìm thấy câu hỏi để xóa' });
 });
 
 // GAME ENGINE STATE

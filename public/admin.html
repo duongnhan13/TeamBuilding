@@ -94,7 +94,7 @@
           🔊
         </button>
         <button class="btn btn-emerald" id="btn-open-add-q">
-          ➕ Thêm Câu Hỏi Mở / Mới
+          ➕ Quản Lý & Thêm Câu Hỏi
         </button>
         <button class="btn btn-secondary" id="btn-open-settings">
           👥 Quản Lý 47 Thành Viên
@@ -272,105 +272,186 @@
 
     </div>
 
-    <!-- MODAL 1: ADD QUESTION MODAL (DYNAMIC OPEN / NEW QUESTIONS) -->
+    <!-- MODAL 1: QUESTION MANAGER & ADDER (STRICT COMPLIANCE WITH SET RULES) -->
     <div id="modal-add-question" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-      <div class="glass-panel" style="max-width: 680px; width: 92%; max-height: 90vh; overflow-y: auto; padding: 28px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h2 style="font-size: 1.4rem; font-weight: 900;" class="gold-gradient-text">
-            ➕ Thêm Câu Hỏi Mới / Câu Hỏi Mở
-          </h2>
+      <div class="glass-panel" style="max-width: 800px; width: 94%; max-height: 90vh; display: flex; flex-direction: column; padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 900;" class="gold-gradient-text">
+              ⚙️ QUẢN LÝ & THÊM CÂU HỎI TRÒ CHƠI
+            </h2>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+              Tuân thủ luật chơi: Bộ 1 (Chỉ vote thành viên chuyến đi) • Bộ 2 (Câu hỏi trắc nghiệm 4 đáp án)
+            </div>
+          </div>
           <button class="btn btn-secondary btn-icon" id="btn-close-add-q">✕</button>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-bottom: 14px;">
-          <div style="flex: 1;">
-            <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px;">1. Chọn phần thi:</label>
-            <select id="add-q-section" class="input-field">
-              <option value="SQUIZZ">🚀 BỘ 1: SQUIZZ (Bóc Phốt / Khảo Sát)</option>
-              <option value="QA">🧠 BỘ 2: ĐẤU TRÍ Q&A (Kahoot)</option>
-            </select>
-          </div>
-          <div style="flex: 1;">
-            <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px;">2. Loại câu hỏi:</label>
-            <select id="add-q-type" class="input-field">
-              <option value="OPEN_TEXT">💬 Câu hỏi mở (Nhập văn bản tự do)</option>
-              <option value="VOTE_MEMBER">👤 Bình chọn đồng nghiệp (47 thành viên)</option>
-              <option value="MULTIPLE_CHOICE" style="display: none;">🎯 Trắc nghiệm 4 đáp án (A, B, C, D)</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Tiêu đề câu hỏi / Biệt danh:</label>
-          <input type="text" id="add-q-title" class="input-field" placeholder="Ví dụ: CÂU HỎI MỞ: Ấn tượng sâu sắc nhất..." maxlength="60">
-        </div>
-
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Nội dung câu hỏi đầy đủ:</label>
-          <textarea id="add-q-text" class="input-field" style="height: 85px; font-size: 1rem; resize: none;" placeholder="Nhập nội dung câu hỏi muốn chiếu lên màn hình..."></textarea>
-        </div>
-
-        <!-- Effect Theme Picker -->
-        <div style="margin-bottom: 14px;">
-          <label style="font-size: 0.85rem; font-weight: 800; color: var(--gold); display: block; margin-bottom: 4px;">Hiệu ứng sân khấu ăn mừng:</label>
-          <select id="add-q-theme" class="input-field">
-            <option value="royal-gold">👑 Royal Gold (Vương miện vàng, kèn mừng)</option>
-            <option value="arctic-freeze">❄️ Arctic Freeze (Băng tuyết Bắc Cực)</option>
-            <option value="party-beer">🍻 Party Beer (Vại bia vàng, zô 100%)</option>
-            <option value="lightning-neon">⚡ Lightning Neon (Tia chớp sấm sét cyber)</option>
-            <option value="speed-rocket">🚀 Speed Rocket (Tên lửa siêu tốc 17h30)</option>
-            <option value="money-rain">💰 Money Rain (Cơn mưa tiền & vàng)</option>
-            <option value="rainbow-magic">🌈 Rainbow Magic (Cầu vồng phép thuật)</option>
-            <option value="music-concert">🎤 Music Concert (Sân khấu rock neon)</option>
-            <option value="snack-party">🍰 Snack Party (Tiệc trà bánh kẹo vặt)</option>
-            <option value="sleeping-cloud">😴 Sleeping Cloud (Mây trăng ru ngủ Zzz)</option>
-            <option value="shopping-spree">📦 Shopping Spree (Chiến thần săn sale)</option>
-            <option value="fish-memory">🐟 Fish Memory (Đại dương cá bơi lội)</option>
-          </select>
-        </div>
-
-        <!-- QA 4 Options Box (only for QA multiple choice) -->
-        <div id="add-qa-options-box" style="display: none; background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; margin-bottom: 14px;">
-          <div style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); margin-bottom: 8px;">4 Đáp án trắc nghiệm:</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-            <input type="text" id="add-opt-0" class="input-field" placeholder="Đáp án A (Đỏ)">
-            <input type="text" id="add-opt-1" class="input-field" placeholder="Đáp án B (Xanh)">
-            <input type="text" id="add-opt-2" class="input-field" placeholder="Đáp án C (Vàng)">
-            <input type="text" id="add-opt-3" class="input-field" placeholder="Đáp án D (Lục)">
-          </div>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <label style="font-size: 0.85rem; font-weight: 800; color: #fef08a;">Đáp án đúng:</label>
-            <select id="add-correct-idx" class="input-field" style="width: 140px;">
-              <option value="0">Đáp án A</option>
-              <option value="1">Đáp án B</option>
-              <option value="2">Đáp án C</option>
-              <option value="3">Đáp án D</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 12px; margin-bottom: 14px;">
-          <div style="flex: 1;">
-            <label style="font-size: 0.85rem; font-weight: 800; color: var(--rose); display: block; margin-bottom: 4px;">Hình phạt / Phần thưởng:</label>
-            <input type="text" id="add-q-punishment" class="input-field" placeholder="Uống 1 chén danh dự! 🍻">
-          </div>
-          <div style="width: 130px;">
-            <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px;">Thời gian (s):</label>
-            <input type="number" id="add-q-time" class="input-field" value="30" min="0" max="180">
-          </div>
-        </div>
-
-        <div style="margin-bottom: 16px;">
-          <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Lời bình luận MC đọc:</label>
-          <input type="text" id="add-q-mcvoice" class="input-field" placeholder="Xin chúc mừng người có câu trả lời tuyệt vời nhất...">
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-          <button class="btn btn-secondary" id="btn-cancel-add-q">Hủy</button>
-          <button class="btn btn-emerald" id="btn-save-add-q" style="font-weight: 800; padding: 12px 24px;">
-            💾 Lưu & Thêm Vào Trò Chơi
+        <!-- Navigation Tabs inside Modal -->
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <button class="btn btn-primary btn-sm" id="tab-q-add" style="font-weight: 800; padding: 8px 18px;">
+            ➕ Thêm Câu Hỏi Mới
+          </button>
+          <button class="btn btn-secondary btn-sm" id="tab-q-list" style="font-weight: 800; padding: 8px 18px;">
+            📋 Xem & Quản Lý Câu Hỏi Hiện Có
           </button>
         </div>
+
+        <!-- TAB CONTENT 1: ADD QUESTION -->
+        <div id="tab-content-q-add" style="flex: 1; overflow-y: auto; padding-right: 4px;">
+          <!-- Section Selector -->
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 6px;">1. Chọn Bộ câu hỏi muốn thêm:</label>
+            <select id="add-q-section" class="input-field" style="font-weight: 800; font-size: 1rem; padding: 10px 14px;">
+              <option value="SQUIZZ">🚀 BỘ 1: SQUIZZ (Bình chọn người trong chuyến đi - Bóc phốt / Khảo sát)</option>
+              <option value="QA">🧠 BỘ 2: ĐẤU TRÍ Q&A (Câu hỏi trắc nghiệm 4 đáp án Kahoot)</option>
+            </select>
+          </div>
+
+          <!-- Dynamic Rule Banner -->
+          <div id="q-rule-box-squizz" style="background: rgba(244, 63, 94, 0.15); border: 1.5px solid var(--rose); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;">
+            <div style="font-weight: 800; color: #fecdd3; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+              <span>📌 LUẬT CHƠI BỘ 1: CHỌN NGƯỜI TRONG CHUYẾN ĐI (VOTE THÀNH VIÊN)</span>
+            </div>
+            <div style="font-size: 0.85rem; color: #e2e8f0; margin-top: 4px; line-height: 1.4;">
+              Mọi người tham gia sẽ dùng điện thoại để <strong>bình chọn 1 đồng nghiệp</strong> trong danh sách thành viên chuyến đi. Khi chốt hoặc hết giờ, người nhận nhiều phiếu nhất sẽ được xướng tên và nhận hiệu ứng vinh danh trên màn hình lớn!
+            </div>
+          </div>
+
+          <div id="q-rule-box-qa" style="display: none; background: rgba(56, 189, 248, 0.15); border: 1.5px solid var(--cyan); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;">
+            <div style="font-weight: 800; color: #7dd3fc; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+              <span>📌 LUẬT CHƠI BỘ 2: CÂU HỎI TRẮC NGHIỆM 4 ĐÁP ÁN (A, B, C, D)</span>
+            </div>
+            <div style="font-size: 0.85rem; color: #e2e8f0; margin-top: 4px; line-height: 1.4;">
+              Mỗi câu hỏi có <strong>4 đáp án A, B, C, D</strong> với 1 đáp án chính xác. Người chơi bấm chọn nhanh trên điện thoại để tính điểm tốc độ và tranh vị trí Quán quân trên bảng xếp hạng!
+            </div>
+          </div>
+
+          <!-- Question Title / Category -->
+          <div style="margin-bottom: 12px;">
+            <label id="lbl-q-title" style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Tiêu đề danh hiệu / Biệt danh (Bộ 1):</label>
+            <input type="text" id="add-q-title" class="input-field" placeholder="Ví dụ: Thần giữ cửa Phương Đông, Siêu quậy chuyến đi, Chiến thần Karaoke..." maxlength="70">
+          </div>
+
+          <!-- Question Content -->
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Nội dung câu hỏi đầy đủ:</label>
+            <textarea id="add-q-text" class="input-field" style="height: 80px; font-size: 0.95rem; resize: none;" placeholder="Nhập câu hỏi chiếu lên màn hình máy chiếu..."></textarea>
+          </div>
+
+          <!-- BỘ 1 SPECIFIC FIELDS -->
+          <div id="box-squizz-fields">
+            <div style="margin-bottom: 12px;">
+              <label style="font-size: 0.85rem; font-weight: 800; color: var(--gold); display: block; margin-bottom: 4px;">Hiệu ứng sân khấu vinh danh người thắng:</label>
+              <select id="add-q-theme" class="input-field">
+                <option value="royal-gold">👑 Royal Gold (Vương miện vàng, kèn mừng)</option>
+                <option value="party-beer">🍻 Party Beer (Vại bia vàng tiệc tùng, 100% zô)</option>
+                <option value="money-rain">💰 Money Rain (Cơn mưa tiền & vàng nổ tung)</option>
+                <option value="speed-rocket">🚀 Speed Rocket (Tên lửa siêu tốc 17h30)</option>
+                <option value="music-concert">🎤 Music Concert (Sân khấu ca nhạc Rock Neon)</option>
+                <option value="rainbow-magic">🌈 Rainbow Magic (Cầu vồng phép thuật lấp lánh)</option>
+                <option value="arctic-freeze">❄️ Arctic Freeze (Băng tuyết Bắc Cực lạnh giá)</option>
+                <option value="lightning-neon">⚡ Lightning Neon (Tia chớp sấm sét giật điện)</option>
+                <option value="snack-party">🍰 Snack Party (Tiệc trà bánh kẹo vặt sành điệu)</option>
+                <option value="sleeping-cloud">😴 Sleeping Cloud (Mây trăng ru ngủ Zzz)</option>
+                <option value="shopping-spree">📦 Shopping Spree (Chiến thần săn sale freeship)</option>
+                <option value="fish-memory">🐟 Fish Memory (Đại dương cá bơi lội não cá vàng)</option>
+              </select>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+              <div style="flex: 1;">
+                <label style="font-size: 0.85rem; font-weight: 800; color: var(--rose); display: block; margin-bottom: 4px;">Hình phạt / Phần thưởng khi được sướng tên:</label>
+                <input type="text" id="add-q-punishment" class="input-field" placeholder="Uống 1 chén danh dự! 🍻">
+              </div>
+              <div style="width: 140px;">
+                <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px;">Thời gian vote (s):</label>
+                <input type="number" id="add-q-time-squizz" class="input-field" value="30" min="0" max="180">
+              </div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+              <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Lời bình luận MC đọc khi công bố:</label>
+              <input type="text" id="add-q-mcvoice" class="input-field" placeholder="Xin chúc mừng đồng chí được anh em bình chọn nhiều nhất...">
+            </div>
+          </div>
+
+          <!-- BỘ 2 SPECIFIC FIELDS (MULTIPLE CHOICE 4 OPTIONS) -->
+          <div id="box-qa-fields" style="display: none;">
+            <div style="background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.3);">
+              <div style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); margin-bottom: 8px;">
+                🎯 4 Đáp án trắc nghiệm:
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-a);">▲ Đáp án A (Đỏ):</label>
+                  <input type="text" id="add-opt-0" class="input-field" placeholder="Nhập đáp án A">
+                </div>
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-b);">◆ Đáp án B (Xanh):</label>
+                  <input type="text" id="add-opt-1" class="input-field" placeholder="Nhập đáp án B">
+                </div>
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-c);">● Đáp án C (Vàng):</label>
+                  <input type="text" id="add-opt-2" class="input-field" placeholder="Nhập đáp án C">
+                </div>
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-d);">■ Đáp án D (Lục):</label>
+                  <input type="text" id="add-opt-3" class="input-field" placeholder="Nhập đáp án D">
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="font-size: 0.85rem; font-weight: 800; color: #fef08a;">Đáp án chính xác:</label>
+                <select id="add-correct-idx" class="input-field" style="width: 160px; font-weight: 800;">
+                  <option value="0">▲ Đáp án A (Đỏ)</option>
+                  <option value="1">◆ Đáp án B (Xanh)</option>
+                  <option value="2">● Đáp án C (Vàng)</option>
+                  <option value="3">■ Đáp án D (Lục)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+              <div style="flex: 1;">
+                <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Giải thích chi tiết (Chiếu khi công bố kết quả):</label>
+                <input type="text" id="add-qa-explanation" class="input-field" placeholder="Giải thích vì sao đáp án này đúng...">
+              </div>
+              <div style="width: 140px;">
+                <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px;">Thời gian đếm (s):</label>
+                <input type="number" id="add-q-time-qa" class="input-field" value="20" min="5" max="90">
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+            <button class="btn btn-secondary" id="btn-cancel-add-q">Hủy</button>
+            <button class="btn btn-emerald" id="btn-save-add-q" style="font-weight: 800; padding: 12px 24px;">
+              💾 Lưu & Đưa Vào Trò Chơi Ngay
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 2: EXISTING QUESTIONS LIST -->
+        <div id="tab-content-q-list" style="display: none; flex: 1; flex-direction: column; overflow-y: hidden;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-rose btn-sm" id="subtab-q-squizz" style="font-weight: 800;">
+                🚀 Bộ 1: Squizz (<span id="count-q-squizz">12</span> câu)
+              </button>
+              <button class="btn btn-primary btn-sm" id="subtab-q-qa" style="font-weight: 800; opacity: 0.6;">
+                🧠 Bộ 2: Q&A (<span id="count-q-qa">15</span> câu)
+              </button>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
+              *Bấm "Nhảy tới" để chiếu câu hỏi lên màn hình ngay
+            </div>
+          </div>
+
+          <div style="flex: 1; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 6px;" id="q-list-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
       </div>
     </div>
 
