@@ -138,6 +138,50 @@ app.post('/api/members/update', (req, res) => {
   res.json({ success: true, member });
 });
 
+app.post('/api/members/reload_excel', (req, res) => {
+  try {
+    const xlsx = require('xlsx');
+    const excelPath = path.join(__dirname, 'Team Building TCKT.xlsx');
+    if (!fs.existsSync(excelPath)) {
+      return res.status(404).json({ error: 'Không tìm thấy file Team Building TCKT.xlsx' });
+    }
+    const wb = xlsx.readFile(excelPath);
+    const sheetName = wb.SheetNames.includes('Danh sách tham gia') ? 'Danh sách tham gia' : wb.SheetNames[0];
+    const rows = xlsx.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1 });
+    const members = [];
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r || !r[1]) continue;
+      const stt = String(r[0] || i);
+      const name = String(r[1]).trim();
+      const role = String(r[2] || '').trim();
+      const fp = String(r[3] !== undefined && r[3] !== null ? r[3] : '').trim();
+      let dob = '';
+      if (r[4]) {
+        if (typeof r[4] === 'number') {
+          const p = xlsx.SSF.parse_date_code(r[4]);
+          const dd = String(p.d).padStart(2, '0');
+          const mm = String(p.m).padStart(2, '0');
+          dob = `${dd}/${mm}/${p.y}`;
+        } else {
+          dob = String(r[4]).trim();
+        }
+      }
+      members.push({ stt, name, role, fingerprint: fp, dob });
+    }
+    if (members.length > 0) {
+      membersList = members;
+      saveJson('members.json', membersList);
+      io.emit('members_updated', membersList);
+      return res.json({ success: true, count: membersList.length, members: membersList });
+    }
+    res.status(400).json({ error: 'Không tìm thấy dòng dữ liệu nào trong sheet' });
+  } catch (err) {
+    console.error('Error reloading excel:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/questions/squizz', (req, res) => {
   res.json(squizzQuestions);
 });

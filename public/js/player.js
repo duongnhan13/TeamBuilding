@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   selectMember.addEventListener('change', () => {
     const selectedOpt = selectMember.selectedOptions[0];
-    if (selectedOpt && selectedOpt.dataset.dob && !inputDob.value) {
-      inputDob.value = selectedOpt.dataset.dob;
+    if (selectedOpt) {
+      inputDob.value = selectedOpt.dataset.dob || '';
     }
     if (joinErrorBox) joinErrorBox.style.display = 'none';
   });

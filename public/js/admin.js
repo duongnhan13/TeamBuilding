@@ -594,4 +594,28 @@ document.addEventListener('DOMContentLoaded', () => {
       memberTableBody.appendChild(tr);
     });
   }
+
+  const btnReloadExcel = document.getElementById('btn-reload-excel');
+  if (btnReloadExcel) {
+    btnReloadExcel.addEventListener('click', () => {
+      btnReloadExcel.textContent = '⏳ Đang nạp từ Excel...';
+      fetch('/api/members/reload_excel', { method: 'POST' })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            btnReloadExcel.textContent = '✅ Nạp thành công!';
+            adminState.members = res.members;
+            renderMembersTable(res.members);
+            setTimeout(() => { btnReloadExcel.textContent = '🔄 Đọc Lại Từ File Excel'; }, 1800);
+          } else {
+            alert('Lỗi: ' + (res.error || 'Không thể nạp dữ liệu từ Excel'));
+            btnReloadExcel.textContent = '🔄 Đọc Lại Từ File Excel';
+          }
+        })
+        .catch(err => {
+          alert('Lỗi kết nối khi nạp Excel: ' + err.message);
+          btnReloadExcel.textContent = '🔄 Đọc Lại Từ File Excel';
+        });
+    });
+  }
 });
