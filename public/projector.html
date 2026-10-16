@@ -78,23 +78,39 @@
           </div>
         </div>
 
-        <!-- Right: Connected Players (Unlimited) -->
-        <div class="glass-panel lobby-players-card">
+        <!-- Right: Connected Players & Missing Members Callout -->
+        <div class="glass-panel lobby-players-card" style="display: flex; flex-direction: column;">
           <div class="lobby-players-header">
             <div>
-              <h2 style="font-size: 1.6rem; font-weight: 900;">DANH SÁCH NGƯỜI CHƠI ĐÃ VÀO PHÒNG</h2>
+              <h2 style="font-size: 1.6rem; font-weight: 900;">ĐÃ ĐIỂM DANH VÀO PHÒNG</h2>
               <p style="font-size: 0.95rem; color: var(--text-muted);">
-                Không giới hạn số lượng • Quét mã là vào ngay lập tức
+                Quét mã QR & chạm vân tay là hiển thị ngay lập tức
               </p>
             </div>
             <div style="font-size: 1.3rem; font-weight: 900; color: var(--cyan);">
-              <span id="proj-lobby-ready-count">0</span> đã sẵn sàng
+              <span id="proj-lobby-ready-count" style="color: #6ee7b7;">0</span> / <span id="proj-lobby-total-members">47</span> thành viên
             </div>
           </div>
 
-          <div class="player-grid" id="proj-player-grid" style="max-height: 520px;">
+          <!-- Connected Players Grid -->
+          <div class="player-grid" id="proj-player-grid" style="max-height: 280px; min-height: 120px;">
             <div style="color: var(--text-muted); font-style: italic; margin: auto;" id="empty-hint">
               Đang chờ các thành viên quét mã QR tham gia...
+            </div>
+          </div>
+
+          <!-- Missing Members Callout Panel (Anh em nhắc nhau) -->
+          <div class="missing-members-box" id="proj-missing-box">
+            <div class="missing-header-row">
+              <div class="missing-title-text">
+                <span>🚨 CÒN <span id="proj-missing-count" class="missing-count-badge">47</span> ĐỒNG CHÍ CHƯA VÀO PHÒNG (NHẮC NHAU NHANH NÀO):</span>
+              </div>
+              <div style="font-size: 0.85rem; color: #fca5a5; font-style: italic;">
+                *Ai ngồi cạnh gọi đồng nghiệp điểm danh nhé!
+              </div>
+            </div>
+            <div class="missing-chips-grid" id="proj-missing-grid">
+              <!-- Filled by JS -->
             </div>
           </div>
         </div>

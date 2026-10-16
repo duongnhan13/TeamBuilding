@@ -90,57 +90,98 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => console.error('Error fetching members:', err));
 
-  function populateMemberSelect(members) {
+  const memberQuickFilter = document.getElementById('member-quick-filter');
+  const memberProfileCard = document.getElementById('member-profile-card');
+  const cardMemberName = document.getElementById('card-member-name');
+  const cardMemberRole = document.getElementById('card-member-role');
+  const cardMemberAvatar = document.getElementById('card-member-avatar');
+  const cardMemberZodiac = document.getElementById('card-member-zodiac');
+
+  function populateMemberSelect(members, filterText = '') {
     if (!selectMember) return;
     selectMember.innerHTML = '<option value="">-- Chọn tên bạn (47 cán bộ nhân viên) --</option>';
-    members.forEach(m => {
+    
+    const filtered = filterText 
+      ? members.filter(m => (m.name && m.name.toLowerCase().includes(filterText)) || (m.role && m.role.toLowerCase().includes(filterText)) || String(m.stt) === filterText)
+      : members;
+
+    filtered.forEach(m => {
       const opt = document.createElement('option');
       opt.value = m.stt;
       opt.textContent = `${m.stt}. ${m.name} ${m.role ? '(' + m.role + ')' : ''}`;
       opt.dataset.name = m.name;
       opt.dataset.role = m.role || '';
       opt.dataset.dob = m.dob || '';
+      opt.dataset.fingerprint = m.fingerprint || '';
       if (playerState.memberId && String(m.stt) === String(playerState.memberId)) {
         opt.selected = true;
       }
       selectMember.appendChild(opt);
     });
 
-    if (playerState.fingerprint && inputFingerprint) {
-      inputFingerprint.value = playerState.fingerprint;
-    }
-    if (playerState.dob && inputDob) {
-      inputDob.value = playerState.dob;
+    if (selectMember.value) {
+      updateProfileCardFromSelect();
     }
   }
 
-  selectMember.addEventListener('change', () => {
+  if (memberQuickFilter) {
+    memberQuickFilter.addEventListener('input', () => {
+      const q = memberQuickFilter.value.trim().toLowerCase();
+      populateMemberSelect(playerState.members, q);
+    });
+  }
+
+  function updateProfileCardFromSelect() {
     const selectedOpt = selectMember.selectedOptions[0];
-    if (selectedOpt) {
-      inputDob.value = selectedOpt.dataset.dob || '';
+    if (!selectedOpt || !selectedOpt.value) {
+      if (memberProfileCard) memberProfileCard.style.display = 'none';
+      return;
     }
+
+    const name = selectedOpt.dataset.name;
+    const role = selectedOpt.dataset.role || 'Phòng TCKT';
+    const dob = selectedOpt.dataset.dob || '';
+    const fp = selectedOpt.dataset.fingerprint || '';
+
+    if (inputFingerprint) inputFingerprint.value = fp;
+    if (inputDob) inputDob.value = dob;
+
+    if (cardMemberName) cardMemberName.textContent = name;
+    if (cardMemberRole) cardMemberRole.textContent = role;
+    if (cardMemberAvatar) cardMemberAvatar.textContent = selectedAvatar;
+
+    if (cardMemberZodiac) {
+      if (window.zodiacHelper && dob) {
+        const zd = window.zodiacHelper.getZodiacDetails(dob);
+        cardMemberZodiac.innerHTML = window.zodiacHelper.generateZodiacBadgesHtml(zd, 'normal');
+      } else {
+        cardMemberZodiac.innerHTML = '';
+      }
+    }
+
+    if (memberProfileCard) memberProfileCard.style.display = 'block';
+  }
+
+  selectMember.addEventListener('change', () => {
+    updateProfileCardFromSelect();
     if (joinErrorBox) joinErrorBox.style.display = 'none';
   });
 
-  // Biometric Touch Login
+  // Biometric Touch Login (1-Touch Effortless Login!)
   btnFingerprintScan.addEventListener('click', () => {
     const memberId = selectMember.value;
     const selectedOpt = selectMember.selectedOptions[0];
-    const nickname = selectedOpt ? selectedOpt.dataset.name : '';
-    const fingerprint = inputFingerprint.value.trim();
-    const dob = inputDob.value.trim();
 
-    if (!memberId) {
+    if (!memberId || !selectedOpt) {
       showJoinError('Vui lòng chọn tên của bạn trong danh sách 47 cán bộ nhân viên!');
       selectMember.focus();
       return;
     }
 
-    if (!fingerprint) {
-      showJoinError('Vui lòng nhập Mã vân tay (Mã chấm công) của bạn!');
-      inputFingerprint.focus();
-      return;
-    }
+    const nickname = selectedOpt.dataset.name || '';
+    // Use pre-registered fingerprint if input is empty
+    const fingerprint = (inputFingerprint && inputFingerprint.value.trim()) ? inputFingerprint.value.trim() : (selectedOpt.dataset.fingerprint || '');
+    const dob = (inputDob && inputDob.value.trim()) ? inputDob.value.trim() : (selectedOpt.dataset.dob || '');
 
     attemptLogin(memberId, nickname, fingerprint, dob, true);
   });
@@ -150,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (withAnimation) {
       btnFingerprintScan.classList.add('scanning');
-      scannerStatusText.textContent = 'ĐANG QUÉT SINH TRẮC HỌC... ⚡';
+      scannerStatusText.textContent = 'ĐANG QUÉT VÂN TAY SINH TRẮC HỌC... ⚡';
       if (window.soundFX) window.soundFX.playBiometricScan();
       if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
     }
@@ -164,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dob,
         avatar: selectedAvatar
       });
-    }, withAnimation ? 600 : 50);
+    }, withAnimation ? 550 : 50);
   }
 
   function showJoinError(msg) {
@@ -236,23 +277,31 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const { sign, lunar } = zodiacInfo;
-    const signText = sign ? `${sign.icon} ${sign.name}` : '';
-    const lunarText = lunar ? `${lunar.icon} ${lunar.canChi}` : '';
-
-    if (elMyZodiacBadge) {
-      elMyZodiacBadge.innerHTML = `✨ ${signText} • ${lunarText}`;
+    if (elMyZodiacBadge && window.zodiacHelper) {
+      elMyZodiacBadge.innerHTML = window.zodiacHelper.generateZodiacBadgesHtml(zodiacInfo, 'small');
       elMyZodiacBadge.style.display = 'inline-flex';
     }
 
-    if (elWaitZodiacInfo) {
-      elWaitZodiacInfo.innerHTML = `
-        <div class="player-zodiac-pill" style="font-size: 0.95rem; padding: 6px 16px;">
-          ✨ Cung ${sign ? sign.name + ' (' + sign.icon + ')' : ''} • ${lunar ? lunar.fullText : ''}
-        </div>
-      `;
+    if (elWaitZodiacInfo && window.zodiacHelper) {
+      elWaitZodiacInfo.innerHTML = window.zodiacHelper.generateZodiacBadgesHtml(zodiacInfo, 'normal');
     }
   }
+
+  socket.on('player_list_updated', ({ players, total, activation }) => {
+    if (activation) {
+      const elMissingCount = document.getElementById('player-missing-count');
+      const elMissingNames = document.getElementById('player-missing-names');
+      if (elMissingCount) elMissingCount.textContent = activation.missingCount;
+      if (elMissingNames) {
+        if (activation.missingCount === 0) {
+          elMissingNames.innerHTML = `<span style="color: #6ee7b7; font-weight: 800;">🎉 Toàn thể 47 cán bộ nhân viên đã có mặt đầy đủ!</span>`;
+        } else {
+          const names = activation.missingMembers.map(m => `${m.name}${m.role ? ' (' + m.role + ')' : ''}`);
+          elMissingNames.textContent = names.join(', ');
+        }
+      }
+    }
+  });
 
   socket.on('members_updated', (members) => {
     playerState.members = members;

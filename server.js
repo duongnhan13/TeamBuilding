@@ -301,6 +301,53 @@ function getConnectedPlayers() {
   return list;
 }
 
+function getMemberActivationStatus() {
+  const connected = getConnectedPlayers();
+  const connectedMemberIds = new Set(
+    connected
+      .filter(p => p.memberId)
+      .map(p => String(p.memberId))
+  );
+
+  const activatedMembers = [];
+  const missingMembers = [];
+
+  membersList.forEach(m => {
+    const isAct = connectedMemberIds.has(String(m.stt));
+    const obj = {
+      stt: m.stt,
+      name: m.name,
+      role: m.role || '',
+      dob: m.dob || '',
+      fingerprint: m.fingerprint || '',
+      zodiacInfo: m.dob ? zodiacHelper.getZodiacDetails(m.dob) : null
+    };
+    if (isAct) {
+      activatedMembers.push(obj);
+    } else {
+      missingMembers.push(obj);
+    }
+  });
+
+  return {
+    totalMembers: membersList.length,
+    activatedCount: activatedMembers.length,
+    missingCount: missingMembers.length,
+    activatedMembers,
+    missingMembers
+  };
+}
+
+function broadcastPlayerList() {
+  const players = getConnectedPlayers();
+  const activation = getMemberActivationStatus();
+  io.emit('player_list_updated', {
+    players,
+    total: players.length,
+    activation
+  });
+}
+
 function normalizeName(str) {
   if (!str) return '';
   return str.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -511,11 +558,8 @@ io.on('connection', (socket) => {
       members: membersList
     });
 
-    // Notify host & all
-    io.to('host').emit('player_list_updated', {
-      players: getConnectedPlayers(),
-      total: getConnectedPlayers().length
-    });
+    // Notify host & all clients
+    broadcastPlayerList();
 
     io.to('host').emit('player_joined_toast', {
       nickname: player.nickname,
@@ -528,12 +572,13 @@ io.on('connection', (socket) => {
       mode: gameState.mode,
       players: getConnectedPlayers(),
       totalPlayers: getConnectedPlayers().length,
+      activation: getMemberActivationStatus(),
       squizz: {
         currentIndex: gameState.squizz.currentIndex,
         isOpen: gameState.squizz.isOpen,
         isRevealed: gameState.squizz.isRevealed,
         timeRemaining: gameState.squizz.timeRemaining,
-        timeLimit: gameState.squizz.timeLimit,
+        timeLimit: gameState.squizz.timeLimit || 30,
         question: squizzQuestions[gameState.squizz.currentIndex] || null,
         tally: calculateSquizzTally()
       },
@@ -667,7 +712,10 @@ io.on('connection', (socket) => {
     gameState.squizz.isRevealed = false;
     gameState.squizz.votes = {};
     gameState.squizz.rawVotes = {};
-    if (timeLimit !== undefined) gameState.squizz.timeLimit = timeLimit;
+    
+    // Default timer: strictly 30s for Question 1, or timeLimit if specified
+    const chosenTimer = (questionIndex === 0) ? (timeLimit !== undefined ? timeLimit : 30) : (timeLimit !== undefined ? timeLimit : 30);
+    gameState.squizz.timeLimit = chosenTimer;
 
     const q = squizzQuestions[gameState.squizz.currentIndex];
 
@@ -975,10 +1023,7 @@ io.on('connection', (socket) => {
     gameState.mode = 'LOBBY';
     if (gameState.qa.timer) clearInterval(gameState.qa.timer);
     io.emit('game_mode_changed', { mode: 'LOBBY' });
-    io.to('host').emit('player_list_updated', {
-      players: getConnectedPlayers(),
-      total: getConnectedPlayers().length
-    });
+    broadcastPlayerList();
   });
 
   socket.on('host_reset_scores', () => {
@@ -989,10 +1034,7 @@ io.on('connection', (socket) => {
     gameState.squizz.votes = {};
     gameState.squizz.rawVotes = {};
     io.emit('scores_reset');
-    io.to('host').emit('player_list_updated', {
-      players: getConnectedPlayers(),
-      total: getConnectedPlayers().length
-    });
+    broadcastPlayerList();
   });
 
   // --- ADMIN RESET & BOT SIMULATION (TESTING FEATURES) ---
@@ -1038,10 +1080,7 @@ io.on('connection', (socket) => {
       });
     }
 
-    io.to('host').emit('player_list_updated', {
-      players: getConnectedPlayers(),
-      total: getConnectedPlayers().length
-    });
+    broadcastPlayerList();
   });
 
   socket.on('host_simulate_squizz', () => {
@@ -1177,10 +1216,7 @@ io.on('connection', (socket) => {
     gameState.squizz.rawVotes = {};
     gameState.qa.answers = {};
     io.emit('scores_reset');
-    io.to('host').emit('player_list_updated', {
-      players: [],
-      total: 0
-    });
+    broadcastPlayerList();
   });
 
   socket.on('host_jump_to_q', ({ mode, index }) => {
@@ -1190,10 +1226,14 @@ io.on('connection', (socket) => {
       gameState.squizz.isRevealed = false;
       gameState.squizz.votes = {};
       gameState.squizz.rawVotes = {};
+      if (gameState.squizz.currentIndex === 0) {
+        gameState.squizz.timeLimit = 30;
+      }
       const q = squizzQuestions[gameState.squizz.currentIndex];
       io.emit('squizz_question_started', {
         currentIndex: gameState.squizz.currentIndex,
         total: squizzQuestions.length,
+        timeLimit: gameState.squizz.timeLimit || 30,
         question: q
       });
       io.to('host').emit('squizz_live_update', {
@@ -1232,10 +1272,7 @@ io.on('connection', (socket) => {
       const player = gameState.players.get(playerId);
       if (player) {
         player.connected = false;
-        io.to('host').emit('player_list_updated', {
-          players: getConnectedPlayers(),
-          total: getConnectedPlayers().length
-        });
+        broadcastPlayerList();
       }
     }
   });

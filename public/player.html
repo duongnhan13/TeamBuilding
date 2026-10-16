@@ -60,47 +60,46 @@
 
     <!-- SCREEN 1: BIOMETRIC FINGERPRINT LOGIN -->
     <section class="glass-panel player-card" id="screen-join">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div style="font-size: 3rem; margin-bottom: 6px;">🎪</div>
-        <h1 style="font-size: 1.5rem; font-weight: 900;" class="gold-gradient-text">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="font-size: 2.8rem; margin-bottom: 4px;">🎪</div>
+        <h1 style="font-size: 1.45rem; font-weight: 900;" class="gold-gradient-text">
           TEAM BUILDING TCKT
         </h1>
-        <p style="font-size: 0.85rem; color: #38bdf8; font-weight: 700; margin-top: 4px;">
+        <p style="font-size: 0.85rem; color: #38bdf8; font-weight: 800; margin-top: 2px;">
           ĐIỂM DANH SINH TRẮC HỌC (47 CÁN BỘ NHÂN VIÊN)
         </p>
       </div>
 
       <!-- Error Toast Box -->
-      <div id="join-error-box" style="display: none; background: rgba(244, 63, 94, 0.2); border: 1.5px solid var(--rose); border-radius: 12px; padding: 12px; margin-bottom: 16px; color: #fecdd3; font-size: 0.9rem; text-align: center; font-weight: 700;">
+      <div id="join-error-box" style="display: none; background: rgba(244, 63, 94, 0.2); border: 1.5px solid var(--rose); border-radius: 12px; padding: 12px; margin-bottom: 14px; color: #fecdd3; font-size: 0.9rem; text-align: center; font-weight: 700;">
       </div>
 
-      <div style="margin-bottom: 6px; font-weight: 700; font-size: 0.9rem;">
-        1. Chọn biểu tượng đại diện:
-      </div>
-      <div class="avatar-selector" id="avatar-list">
-        <!-- Filled by JS -->
+      <!-- Quick Name Selector -->
+      <div style="margin-bottom: 8px;">
+        <label style="font-weight: 800; font-size: 0.95rem; color: var(--cyan); display: block; margin-bottom: 6px;">
+          👉 1. Chọn tên của bạn (47 cán bộ nhân viên):
+        </label>
+        <input type="text" id="member-quick-filter" class="input-field" placeholder="🔍 Gõ tên bạn để tìm nhanh..." style="margin-bottom: 8px; font-size: 0.95rem;">
+        <select id="select-member" class="input-field" style="font-size: 1rem; font-weight: 800; height: 50px; margin-bottom: 12px;">
+          <option value="">-- Đang nạp danh sách 47 thành viên... --</option>
+        </select>
       </div>
 
-      <div style="margin-bottom: 6px; font-weight: 700; font-size: 0.9rem; margin-top: 10px;">
-        2. Chọn tên của bạn trong danh sách:
+      <!-- Auto Profile Card (Pops up when selected) -->
+      <div class="member-quick-card" id="member-profile-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div class="member-quick-name" id="card-member-name">Nguyễn Thị Thùy Dung</div>
+            <div class="member-quick-role" id="card-member-role">Trưởng phòng</div>
+          </div>
+          <div style="font-size: 2.5rem;" id="card-member-avatar">😎</div>
+        </div>
+        <div class="member-quick-zodiac" id="card-member-zodiac"></div>
       </div>
-      <select id="select-member" class="input-field" style="font-size: 0.95rem; font-weight: 700; height: 48px; margin-bottom: 12px;">
-        <option value="">-- Đang tải danh sách 47 thành viên... --</option>
-      </select>
 
-      <div style="margin-bottom: 6px; font-weight: 700; font-size: 0.9rem;">
-        3. Mã vân tay (Mã chấm công):
-      </div>
-      <input type="password" id="input-fingerprint" class="input-field" placeholder="Nhập mã chấm công của bạn..." inputmode="numeric" maxlength="10" autocomplete="off" style="margin-bottom: 12px; letter-spacing: 2px;">
-
-      <div style="margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: var(--gold);">
-        4. Ngày sinh (Tùy chọn - để hiện Cung & Con giáp):
-      </div>
-      <input type="text" id="input-dob" class="input-field" placeholder="Ví dụ: 15/06/1992 hoặc 1995..." maxlength="15" style="margin-bottom: 16px;">
-
-      <!-- Glowing Biometric Touch Scanner -->
-      <div class="biometric-scanner-container">
-        <button type="button" class="fingerprint-btn" id="btn-fingerprint-scan" title="Chạm để quét vân tay">
+      <!-- Massive Glowing Biometric Touch Scanner -->
+      <div class="biometric-scanner-container" style="margin-top: 6px;">
+        <button type="button" class="fingerprint-btn" id="btn-fingerprint-scan" title="Chạm để xác thực vân tay">
           <div class="fingerprint-scan-line"></div>
           <svg class="fingerprint-icon" viewBox="0 0 24 24">
             <path d="M12 2a10 10 0 0 0-7.07 17.07M12 6a6 6 0 0 0-4.24 10.24M12 10a2 2 0 0 0-1.41 3.41M12 14a2 2 0 0 1 1.41-.59M12 18a6 6 0 0 1 4.24-1.76M12 22a10 10 0 0 1 7.07-2.93"/>
@@ -110,26 +109,51 @@
         <div class="biometric-label" id="scanner-status-text">CHẠM ĐỂ XÁC THỰC VÂN TAY 👆</div>
       </div>
 
-      <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 10px;">
-        🔒 Hệ thống bảo mật điểm danh BVĐK Phương Đông
+      <!-- Advanced Optional Accordion -->
+      <details style="margin-top: 14px; font-size: 0.85rem; color: var(--text-muted); text-align: left;">
+        <summary style="cursor: pointer; color: var(--cyan); font-weight: 700;">⚙️ Tùy chọn nâng cao (Avatar / Mã chấm công)</summary>
+        <div style="margin-top: 10px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px;">
+          <div style="margin-bottom: 6px; font-weight: 700;">Chọn biểu tượng đại diện:</div>
+          <div class="avatar-selector" id="avatar-list"></div>
+          <div style="margin: 8px 0 4px; font-weight: 700;">Mã chấm công:</div>
+          <input type="password" id="input-fingerprint" class="input-field" placeholder="Mã chấm công..." inputmode="numeric" style="margin-bottom: 6px;">
+          <div style="margin: 8px 0 4px; font-weight: 700;">Ngày sinh (dd/mm/yyyy):</div>
+          <input type="text" id="input-dob" class="input-field" placeholder="dd/mm/yyyy...">
+        </div>
+      </details>
+
+      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 12px;">
+        🔒 Hệ thống điểm danh sinh trắc học BVĐK Phương Đông
       </div>
     </section>
 
     <!-- SCREEN 2: WAITING IN LOBBY -->
     <section class="glass-panel player-card" id="screen-waiting" style="display: none; text-align: center;">
       <div class="waiting-pulse-circle" id="wait-avatar">😎</div>
-      <h2 style="font-size: 1.45rem; font-weight: 800; margin-bottom: 8px;">
-        Xác thực vân tay thành công!
+      <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">
+        Điểm danh vân tay thành công!
       </h2>
-      <div id="wait-member-info" style="font-size: 1.1rem; font-weight: 800; color: #fef08a; margin-bottom: 4px;"></div>
-      <div id="wait-zodiac-info" style="margin-bottom: 20px;"></div>
+      <div id="wait-member-info" style="font-size: 1.15rem; font-weight: 900; color: #fef08a; margin-bottom: 6px;"></div>
+      <div id="wait-zodiac-info" style="margin-bottom: 16px;"></div>
       
-      <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;">
-        Hãy chú ý lên màn hình máy chiếu.<br>
+      <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
+        Hãy chú ý lên màn hình máy chiếu hội trường.<br>
         MC sẽ khởi động trò chơi trong giây lát!
       </p>
-      <div style="background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 12px; font-size: 0.85rem; color: var(--cyan);">
-        ⏳ Trạng thái: Đang kết nối trực tiếp với MC
+
+      <!-- Missing Colleagues Banner (Nhắc nhau) -->
+      <div class="missing-members-box" id="player-missing-box" style="margin-bottom: 16px; text-align: left; padding: 14px 16px;">
+        <div style="font-weight: 800; font-size: 0.92rem; color: #fecdd3; margin-bottom: 6px; display: flex; justify-content: space-between;">
+          <span>📢 Còn <span id="player-missing-count" style="color: var(--gold); font-weight: 900;">0</span> đồng nghiệp chưa vào:</span>
+          <span style="font-size: 0.75rem; color: #fca5a5;">(Nhắc nhau vào nhanh)</span>
+        </div>
+        <div id="player-missing-names" style="font-size: 0.82rem; color: #ffe4e6; line-height: 1.5; max-height: 90px; overflow-y: auto;">
+          Đang tải danh sách...
+        </div>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 12px; font-size: 0.85rem; color: var(--cyan);">
+        ⏳ Trạng thái: Đã kết nối trực tiếp với MC & Màn Chiếu
       </div>
     </section>
 

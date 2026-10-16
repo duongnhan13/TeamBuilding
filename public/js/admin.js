@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     squizzQuestions: [],
     qaQuestions: [],
     members: [],
+    activation: null,
+    actTab: 'all',
     squizzIndex: 0,
     qaIndex: 0,
     isSquizzLocked: false,
@@ -29,6 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const elSecretTally = document.getElementById('admin-secret-tally');
   const btnToggleLock = document.getElementById('btn-toggle-lock');
 
+  const elActSummary = document.getElementById('admin-act-summary');
+  const elActMissingBadge = document.getElementById('admin-act-missing-badge');
+
   // Connect as Admin
   socket.emit('admin_join');
 
@@ -43,6 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateModeBadge(data.mode);
     populateJumpSelect();
 
+    if (data.activation) {
+      adminState.activation = data.activation;
+      updateActivationBadges(data.activation);
+    }
+
     if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
       updateSquizzTeleprompter(data.squizz.question, data.squizz.currentIndex, data.squizzQuestions.length);
       if (data.squizz.tally) updateSecretTally(data.squizz.tally);
@@ -51,10 +61,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  socket.on('player_list_updated', ({ players, total }) => {
+  socket.on('player_list_updated', ({ players, total, activation }) => {
     adminState.players = players;
     updatePlayerCount(total);
+    if (activation) {
+      adminState.activation = activation;
+      updateActivationBadges(activation);
+      renderActivationTable();
+    }
   });
+
+  function updateActivationBadges(activation) {
+    if (!activation) return;
+    if (elActSummary) {
+      elActSummary.textContent = `${activation.activatedCount}/${activation.totalMembers} Đã Điểm Danh`;
+    }
+    if (elActMissingBadge) {
+      elActMissingBadge.textContent = `${activation.missingCount} chưa vào`;
+      elActMissingBadge.style.display = activation.missingCount > 0 ? 'inline-block' : 'none';
+    }
+    const missingBadgeModal = document.getElementById('modal-missing-count-badge');
+    if (missingBadgeModal) missingBadgeModal.textContent = activation.missingCount;
+    const activeBadgeModal = document.getElementById('modal-active-count-badge');
+    if (activeBadgeModal) activeBadgeModal.textContent = activation.activatedCount;
+  }
 
   socket.on('questions_updated', () => {
     // Refresh question list
@@ -261,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-mode-squizz').addEventListener('click', () => {
-    socket.emit('host_squizz_start', { questionIndex: 0, timeLimit: adminState.timerLimit });
+    socket.emit('host_squizz_start', { questionIndex: 0, timeLimit: 30 });
   });
 
   document.getElementById('btn-mode-qa').addEventListener('click', () => {
@@ -595,27 +625,122 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const btnReloadExcel = document.getElementById('btn-reload-excel');
-  if (btnReloadExcel) {
-    btnReloadExcel.addEventListener('click', () => {
-      btnReloadExcel.textContent = '⏳ Đang nạp từ Excel...';
-      fetch('/api/members/reload_excel', { method: 'POST' })
-        .then(r => r.json())
-        .then(res => {
-          if (res.success) {
-            btnReloadExcel.textContent = '✅ Nạp thành công!';
-            adminState.members = res.members;
-            renderMembersTable(res.members);
-            setTimeout(() => { btnReloadExcel.textContent = '🔄 Đọc Lại Từ File Excel'; }, 1800);
-          } else {
-            alert('Lỗi: ' + (res.error || 'Không thể nạp dữ liệu từ Excel'));
-            btnReloadExcel.textContent = '🔄 Đọc Lại Từ File Excel';
-          }
-        })
-        .catch(err => {
-          alert('Lỗi kết nối khi nạp Excel: ' + err.message);
-          btnReloadExcel.textContent = '🔄 Đọc Lại Từ File Excel';
-        });
+  // --- MODAL 3: LIVE ACTIVATION / ATTENDANCE MONITOR ---
+  const modalActivation = document.getElementById('modal-activation');
+  const btnToggleActivation = document.getElementById('btn-toggle-activation-modal');
+  const btnCloseActivation = document.getElementById('btn-close-activation');
+  const btnCloseActBottom = document.getElementById('btn-close-act-bottom');
+  const tabActAll = document.getElementById('tab-act-all');
+  const tabActMissing = document.getElementById('tab-act-missing');
+  const tabActActive = document.getElementById('tab-act-active');
+  const actSearchFilter = document.getElementById('act-search-filter');
+  const activationTableBody = document.getElementById('activation-table-body');
+
+  if (btnToggleActivation) {
+    btnToggleActivation.addEventListener('click', () => {
+      modalActivation.style.display = 'flex';
+      renderActivationTable();
+    });
+  }
+
+  [btnCloseActivation, btnCloseActBottom].forEach(btn => {
+    if (btn) btn.addEventListener('click', () => modalActivation.style.display = 'none');
+  });
+
+  if (tabActAll) {
+    tabActAll.addEventListener('click', () => {
+      adminState.actTab = 'all';
+      updateActTabButtons();
+      renderActivationTable();
+    });
+  }
+  if (tabActMissing) {
+    tabActMissing.addEventListener('click', () => {
+      adminState.actTab = 'missing';
+      updateActTabButtons();
+      renderActivationTable();
+    });
+  }
+  if (tabActActive) {
+    tabActActive.addEventListener('click', () => {
+      adminState.actTab = 'active';
+      updateActTabButtons();
+      renderActivationTable();
+    });
+  }
+
+  function updateActTabButtons() {
+    [tabActAll, tabActMissing, tabActActive].forEach(b => {
+      if (b) b.style.opacity = '0.6';
+    });
+    if (adminState.actTab === 'all' && tabActAll) tabActAll.style.opacity = '1';
+    if (adminState.actTab === 'missing' && tabActMissing) tabActMissing.style.opacity = '1';
+    if (adminState.actTab === 'active' && tabActActive) tabActActive.style.opacity = '1';
+  }
+
+  if (actSearchFilter) {
+    actSearchFilter.addEventListener('input', () => {
+      renderActivationTable();
+    });
+  }
+
+  function renderActivationTable() {
+    if (!activationTableBody) return;
+    activationTableBody.innerHTML = '';
+
+    const act = adminState.activation;
+    const query = actSearchFilter ? actSearchFilter.value.trim().toLowerCase() : '';
+
+    const activatedSet = new Set(act && act.activatedMembers ? act.activatedMembers.map(m => String(m.stt)) : []);
+    const allMembers = adminState.members.length > 0 ? adminState.members : (act ? [...(act.activatedMembers || []), ...(act.missingMembers || [])] : []);
+
+    let listToRender = allMembers;
+    if (adminState.actTab === 'missing') {
+      listToRender = allMembers.filter(m => !activatedSet.has(String(m.stt)));
+    } else if (adminState.actTab === 'active') {
+      listToRender = allMembers.filter(m => activatedSet.has(String(m.stt)));
+    }
+
+    if (query) {
+      listToRender = listToRender.filter(m =>
+        (m.name && m.name.toLowerCase().includes(query)) ||
+        (m.role && m.role.toLowerCase().includes(query)) ||
+        (m.stt && String(m.stt).includes(query))
+      );
+    }
+
+    if (listToRender.length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted); font-style: italic;">Không có thành viên nào phù hợp...</td>`;
+      activationTableBody.appendChild(tr);
+      return;
+    }
+
+    listToRender.forEach(m => {
+      const isJoined = activatedSet.has(String(m.stt));
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid rgba(255,255,255,0.06)';
+      tr.style.background = isJoined ? 'rgba(16, 185, 129, 0.05)' : 'rgba(244, 63, 94, 0.05)';
+
+      const zodiacDetails = (window.zodiacHelper && m.dob) ? window.zodiacHelper.getZodiacDetails(m.dob) : null;
+      let zodiacBadge = '<span style="color: var(--text-muted); font-size: 0.8rem;">Chưa có</span>';
+      if (zodiacDetails && zodiacDetails.sign && zodiacDetails.lunar) {
+        zodiacBadge = `<span style="font-size: 0.82rem; font-weight: 700; color: #fef08a;">${zodiacDetails.sign.icon} ${zodiacDetails.sign.name} • ${zodiacDetails.lunar.icon} ${zodiacDetails.lunar.canChi}</span>`;
+      }
+
+      const statusBadge = isJoined
+        ? `<span style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--emerald); color: #6ee7b7; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 0.8rem;">🟢 ĐÃ VÀO</span>`
+        : `<span style="background: rgba(244, 63, 94, 0.2); border: 1px solid var(--rose); color: #fca5a5; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 0.8rem;">🔴 CHƯA VÀO</span>`;
+
+      tr.innerHTML = `
+        <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan);">${m.stt}</td>
+        <td style="padding: 10px 12px; font-weight: 800; font-size: 0.95rem; color: #fff;">${m.name}</td>
+        <td style="padding: 10px 12px; font-size: 0.85rem; color: var(--text-muted);">${m.role || 'Thành viên'}</td>
+        <td style="padding: 10px 12px; font-family: monospace; font-size: 0.9rem; color: var(--gold);">${m.fingerprint || '--'}</td>
+        <td style="padding: 10px 12px;">${zodiacBadge}</td>
+        <td style="padding: 10px 12px; text-align: center;">${statusBadge}</td>
+      `;
+      activationTableBody.appendChild(tr);
     });
   }
 });

@@ -1532,3 +1532,257 @@ body {
   color: var(--cyan);
 }
 
+/* ==========================================================================
+   PREMIUM ZODIAC & LUNAR ANIMAL VISUAL BADGES
+   ========================================================================== */
+.zodiac-badges-container {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.zodiac-badge-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 5px 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.zodiac-badge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.zodiac-badge-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.zodiac-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+}
+
+.zodiac-badge-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.2px;
+}
+
+.zodiac-badge-sub {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  opacity: 0.85;
+}
+
+/* Spot Zodiac Container in Winner Spotlight */
+.spotlight-zodiac-banner {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 10px 0 16px;
+}
+
+.spotlight-zodiac-banner .zodiac-badge-card {
+  padding: 8px 18px;
+  border-radius: 14px;
+}
+.spotlight-zodiac-banner .zodiac-badge-icon {
+  font-size: 1.8rem;
+}
+.spotlight-zodiac-banner .zodiac-badge-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+.spotlight-zodiac-banner .zodiac-badge-sub {
+  font-size: 0.82rem;
+}
+
+/* ==========================================================================
+   LOBBY: MISSING MEMBERS CALLOUT (ĐIỂM DANH NHẮC NHAU)
+   ========================================================================== */
+.missing-members-box {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.12), rgba(245, 158, 11, 0.08));
+  border: 2px solid rgba(244, 63, 94, 0.4);
+  border-radius: 18px;
+  padding: 16px 20px;
+  margin-top: 16px;
+  box-shadow: 0 8px 24px rgba(244, 63, 94, 0.15);
+  animation: pulseBorder 3s infinite ease-in-out;
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(244, 63, 94, 0.4); box-shadow: 0 0 15px rgba(244, 63, 94, 0.15); }
+  50% { border-color: rgba(245, 158, 11, 0.7); box-shadow: 0 0 25px rgba(245, 158, 11, 0.3); }
+}
+
+.missing-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.missing-title-text {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fecdd3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.missing-count-badge {
+  background: var(--rose);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.missing-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.missing-chip {
+  background: rgba(244, 63, 94, 0.18);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffe4e6;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.missing-chip .chip-stt {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #fca5a5;
+}
+
+.all-checked-in-banner {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.15));
+  border: 2px solid var(--emerald);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  color: #a7f3d0;
+  font-weight: 800;
+  font-size: 1.1rem;
+  animation: popIn 0.3s ease;
+}
+
+/* ==========================================================================
+   STREAMLINED MOBILE 1-TOUCH LOGIN
+   ========================================================================== */
+.member-quick-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(56, 189, 248, 0.3);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  animation: popIn 0.3s ease;
+}
+
+.member-quick-name {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.member-quick-role {
+  font-size: 0.85rem;
+  color: var(--cyan);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.member-quick-zodiac {
+  margin-top: 10px;
+}
+
+.biometric-big-touch {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(99, 102, 241, 0.1) 70%);
+  border: 3px solid var(--cyan);
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.5), inset 0 0 20px rgba(56, 189, 248, 0.25);
+  border-radius: 50%;
+  width: 140px;
+  height: 140px;
+  margin: 12px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.biometric-big-touch:active {
+  transform: scale(0.92);
+  border-color: var(--emerald);
+  box-shadow: 0 0 50px rgba(16, 185, 129, 0.8);
+}
+
+.biometric-big-touch .fingerprint-icon {
+  width: 65px;
+  height: 65px;
+  stroke: var(--cyan);
+  stroke-width: 1.8;
+  fill: none;
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.8));
+}
+
+.biometric-big-touch:active .fingerprint-icon {
+  stroke: var(--emerald);
+}
+
+.admin-activation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1.5px solid var(--emerald);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #a7f3d0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-activation-badge:hover {
+  background: rgba(16, 185, 129, 0.25);
+  transform: translateY(-1px);
+}
+
+

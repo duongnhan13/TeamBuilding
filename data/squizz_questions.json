@@ -142,5 +142,101 @@
     "mcVoice": "Kế hoạch ăn chơi tiếp theo đã được lập sổ sách! Xin mời Trưởng phòng duyệt chi và nâng ly khai tiệc!",
     "punishment": "Cạn 1 chén vì chuyến đi sắp tới! 🏖️✈️",
     "suggested": ""
+  },
+  {
+    "id": 13,
+    "type": "VOTE_MEMBER",
+    "effectTheme": "snack-party",
+    "icon": "🧋",
+    "title": "Chiến thần trà sữa 15h00",
+    "question": "Ai là người cứ đến 15h00 chiều là bắt đầu rủ rê, khơi mào các kèo đặt Gongcha, trà đào, trà mận giải cứu cơn buồn ngủ của cả phòng?",
+    "target": "Chủ tịch hội trà sữa bánh ngọt",
+    "mcVoice": "Năng lượng buổi chiều của phòng Kế toán được duy trì nhờ công lao rủ rê của nhân vật này! Cả phòng xin nâng 1 chén trà sữa hoặc 1 chén rượu cảm ơn chủ tịch!",
+    "punishment": "Cạn 1 chén nạp 100% đường huyết! 🧋🍻",
+    "suggested": ""
+  },
+  {
+    "id": 14,
+    "type": "VOTE_MEMBER",
+    "effectTheme": "lightning-neon",
+    "icon": "⌨️",
+    "title": "Chiến thần Excel - Phím tắt không cần chuột",
+    "question": "Ai là người gõ phím lách cách nhanh như súng liên thanh, dùng Excel lướt phím tắt vèo vèo không bao giờ thèm đụng vào chuột máy tính?",
+    "target": "Bậc thầy bảng tính và công thức",
+    "mcVoice": "Bàn tay vàng trong làng phím tắt! Tốc độ ngón tay gõ phím nhanh hơn cả máy đếm tiền! Xin chúc mừng và mời bạn cạn 1 chén vinh danh!",
+    "punishment": "Cạn 1 chén chúc tay nghề gõ phím ngày càng điêu luyện! ⌨️🍷",
+    "suggested": "Dương Quý Nhân"
+  },
+  {
+    "id": 15,
+    "type": "VOTE_MEMBER",
+    "effectTheme": "rainbow-magic",
+    "icon": "😇",
+    "title": "Nụ cười công nghiệp bất biến",
+    "question": "Ai là người dù bị đòi tiền, giục duyệt chi hay điện thoại réo dồn dập 8 tiếng mỗi ngày vẫn giữ được gương mặt tươi cười dịu dàng 'Em đang làm rồi ạ'?",
+    "target": "Người kiên nhẫn và bình tĩnh nhất hành tinh",
+    "mcVoice": "Bản lĩnh thép của ngành kế toán! Giông bão ngoài kia không bằng sự điềm tĩnh dịu dàng của đồng chí! Xin mời cạn 1 chén xả stress!",
+    "punishment": "Cạn 1 chén giữ vững tinh thần thép! 😇🥂",
+    "suggested": ""
+  },
+  {
+    "id": 16,
+    "type": "VOTE_MEMBER",
+    "effectTheme": "royal-gold",
+    "icon": "📸",
+    "title": "Nhiếp ảnh gia kiêm Nữ hoàng sống ảo",
+    "question": "Ai là người chụp ảnh có tâm nhất phòng, mỗi chuyến đi chơi hay sự kiện đều chụp hàng trăm bức ảnh đẹp lung linh phục vụ chị em đăng Facebook?",
+    "target": "Nhà tài trợ ảnh sống ảo triệu like",
+    "mcVoice": "Không có đồng chí này thì album ảnh của cả phòng không thể rực rỡ như hôm nay! Xin cả phòng nâng ly cảm ơn nhiếp ảnh gia đại tài!",
+    "punishment": "Cả phòng nâng chén tri ân nhiếp ảnh gia! 📸🍾",
+    "suggested": ""
+  },
+  {
+    "id": 17,
+    "type": "VOTE_MEMBER",
+    "effectTheme": "speed-rocket",
+    "icon": "⏳",
+    "title": "Chiến thần 'Để mai tính'",
+    "question": "Ai là người hay nói câu cửa miệng 'Cứ để đấy mai em xử lý', nhưng đến hạn chót deadline thì bùng nổ năng lượng hoàn thành xuất sắc trong 1 nốt nhạc?",
+    "target": "Bậc thầy chạy nước rút deadline",
+    "mcVoice": "Áp lực tạo nên kim cương, và đồng chí này chính là viên kim cương sáng nhất lúc cận kề deadline! Mời cạn 1 chén ăn mừng!",
+    "punishment": "Cạn 1 chén mừng vượt qua mọi hạn chót! ⏳🍻",
+    "suggested": ""
+  },
+  {
+    "id": 18,
+    "type": "VOTE_MEMBER",
+    "effectTheme": "party-beer",
+    "icon": "🎭",
+    "title": "Cây hài duyên dáng của phòng",
+    "question": "Ai là người chỉ cần mở miệng nói 1 câu hoặc làm 1 biểu cảm là cả phòng Kế toán cười lăn cười bò, cứu tinh giải tỏa căng thẳng những ngày chốt sổ?",
+    "target": "Liều thuốc bổ nụ cười của cả phòng",
+    "mcVoice": "Cây hài độc quyền của BVĐK Phương Đông! Mỗi câu nói là một rổ tiếng cười! Xin mời cây hài cạn 1 chén cùng cả phòng!",
+    "punishment": "Cạn 1 chén vì nụ cười của toàn đội! 🎭🍺",
+    "suggested": ""
+  },
+  {
+    "id": 19,
+    "type": "OPEN_TEXT",
+    "effectTheme": "royal-gold",
+    "icon": "💌",
+    "title": "CÂU HỎI MỞ: Kỷ niệm nhớ đời tại Phương Đông",
+    "question": "Hãy chia sẻ ngắn gọn 1 kỷ niệm hoặc khoảnh khắc hài hước / đáng nhớ nhất của bạn kể từ khi làm việc tại phòng Kế toán BVĐK Phương Đông?",
+    "target": "Gắn kết cảm xúc và chia sẻ kỷ niệm chân thành",
+    "mcVoice": "Những dòng tâm sự chân thành nhất đang xuất hiện trên màn hình lớn! Xin mời tác giả câu chuyện đứng lên nhận chén rượu tri ân!",
+    "punishment": "Cả phòng nâng ly vì những kỷ niệm tuyệt vời đã qua! 🥂❤️",
+    "suggested": ""
+  },
+  {
+    "id": 20,
+    "type": "OPEN_TEXT",
+    "effectTheme": "money-rain",
+    "icon": "🌟",
+    "title": "CÂU HỎI MỞ: Lời chúc bá đạo gửi cả phòng",
+    "question": "Hãy gửi 1 lời chúc chất chơi nhất tới Trưởng phòng, các Phó phòng và toàn thể anh chị em phòng Kế toán năm 2026?",
+    "target": "Bùng nổ năng lượng tích cực và may mắn tài lộc",
+    "mcVoice": "Lời chúc mang lại may mắn và tài lộc cho cả năm 2026! Trưởng phòng cùng nâng ly khai mở tài lộc!",
+    "punishment": "100% CẠN CHÉN VÌ NĂM 2026 RỰC RỠ THẮNG LỢI! 🚀💰🍻",
+    "suggested": ""
   }
 ]

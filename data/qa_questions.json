@@ -223,5 +223,230 @@
     "correctAnswer": 0,
     "explanation": "Trái tim đập thì người sống, ngừng đập là toi ngay!",
     "timeLimit": 15
+  },
+  {
+    "id": 16,
+    "category": "Kế toán & Kinh tế",
+    "icon": "⚖️",
+    "question": "Trong ngành Kế toán, hệ thống ghi sổ kép 'Nợ - Có' (Debit & Credit) bắt nguồn từ quốc gia nào?",
+    "options": [
+      "Ai Cập cổ đại",
+      "Nước Ý (Italy)",
+      "Vương quốc Anh",
+      "Hy Lạp"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Nhà toán học người Ý Luca Pacioli đã xuất bản công trình đầu tiên về phương pháp kế toán kép vào năm 1494 tại Venice!",
+    "timeLimit": 20
+  },
+  {
+    "id": 17,
+    "category": "Đố vui hại não",
+    "icon": "🐷",
+    "question": "Con gì sinh ra đã có số hưởng, chỉ việc ăn tiền và ngủ trên tủ mà lúc nào cũng cười tươi?",
+    "options": [
+      "Con mèo thần tài",
+      "Con heo đất (Ống tiết kiệm)",
+      "Con cá chép phong thủy",
+      "Con gấu trúc"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Con heo đất / lợn đất chỉ việc nằm một chỗ 'ăn tiền' và cười cả ngày!",
+    "timeLimit": 15
+  },
+  {
+    "id": 18,
+    "category": "Phương Đông & Địa lý",
+    "icon": "🏥",
+    "question": "Bệnh viện Đa khoa Phương Đông tọa lạc tại con phố nào ở quận Bắc Từ Liêm, Hà Nội?",
+    "options": [
+      "Phố Vũ Phạm Hàm",
+      "Số 9 Phố Viên",
+      "Phố Trần Cung",
+      "Phố Hoàng Quốc Việt"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Bệnh viện ĐK Phương Đông ngự tại Số 9 Phố Viên, Cổ Nhuế 2, Bắc Từ Liêm, Hà Nội với khuôn viên xanh ngút ngàn gần 10 hecta!",
+    "timeLimit": 15
+  },
+  {
+    "id": 19,
+    "category": "Đố mẹo dân gian",
+    "icon": "⚰️",
+    "question": "Cái gì người mua biết, người bán biết, nhưng người trực tiếp sử dụng lại không bao giờ biết?",
+    "options": [
+      "Chiếc nôi em bé",
+      "Cái quan tài",
+      "Liều thuốc ngủ",
+      "Bình oxy"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Người nằm trong quan tài thì đã nhắm mắt xuôi tay nên không bao giờ biết!",
+    "timeLimit": 15
+  },
+  {
+    "id": 20,
+    "category": "Nghiệp vụ Kế toán",
+    "icon": "🏢",
+    "question": "Loại tài sản nào trong bảng cân đối kế toán dùng qua nhiều năm nhưng KHÔNG bị trích khấu hao?",
+    "options": [
+      "Hệ thống máy chủ dữ liệu",
+      "Xe cấp cứu bệnh viện",
+      "Quyền sử dụng đất lâu dài",
+      "Phần mềm ERP bệnh viện"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Theo Thông tư 45/2013/TT-BTC, Quyền sử dụng đất lâu dài là tài sản cố định vô hình đặc biệt KHÔNG trích khấu hao!",
+    "timeLimit": 20
+  },
+  {
+    "id": 21,
+    "category": "Đố vui cuộc sống",
+    "icon": "🛣️",
+    "question": "Con đường nào dài nhất mà không có bất kỳ điểm kết thúc nào?",
+    "options": [
+      "Đường xích đạo",
+      "Đường chân trời",
+      "Đường đời",
+      "Đường cao tốc Bắc Nam"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Đường đời của mỗi con người là hành trình dài bất tận với vô vàn trải nghiệm!",
+    "timeLimit": 15
+  },
+  {
+    "id": 22,
+    "category": "Kế toán Thuế",
+    "icon": "🧾",
+    "question": "Theo Nghị định 123/2020/NĐ-CP, yếu tố nào là BẮT BUỘC để một hóa đơn điện tử có giá trị pháp lý?",
+    "options": [
+      "Chữ ký số hợp lệ của người bán",
+      "Dấu mộc đỏ tươi của giám đốc",
+      "Màu nền hóa đơn phải màu xanh",
+      "In ra giấy A4 có đóng dấu giáp lai"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Hóa đơn điện tử hợp pháp bắt buộc phải có chữ ký số/chữ ký điện tử hợp lệ của bên bán!",
+    "timeLimit": 20
+  },
+  {
+    "id": 23,
+    "category": "Đố mẹo tình cảm",
+    "icon": "😊",
+    "question": "Cái gì mà bạn giữ thì có, trao cho người khác thì không mất đi mà lại nhân đôi niềm vui?",
+    "options": [
+      "Chiếc phong bì lương",
+      "Nụ cười chân thành",
+      "Bát chè sầu riêng",
+      "Mật khẩu máy tính"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Nụ cười trao đi mang lại niềm vui cho cả người nhận lẫn người trao mà bạn không hề mất đi!",
+    "timeLimit": 15
+  },
+  {
+    "id": 24,
+    "category": "Địa lý Việt Nam",
+    "icon": "🗺️",
+    "question": "Tỉnh nào ở Việt Nam có diện tích tự nhiên NHỎ NHẤT cả nước?",
+    "options": [
+      "Tỉnh Bắc Ninh",
+      "Tỉnh Hà Nam",
+      "Tỉnh Hưng Yên",
+      "Tỉnh Ninh Bình"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Bắc Ninh là tỉnh có diện tích nhỏ nhất Việt Nam (~822.7 km²) nhưng là trung tâm công nghiệp và văn hóa Quan họ lừng danh!",
+    "timeLimit": 15
+  },
+  {
+    "id": 25,
+    "category": "Đố vui kế toán",
+    "icon": "🍌",
+    "question": "Kế toán đi chợ mua 1 nải chuối 10 quả, gặp người nghèo cho 3 quả, bị rơi mất 2 quả. Hỏi kế toán còn gì?",
+    "options": [
+      "Còn 5 quả chuối",
+      "Còn cái hóa đơn mua chuối",
+      "Còn cái nịt",
+      "Còn tấm lòng nhân ái"
+    ],
+    "correctAnswer": 3,
+    "explanation": "Biết san sẻ cho người khó khăn thì cái còn mãi chính là tấm lòng nhân ái bao dung!",
+    "timeLimit": 15
+  },
+  {
+    "id": 26,
+    "category": "Tư duy logic",
+    "icon": "🦆",
+    "question": "Có 2 con vịt đi trước 2 con vịt, 2 con vịt đi sau 2 con vịt, 2 con vịt đi giữa 2 con vịt. Hỏi có tất cả mấy con?",
+    "options": [
+      "4 con vịt",
+      "6 con vịt",
+      "8 con vịt",
+      "10 con vịt"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Chỉ có đúng 4 con vịt bơi nối đuôi nhau thành 1 hàng dọc là thỏa mãn tất cả các điều kiện trên!",
+    "timeLimit": 15
+  },
+  {
+    "id": 27,
+    "category": "Phương Đông Pride",
+    "icon": "🏨",
+    "question": "BVĐK Phương Đông tiên phong theo mô hình chăm sóc sức khỏe độc đáo nào tại miền Bắc?",
+    "options": [
+      "Bệnh viện dã chiến công nghệ cao",
+      "Bệnh viện - Khách sạn 5 sao nghỉ dưỡng xanh",
+      "Trạm xá lưu động",
+      "Viện điều dưỡng quân đội"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Phương Đông là tổ hợp Y tế - Khách sạn 5 sao với không gian xanh ngát chuẩn resort, chữa lành thân - tâm - trí!",
+    "timeLimit": 15
+  },
+  {
+    "id": 28,
+    "category": "Nghệ thuật thế giới",
+    "icon": "🎨",
+    "question": "Bức tranh nào đắt giá nhất lịch sử thế giới từng được bán đấu giá với mức hơn 450 triệu USD?",
+    "options": [
+      "Mona Lisa",
+      "Salvator Mundi (Đấng Cứu Thế)",
+      "Đêm đầy sao (Starry Night)",
+      "Tiếng thét (The Scream)"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Kiệt tác 'Salvator Mundi' của Leonardo da Vinci được bán đấu giá tại Christie's năm 2017 với mức giá kỷ lục 450.3 triệu USD!",
+    "timeLimit": 20
+  },
+  {
+    "id": 29,
+    "category": "Đố mẹo thời gian",
+    "icon": "📅",
+    "question": "Tháng nào trong năm mọi người trên thế giới nói ít nhất?",
+    "options": [
+      "Tháng Giêng (Tháng 1)",
+      "Tháng Chạp (Tháng 12)",
+      "Tháng 2",
+      "Tháng 7 âm lịch"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Tháng 2 chỉ có 28 hoặc 29 ngày, ít ngày nhất trong năm nên số câu nói ít nhất!",
+    "timeLimit": 15
+  },
+  {
+    "id": 30,
+    "category": "Tinh thần đồng đội",
+    "icon": "🤝",
+    "question": "Trong bảng chữ cái và câu chữ tiếng Việt, thứ gì đứng chính giữa hai từ 'ĐOÀN' và 'KẾT'?",
+    "options": [
+      "Chữ O",
+      "Dấu cách (Khoảng trống kết nối)",
+      "Chữ A",
+      "Dấu gạch ngang"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Chính là dấu cách (space) kết nối hai từ ĐOÀN và KẾT thành sức mạnh vô địch của tập thể TCKT!",
+    "timeLimit": 15
   }
 ]

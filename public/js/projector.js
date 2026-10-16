@@ -25,11 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Elements
   const elPlayerCount = document.getElementById('proj-player-count');
   const elLobbyReadyCount = document.getElementById('proj-lobby-ready-count');
+  const elLobbyTotalMembers = document.getElementById('proj-lobby-total-members');
   const elPlayerGrid = document.getElementById('proj-player-grid');
   const elEmptyHint = document.getElementById('empty-hint');
   const elQrImg = document.getElementById('proj-qr-img');
   const elJoinUrl = document.getElementById('proj-join-url');
   const elNetStatus = document.getElementById('proj-net-status');
+  const elMissingBox = document.getElementById('proj-missing-box');
+  const elMissingCount = document.getElementById('proj-missing-count');
+  const elMissingGrid = document.getElementById('proj-missing-grid');
 
   // Views
   const views = {
@@ -75,6 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
     projState.mode = data.mode;
     projState.players = data.players || [];
     updatePlayers();
+    if (data.activation) {
+      updateMissingMembersList(data.activation);
+    }
 
     if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
       renderSquizz(data.squizz.question, data.squizz.currentIndex, data.squizzQuestions.length, data.squizz.timeLimit);
@@ -98,11 +105,15 @@ document.addEventListener('DOMContentLoaded', () => {
     elNetStatus.innerHTML = `🌐 <strong>ĐÃ NỐI CLOUDFLARE TOÀN CẦU</strong> (4G / 5G / Wi-Fi)`;
   });
 
-  socket.on('player_list_updated', ({ players, total }) => {
+  socket.on('player_list_updated', ({ players, total, activation }) => {
     projState.players = players;
-    elPlayerCount.textContent = total;
-    elLobbyReadyCount.textContent = total;
+    if (elPlayerCount) elPlayerCount.textContent = total;
+    if (elLobbyReadyCount) elLobbyReadyCount.textContent = total;
     updatePlayers();
+
+    if (activation) {
+      updateMissingMembersList(activation);
+    }
 
     const sqTotal = document.getElementById('proj-sq-total');
     if (sqTotal) sqTotal.textContent = total;
@@ -114,6 +125,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.soundFX) window.soundFX.playJoin();
   });
 
+  function updateMissingMembersList(activation) {
+    if (!activation) return;
+    if (elLobbyTotalMembers) elLobbyTotalMembers.textContent = activation.totalMembers;
+    if (elLobbyReadyCount) elLobbyReadyCount.textContent = activation.activatedCount;
+    if (elMissingCount) elMissingCount.textContent = activation.missingCount;
+
+    if (!elMissingGrid) return;
+    elMissingGrid.innerHTML = '';
+
+    if (activation.missingCount === 0) {
+      elMissingGrid.innerHTML = `
+        <div class="all-checked-in-banner" style="width: 100%;">
+          🎉 TOÀN THỂ ${activation.totalMembers} CÁN BỘ NHÂN VIÊN PHÒNG TCKT ĐÃ ĐIỂM DANH ĐÔNG ĐỦ! SẴN SÀNG KHỞI TRANH! 🚀
+        </div>
+      `;
+      return;
+    }
+
+    activation.missingMembers.forEach(m => {
+      const chip = document.createElement('div');
+      chip.className = 'missing-chip';
+      const roleStr = m.role ? ` (${m.role})` : '';
+      chip.innerHTML = `<span class="chip-stt">#${m.stt}</span> <span>${escapeHtml(m.name)}${escapeHtml(roleStr)}</span>`;
+      elMissingGrid.appendChild(chip);
+    });
+  }
+
   function updatePlayers() {
     if (!elPlayerGrid) return;
     elPlayerGrid.innerHTML = '';
@@ -124,8 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
     projState.players.forEach(p => {
       const chip = document.createElement('div');
       chip.className = 'player-chip';
-      const zodiacText = (p.zodiacInfo && p.zodiacInfo.sign) ? ` <span style="font-size: 0.8rem; opacity: 0.85;">(${p.zodiacInfo.sign.icon})</span>` : '';
-      chip.innerHTML = `<span class="avatar">${p.avatar}</span> <span>${p.nickname}${zodiacText}</span>`;
+      const zodiacText = (p.zodiacInfo && p.zodiacInfo.sign) ? ` <span style="font-size: 0.82rem; opacity: 0.9;">(${p.zodiacInfo.sign.icon})</span>` : '';
+      chip.innerHTML = `<span class="avatar">${p.avatar}</span> <span>${escapeHtml(p.nickname)}${zodiacText}</span>`;
       elPlayerGrid.appendChild(chip);
     });
   }
@@ -328,12 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Zodiac & Con Giap Display
     if (spotZodiacCard) {
-      if (winnerDetails && winnerDetails.zodiac) {
-        const { sign, lunar } = winnerDetails.zodiac;
-        const signHtml = sign ? `<div class="spotlight-zodiac-item">✨ Cung ${sign.name} (${sign.icon})</div>` : '';
-        const lunarHtml = lunar ? `<div class="spotlight-zodiac-item">${lunar.icon} ${lunar.fullText}</div>` : '';
-        spotZodiacCard.innerHTML = `${signHtml} <span style="opacity:0.5;">•</span> ${lunarHtml}`;
-        spotZodiacCard.style.display = 'inline-flex';
+      if (winnerDetails && winnerDetails.zodiac && window.zodiacHelper) {
+        spotZodiacCard.innerHTML = window.zodiacHelper.generateZodiacBadgesHtml(winnerDetails.zodiac, 'normal');
+        spotZodiacCard.style.display = 'flex';
       } else {
         spotZodiacCard.style.display = 'none';
       }
