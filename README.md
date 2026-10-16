@@ -27,37 +27,54 @@ Hệ thống web trò chơi tương tác thời gian thực (Real-time Multiplay
 
 ---
 
-## 🚀 HƯỚNG DẪN SỬ DỤNG NHANH
+## 🚀 HƯỚNG DẪN KHỞI ĐỘNG CÓ NỐI CLOUDFLARE (QUÉT QR QUA 4G/5G/WI-FI)
 
 ### Cách 1: Chạy bằng 1 click chuột (Khuyên dùng)
-- Nhấp đúp chuột vào file **`chay_game.bat`** trong thư mục này.
-- Cửa sổ màu đen sẽ hiện lên địa chỉ IP mạng nội bộ và cổng (mặc định đã cấu hình cổng **`3999`** để tránh các cổng đang bận của máy).
+- Nhấp đúp chuột vào file **`chay_game.bat`**.
+- Hệ thống sẽ:
+  1. Khởi động máy chủ Node.js trên cổng an toàn **`3999`** (tự động đổi nếu bận).
+  2. Tự động kết nối **Cloudflare Quick Tunnel** tạo đường link công khai HTTPS miễn phí: `https://xxxx.trycloudflare.com`.
+  3. Tự động đổi mã QR trên màn hình máy chiếu sang link Cloudflare.
+- **Mọi người chỉ cần mở Camera điện thoại (dù đang dùng 4G, 5G hay bất kỳ mạng Wi-Fi nào) quét mã QR là vào chơi được ngay!**
 
 ### Cách 2: Chạy bằng dòng lệnh
 Mở Terminal / PowerShell trong thư mục dự án và chạy:
-```bash
+```powershell
 node server.js 3999
 ```
-*(Bạn có thể đổi số 3999 thành bất kỳ số cổng nào bạn muốn, ví dụ: `node server.js 8999`).*
+
+---
+
+## 🌐 HƯỚNG DẪN ĐẨY VÀO GIT (GITHUB / GITLAB)
+
+Dự án đã được khởi tạo sẵn kho Git cục bộ (`git init`) và tạo commit ban đầu. Để đẩy lên tài khoản GitHub/GitLab của bạn:
+
+1. **Tạo một Repository mới** trên GitHub (ví dụ: đặt tên là `TeamBuilding-TCKT-2026`).
+2. Mở PowerShell trong thư mục này và chạy 3 lệnh sau:
+   ```powershell
+   git branch -M main
+   git remote add origin <URL_REPOSITORY_CỦA_BẠN>
+   git push -u origin main
+   ```
+   *(Ví dụ: `git remote add origin https://github.com/your-username/TeamBuilding-TCKT-2026.git`)*
 
 ---
 
 ## 📱 CÁCH KẾT NỐI VÀ TRÌNH CHIẾU
 
 1. **Đối với Máy tính / Laptop của Ban tổ chức (MC / Host)**:
-   - Kết nối máy tính vào mạng Wi-Fi chung của phòng hoặc phát Wi-Fi từ điện thoại/laptop.
    - Cắm dây HDMI vào Máy chiếu hoặc TV lớn.
    - Mở trình duyệt web (Chrome / Cốc Cốc / Edge) và truy cập:
      ```
      http://localhost:3999/host.html
      ```
-   - Nhấn nút **Toàn màn hình (⛶)** hoặc phím **F11** để giao diện hiển thị chuyên nghiệp như một Gameshow truyền hình.
+   - Nhấn nút **Toàn màn hình (⛶)** hoặc phím **F11** để hiển thị full-screen.
+   - Màn hình sẽ hiển thị mã QR kèm dòng thông báo xanh: `🌐 ĐÃ NỐI CLOUDFLARE TOÀN CẦU`.
 
 2. **Đối với 40+ Người chơi (Sử dụng Điện thoại thông minh)**:
-   - Kết nối điện thoại vào **cùng mạng Wi-Fi** với máy tính Host.
    - Mở ứng dụng **Camera** hoặc **Zalo** quét mã QR to trên màn hình máy chiếu.
-   - Hoặc gõ trực tiếp địa chỉ hiển thị trên máy chiếu (Ví dụ: `http://192.168.120.178:3999/player.html`).
    - Nhập tên của mình, chọn biểu tượng avatar yêu thích và bấm **"VÀO CHƠI NGAY"**.
+   - Không bắt buộc phải kết nối chung Wi-Fi (bật 4G/5G quét vẫn vào bình thường nhờ Cloudflare Tunnel).
 
 ---
 
