@@ -78,10 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.on('host_init', (data) => {
     projState.mode = data.mode;
     projState.players = data.players || [];
-    updatePlayers();
     if (data.activation) {
+      projState.activation = data.activation;
       updateMissingMembersList(data.activation);
     }
+    updatePlayers();
 
     if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
       renderSquizz(data.squizz.question, data.squizz.currentIndex, data.squizzQuestions.length, data.squizz.timeLimit);
@@ -107,18 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('player_list_updated', ({ players, total, activation }) => {
     projState.players = players;
-    if (elPlayerCount) elPlayerCount.textContent = total;
-    if (elLobbyReadyCount) elLobbyReadyCount.textContent = total;
-    updatePlayers();
-
     if (activation) {
+      projState.activation = activation;
       updateMissingMembersList(activation);
     }
+    const currentTotal = (activation && activation.activatedCount !== undefined) ? activation.activatedCount : total;
+    if (elPlayerCount) elPlayerCount.textContent = currentTotal;
+    if (elLobbyReadyCount) elLobbyReadyCount.textContent = currentTotal;
+    updatePlayers();
 
     const sqTotal = document.getElementById('proj-sq-total');
-    if (sqTotal) sqTotal.textContent = total;
+    if (sqTotal) sqTotal.textContent = currentTotal;
     const qaTotal = document.getElementById('proj-qa-total');
-    if (qaTotal) qaTotal.textContent = total;
+    if (qaTotal) qaTotal.textContent = currentTotal;
   });
 
   socket.on('player_joined_toast', () => {
@@ -154,15 +156,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function updatePlayers() {
     if (!elPlayerGrid) return;
     elPlayerGrid.innerHTML = '';
-    if (projState.players.length === 0) {
+    
+    // Luôn ưu tiên dùng danh sách thành viên đã kích hoạt/vào tiệc để số lượng và chip hiển thị khớp 100%
+    const list = (projState.activation && projState.activation.activatedMembers && projState.activation.activatedMembers.length > 0)
+      ? projState.activation.activatedMembers
+      : projState.players;
+
+    if (list.length === 0) {
       if (elEmptyHint) elPlayerGrid.appendChild(elEmptyHint);
       return;
     }
-    projState.players.forEach(p => {
+    list.forEach(p => {
       const chip = document.createElement('div');
-      chip.className = 'player-chip';
+      const isAway = p.connected === false;
+      chip.className = 'player-chip' + (isAway ? ' away' : '');
       const zodiacText = (p.zodiacInfo && p.zodiacInfo.sign) ? ` <span style="font-size: 0.82rem; opacity: 0.9;">(${p.zodiacInfo.sign.icon})</span>` : '';
-      chip.innerHTML = `<span class="avatar">${p.avatar}</span> <span>${escapeHtml(p.nickname)}${zodiacText}</span>`;
+      chip.innerHTML = `<span class="avatar">${p.avatar || '😎'}</span> <span>${escapeHtml(p.name || p.nickname)}${zodiacText}</span>`;
       elPlayerGrid.appendChild(chip);
     });
   }
@@ -423,6 +432,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const elQaExplanationBox = document.getElementById('proj-qa-explanation-box');
   const elQaExplanationText = document.getElementById('proj-qa-explanation-text');
 
+  const elQaWrongBox = document.getElementById('proj-qa-wrong-box');
+  const elQaWrongGrid = document.getElementById('proj-qa-wrong-grid');
+  const elQaWrongCount = document.getElementById('proj-qa-wrong-count-tag');
+
   function renderQa(q, index, total, timeLimit) {
     projState.qa.currentIndex = index;
     projState.qa.question = q;
@@ -436,6 +449,8 @@ document.addEventListener('DOMContentLoaded', () => {
     elQaTimerRing.style.background = `conic-gradient(var(--cyan) 100%, transparent 0)`;
     elQaAnswered.textContent = '0';
     elQaExplanationBox.style.display = 'none';
+    if (elQaWrongBox) elQaWrongBox.style.display = 'none';
+    if (elQaWrongGrid) elQaWrongGrid.innerHTML = '';
 
     for (let i = 0; i < 4; i++) {
       const card = document.getElementById(`pcard-${i}`);
@@ -456,16 +471,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.soundFX) window.soundFX.playJoin();
   });
 
-  socket.on('qa_timer_tick', ({ timeRemaining }) => {
+  socket.on('qa_timer_tick', ({ timeRemaining, isPaused }) => {
     projState.qa.timeRemaining = timeRemaining;
-    elQaTimerNum.textContent = timeRemaining;
+    if (isPaused) {
+      elQaTimerNum.textContent = '⏸️';
+    } else {
+      elQaTimerNum.textContent = timeRemaining;
+    }
     const fraction = Math.max(0, timeRemaining / projState.qa.timeLimit);
     const degrees = Math.round(fraction * 360);
     elQaTimerRing.style.background = `conic-gradient(${timeRemaining <= 5 ? 'var(--rose)' : 'var(--cyan)'} ${degrees}deg, transparent 0)`;
 
-    if (window.soundFX) {
+    if (window.soundFX && !isPaused) {
       if (timeRemaining <= 5 && timeRemaining > 0) window.soundFX.playUrgentTick();
       else window.soundFX.playTick();
+    }
+  });
+
+  socket.on('qa_timer_paused', ({ isPaused, timeRemaining }) => {
+    if (elQaTimerNum) {
+      elQaTimerNum.textContent = isPaused ? '⏸️' : timeRemaining;
     }
   });
 
@@ -480,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (qaTotal) qaTotal.textContent = totalPlayers;
   });
 
-  socket.on('qa_revealed', ({ correctAnswer, explanation, stats }) => {
+  socket.on('qa_revealed', ({ correctAnswer, explanation, stats, wrongAnswers, leaderboard }) => {
     if (window.soundFX) window.soundFX.playCorrect();
     if (window.fireConfetti) window.fireConfetti({ count: 60 });
 
@@ -501,6 +526,40 @@ document.addEventListener('DOMContentLoaded', () => {
     if (explanation) {
       elQaExplanationText.textContent = explanation;
       elQaExplanationBox.style.display = 'flex';
+    }
+
+    // Hiển thị danh sách Hội người trả lời sai (Lạc lối)
+    if (elQaWrongBox && elQaWrongGrid) {
+      elQaWrongGrid.innerHTML = '';
+      if (wrongAnswers && wrongAnswers.length > 0) {
+        if (elQaWrongCount) {
+          elQaWrongCount.textContent = `${wrongAnswers.length} người`;
+          elQaWrongCount.style.background = 'var(--rose)';
+        }
+        wrongAnswers.forEach(w => {
+          const chip = document.createElement('div');
+          chip.style.cssText = 'background: rgba(244, 63, 94, 0.25); border: 1.5px solid var(--rose); color: #ffe4e6; padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; animation: popIn 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3);';
+          chip.innerHTML = `<span style="font-size: 1.25rem;">${w.avatar || '😅'}</span> <span>${escapeHtml(w.name)}</span> <span style="color: #fecdd3; font-size: 0.85rem; background: rgba(0,0,0,0.45); padding: 2px 8px; border-radius: 6px;">Chọn ${w.optionLetter}</span>`;
+          elQaWrongGrid.appendChild(chip);
+        });
+        elQaWrongBox.style.display = 'block';
+        if (window.soundFX) window.soundFX.playWrong();
+      } else {
+        if (elQaWrongCount) {
+          elQaWrongCount.textContent = '0 người';
+          elQaWrongCount.style.background = 'var(--emerald)';
+        }
+        elQaWrongGrid.innerHTML = `<div style="color: #6ee7b7; font-weight: 800; font-size: 1.15rem; padding: 10px 0;">🎉 KỲ TÍCH! 100% CẢ PHÒNG ĐỀU TRẢ LỜI ĐÚNG! KHÔNG AI BỊ PHẠT 🍻</div>`;
+        elQaWrongBox.style.display = 'block';
+      }
+    }
+  });
+
+  socket.on('qa_display_changed', ({ displayMode }) => {
+    if (displayMode === 'LEADERBOARD') {
+      switchView('leaderboard');
+    } else {
+      switchView('qa');
     }
   });
 

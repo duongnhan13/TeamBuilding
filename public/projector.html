@@ -244,13 +244,28 @@
           <div id="proj-qa-explanation-text">Giải thích chi tiết...</div>
         </div>
 
+        <!-- Wrong Answers Box (Hội Lạc Lối Trả Lời Sai) -->
+        <div class="qa-wrong-box glass-panel" id="proj-qa-wrong-box" style="display: none; margin-top: 12px; padding: 14px 20px; border: 1.5px solid rgba(244, 63, 94, 0.45); background: rgba(244, 63, 94, 0.12); border-radius: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-weight: 900; font-size: 1.25rem; color: #fca5a5; display: flex; align-items: center; gap: 8px;">
+              <span>😅</span> HỘI NHỮNG ĐỒNG ĐỘI "LẠC LỐI" (TRẢ LỜI SAI):
+            </div>
+            <span id="proj-qa-wrong-count-tag" style="background: var(--rose); color: white; font-weight: 900; font-size: 0.95rem; padding: 4px 14px; border-radius: 999px;">
+              0 người
+            </span>
+          </div>
+          <div id="proj-qa-wrong-grid" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 180px; overflow-y: auto;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
         <!-- Progress Counter Bar -->
-        <div class="glass-panel" style="padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="glass-panel" style="padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
           <div style="font-weight: 800; font-size: 1.15rem; color: var(--cyan);">
             Đã trả lời: <span id="proj-qa-answered">0</span> / <span id="proj-qa-total">0</span> người
           </div>
           <div style="font-size: 0.95rem; color: var(--text-muted); font-style: italic;">
-            Hết thời gian hoặc khi mọi người trả lời xong, đáp án sẽ tự động công bố!
+            Hết thời gian hoặc MC bấm công bố, đáp án và danh sách người sai sẽ hiện ngay!
           </div>
         </div>
       </section>

@@ -13,7 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     squizzIndex: 0,
     qaIndex: 0,
     isSquizzLocked: false,
-    timerLimit: 30
+    timerLimit: 30,
+    qaIsPaused: false,
+    qaAutoReveal: true
   };
 
   // Elements
@@ -30,6 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const elTotalCount = document.getElementById('admin-total-count');
   const elSecretTally = document.getElementById('admin-secret-tally');
   const btnToggleLock = document.getElementById('btn-toggle-lock');
+
+  const adminQaControlsPanel = document.getElementById('admin-qa-controls-panel');
+  const btnQaAutoToggle = document.getElementById('btn-qa-auto-toggle');
+  const btnQaPause = document.getElementById('btn-qa-pause');
+  const btnQaAdd5s = document.getElementById('btn-qa-add-5s');
+  const btnQaAdd10s = document.getElementById('btn-qa-add-10s');
+  const btnQaRevealQuick = document.getElementById('btn-qa-reveal-quick');
+  const btnQaShowWrong = document.getElementById('btn-qa-show-wrong');
+  const btnQaShowLeaderboard = document.getElementById('btn-qa-show-leaderboard');
+
+  const adminQaWrongMonitor = document.getElementById('admin-qa-wrong-monitor');
+  const adminQaWrongCountBadge = document.getElementById('admin-qa-wrong-count-badge');
+  const adminQaWrongList = document.getElementById('admin-qa-wrong-list');
 
   const elActSummary = document.getElementById('admin-act-summary');
   const elActMissingBadge = document.getElementById('admin-act-missing-badge');
@@ -121,6 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateModeBadge(mode) {
     if (!elModeBadge) return;
+    if (adminQaControlsPanel) {
+      adminQaControlsPanel.style.display = (mode === 'QA') ? 'flex' : 'none';
+    }
+    if (mode !== 'QA') {
+      if (adminQaWrongMonitor) adminQaWrongMonitor.style.display = 'none';
+    }
     if (mode === 'SQUIZZ') {
       elModeBadge.textContent = 'BỘ 1: SQUIZZ (BÓC PHỐT)';
       elModeBadge.style.color = 'var(--rose)';
@@ -279,6 +300,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('qa_question_started', ({ currentIndex, total, question }) => {
     updateQaTeleprompter(question, currentIndex, total);
+    if (adminQaWrongMonitor) adminQaWrongMonitor.style.display = 'none';
+    if (adminQaWrongList) adminQaWrongList.innerHTML = '';
+    if (adminQaWrongCountBadge) adminQaWrongCountBadge.textContent = '0';
   });
 
   socket.on('qa_timer_tick', ({ timeRemaining }) => {
@@ -289,6 +313,30 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.on('qa_live_update', ({ stats, totalAnswered, totalPlayers }) => {
     elVotedCount.textContent = totalAnswered;
     updatePlayerCount(totalPlayers);
+  });
+
+  socket.on('qa_revealed', ({ wrongAnswers, correctAnswers, unanswered, correctAnswer, explanation, leaderboard }) => {
+    if (adminQaWrongMonitor) {
+      adminQaWrongMonitor.style.display = 'block';
+      const wrongList = wrongAnswers || [];
+      if (adminQaWrongCountBadge) adminQaWrongCountBadge.textContent = wrongList.length;
+      if (adminQaWrongList) {
+        if (wrongList.length === 0) {
+          adminQaWrongList.innerHTML = '<div style="color: #6ee7b7; font-weight: 700; font-size: 0.85rem; padding: 4px;">🎉 Tuyệt vời! Không ai trả lời sai câu này!</div>';
+        } else {
+          const optLabels = ['A', 'B', 'C', 'D'];
+          adminQaWrongList.innerHTML = wrongList.map(p => {
+            const optLetter = p.chosenOption >= 0 ? (optLabels[p.chosenOption] || p.chosenOption) : 'Chưa chọn';
+            return `
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: rgba(0,0,0,0.25); border-radius: 6px; font-size: 0.85rem;">
+                <span style="font-weight: 700; color: #fff;">${p.avatar || '😎'} ${escapeHtml(p.nickname || p.name)}</span>
+                <span style="color: #fca5a5; font-weight: 800; font-size: 0.8rem;">Đã chọn: ${optLetter}</span>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    }
   });
 
   socket.on('game_mode_changed', ({ mode }) => {
@@ -338,6 +386,73 @@ document.addEventListener('DOMContentLoaded', () => {
       socket.emit('host_squizz_reveal');
     } else if (adminState.mode === 'QA') {
       socket.emit('host_qa_reveal');
+    }
+  });
+
+  // QA MC Control Buttons
+  if (btnQaAutoToggle) {
+    btnQaAutoToggle.addEventListener('click', () => {
+      socket.emit('host_qa_toggle_auto', { enabled: !adminState.qaAutoReveal });
+    });
+  }
+
+  if (btnQaPause) {
+    btnQaPause.addEventListener('click', () => {
+      socket.emit('host_qa_pause_timer', { pause: !adminState.qaIsPaused });
+    });
+  }
+
+  if (btnQaAdd5s) {
+    btnQaAdd5s.addEventListener('click', () => {
+      socket.emit('host_qa_add_time', { seconds: 5 });
+    });
+  }
+
+  if (btnQaAdd10s) {
+    btnQaAdd10s.addEventListener('click', () => {
+      socket.emit('host_qa_add_time', { seconds: 10 });
+    });
+  }
+
+  if (btnQaRevealQuick) {
+    btnQaRevealQuick.addEventListener('click', () => {
+      socket.emit('host_qa_reveal');
+    });
+  }
+
+  if (btnQaShowWrong) {
+    btnQaShowWrong.addEventListener('click', () => {
+      socket.emit('host_qa_set_display', { displayMode: 'WRONG_ANSWERS' });
+    });
+  }
+
+  if (btnQaShowLeaderboard) {
+    btnQaShowLeaderboard.addEventListener('click', () => {
+      socket.emit('host_qa_set_display', { displayMode: 'LEADERBOARD' });
+    });
+  }
+
+  socket.on('qa_auto_toggled', ({ autoReveal }) => {
+    adminState.qaAutoReveal = autoReveal;
+    if (btnQaAutoToggle) {
+      btnQaAutoToggle.textContent = autoReveal ? '⚙️ Tự động 15s: BẬT' : '⚙️ Tự động 15s: TẮT';
+      btnQaAutoToggle.style.color = autoReveal ? '#6ee7b7' : '#fca5a5';
+    }
+  });
+
+  socket.on('qa_timer_paused', ({ isPaused }) => {
+    adminState.qaIsPaused = isPaused;
+    if (btnQaPause) {
+      btnQaPause.textContent = isPaused ? '▶️ Tiếp Tục Timer' : '⏸️ Tạm Dừng Timer';
+      if (isPaused) {
+        btnQaPause.style.background = 'rgba(245, 158, 11, 0.3)';
+        btnQaPause.style.borderColor = 'var(--gold)';
+        btnQaPause.style.color = '#fef08a';
+      } else {
+        btnQaPause.style.background = '';
+        btnQaPause.style.borderColor = '';
+        btnQaPause.style.color = '';
+      }
     }
   });
 
@@ -962,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (listToRender.length === 0) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="5" style="padding: 24px; text-align: center; color: var(--text-muted); font-style: italic;">Không có thành viên nào phù hợp...</td>`;
+      tr.innerHTML = `<td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted); font-style: italic;">Không có thành viên nào phù hợp...</td>`;
       activationTableBody.appendChild(tr);
       return;
     }
@@ -983,13 +1098,34 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `<span style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--emerald); color: #6ee7b7; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 0.8rem;">🟢 ĐÃ VÀO</span>`
         : `<span style="background: rgba(244, 63, 94, 0.2); border: 1px solid var(--rose); color: #fca5a5; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 0.8rem;">🔴 CHƯA VÀO</span>`;
 
+      const actionBtn = isJoined
+        ? `<button class="btn btn-rose btn-sm btn-kick-member" data-stt="${m.stt}" data-name="${escapeHtml(m.name)}" style="padding: 3px 8px; font-size: 0.78rem; font-weight: 800; background: rgba(244, 63, 94, 0.2); border: 1px solid var(--rose); color: #fecdd3; border-radius: 6px; cursor: pointer;">🚫 Kick / Đặt lại</button>`
+        : `<span style="color: var(--text-muted); font-size: 0.8rem;">--</span>`;
+
       tr.innerHTML = `
         <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan);">${m.stt}</td>
         <td style="padding: 10px 12px; font-weight: 800; font-size: 0.95rem; color: #fff;">${m.name}</td>
         <td style="padding: 10px 12px; font-family: monospace; font-size: 0.9rem; color: var(--gold);">${m.fingerprint || '--'}</td>
         <td style="padding: 10px 12px;">${zodiacBadge}</td>
         <td style="padding: 10px 12px; text-align: center;">${statusBadge}</td>
+        <td style="padding: 10px 12px; text-align: center;">${actionBtn}</td>
       `;
+
+      if (isJoined) {
+        const btnKick = tr.querySelector('.btn-kick-member');
+        if (btnKick) {
+          btnKick.addEventListener('click', () => {
+            const stt = btnKick.dataset.stt;
+            const name = btnKick.dataset.name;
+            if (confirm(`Bạn có chắc muốn ĐẶT LẠI trạng thái cho "${name}"?\n(Dùng khi người chơi ấn nhầm tên người khác để họ chọn lại)`)) {
+              btnKick.disabled = true;
+              btnKick.textContent = 'Đang đặt lại...';
+              socket.emit('admin_kick_member', { memberId: stt });
+            }
+          });
+        }
+      }
+
       activationTableBody.appendChild(tr);
     });
   }

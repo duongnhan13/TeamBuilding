@@ -322,6 +322,8 @@ const gameState = {
     timeLimit: 15, // 15s tự động đếm ngược & công bố
     timeRemaining: 15,
     timer: null,
+    autoReveal: true, // Admin có thể bật / tắt tự động công bố
+    isPaused: false,
     answers: {} // playerId -> { optionIndex, isCorrect, points, timeTakenMs }
   }
 };
@@ -348,9 +350,12 @@ function getConnectedPlayers() {
 function getMemberActivationStatus() {
   // Thành viên được tính là ĐÃ VÀO TIỆC khi đã check-in (hasJoined = true hoặc đang online)
   const activatedMemberIds = new Set();
+  const playerByMemberId = new Map();
+
   gameState.players.forEach(p => {
     if (p.memberId && (p.hasJoined || p.connected)) {
       activatedMemberIds.add(String(p.memberId));
+      playerByMemberId.set(String(p.memberId), p);
     }
   });
 
@@ -359,10 +364,14 @@ function getMemberActivationStatus() {
 
   membersList.forEach(m => {
     const isAct = activatedMemberIds.has(String(m.stt));
+    const p = playerByMemberId.get(String(m.stt));
     const obj = {
       stt: m.stt,
       name: m.name,
       role: '',
+      avatar: p ? (p.avatar || '😎') : '😎',
+      score: p ? p.score : 0,
+      connected: p ? !!p.connected : false,
       dob: m.dob || '',
       fingerprint: m.fingerprint || '',
       zodiacInfo: m.dob ? zodiacHelper.getZodiacDetails(m.dob) : null
@@ -916,14 +925,18 @@ io.on('connection', (socket) => {
 
   function startQaTimer() {
     if (gameState.qa.timer) clearInterval(gameState.qa.timer);
+    gameState.qa.isPaused = false;
     gameState.qa.timer = setInterval(() => {
+      if (gameState.qa.isPaused) return;
       gameState.qa.timeRemaining--;
-      io.emit('qa_timer_tick', { timeRemaining: gameState.qa.timeRemaining });
+      io.emit('qa_timer_tick', { timeRemaining: gameState.qa.timeRemaining, isPaused: gameState.qa.isPaused });
       if (gameState.qa.timeRemaining <= 0) {
         clearInterval(gameState.qa.timer);
         gameState.qa.timer = null;
         endQaQuestion();
-        revealQaAnswer(true);
+        if (gameState.qa.autoReveal !== false) {
+          revealQaAnswer(true);
+        }
       }
     }, 1000);
   }
@@ -944,15 +957,55 @@ io.on('connection', (socket) => {
     const currentQ = qaQuestions[gameState.qa.currentIndex];
     const leaderboard = getLeaderboard();
 
+    // Compile list of players who answered wrong vs right vs unanswered
+    const wrongAnswers = [];
+    const correctAnswers = [];
+    const unanswered = [];
+
+    gameState.players.forEach((p, pId) => {
+      if (!p.hasJoined && !p.connected) return;
+      const ans = gameState.qa.answers[pId];
+      if (!ans) {
+        unanswered.push({
+          id: pId,
+          name: p.nickname,
+          avatar: p.avatar
+        });
+      } else if (ans.isCorrect) {
+        correctAnswers.push({
+          id: pId,
+          name: p.nickname,
+          avatar: p.avatar,
+          points: ans.points,
+          timeTakenMs: ans.timeTakenMs
+        });
+      } else {
+        const optLetter = (ans.optionIndex >= 0 && ans.optionIndex <= 3) ? ['A', 'B', 'C', 'D'][ans.optionIndex] : '?';
+        const optText = (currentQ && currentQ.options && currentQ.options[ans.optionIndex]) ? currentQ.options[ans.optionIndex] : '';
+        wrongAnswers.push({
+          id: pId,
+          name: p.nickname,
+          avatar: p.avatar,
+          optionIndex: ans.optionIndex,
+          optionLetter: optLetter,
+          optionText: optText
+        });
+      }
+    });
+
     io.emit('qa_revealed', {
       correctAnswer: currentQ ? currentQ.correctAnswer : 0,
       explanation: currentQ ? currentQ.explanation : '',
       stats,
       leaderboard: leaderboard.slice(0, 10),
+      wrongAnswers,
+      correctAnswers,
+      unanswered,
       auto
     });
   }
 
+  // Master Host QA Controls
   socket.on('host_qa_start', ({ questionIndex = 0, timeLimit }) => {
     gameState.mode = 'QA';
     gameState.qa.currentIndex = questionIndex;
@@ -990,6 +1043,66 @@ io.on('connection', (socket) => {
 
   socket.on('host_qa_reveal', () => {
     revealQaAnswer(false);
+  });
+
+  socket.on('host_qa_toggle_auto', ({ enabled }) => {
+    gameState.qa.autoReveal = (enabled !== undefined) ? !!enabled : !gameState.qa.autoReveal;
+    io.emit('qa_auto_toggled', { autoReveal: gameState.qa.autoReveal });
+  });
+
+  socket.on('host_qa_pause_timer', ({ pause }) => {
+    gameState.qa.isPaused = (pause !== undefined) ? !!pause : !gameState.qa.isPaused;
+    io.emit('qa_timer_paused', { isPaused: gameState.qa.isPaused, timeRemaining: gameState.qa.timeRemaining });
+  });
+
+  socket.on('host_qa_add_time', ({ seconds = 5 }) => {
+    gameState.qa.timeRemaining = Math.max(0, (gameState.qa.timeRemaining || 0) + seconds);
+    io.emit('qa_timer_tick', { timeRemaining: gameState.qa.timeRemaining, isPaused: gameState.qa.isPaused });
+  });
+
+  socket.on('host_qa_set_display', ({ displayMode }) => {
+    // 'WRONG_ANSWERS' or 'LEADERBOARD' or 'DEFAULT'
+    io.emit('qa_display_changed', { displayMode });
+  });
+
+  // Admin Kick Member (Dùng khi chọn nhầm tên)
+  socket.on('admin_kick_member', ({ memberId }) => {
+    if (!memberId) return;
+    const cleanId = String(memberId);
+    let targetPlayerId = null;
+    let targetSocketId = null;
+    let kickedName = '';
+
+    gameState.players.forEach((p, pId) => {
+      if (String(p.memberId) === cleanId) {
+        targetPlayerId = pId;
+        targetSocketId = p.socketId;
+        kickedName = p.nickname;
+      }
+    });
+
+    if (targetPlayerId) {
+      gameState.players.delete(targetPlayerId);
+      delete gameState.squizz.votes[targetPlayerId];
+      delete gameState.squizz.rawVotes[targetPlayerId];
+      delete gameState.qa.answers[targetPlayerId];
+    }
+
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('player_kicked', {
+        message: `Tài khoản (${kickedName}) đã được Admin đặt lại trạng thái (do chọn nhầm tên). Vui lòng chọn đúng tên hoặc nhập mã vân tay của bạn để vào lại bàn tiệc!`
+      });
+      const s = io.sockets.sockets.get(targetSocketId);
+      if (s) {
+        s.playerId = null;
+        s.leave('players');
+      }
+    }
+
+    broadcastPlayerList();
+    io.to('host').emit('action_success', {
+      message: `Đã hủy điểm danh thành viên #${cleanId} (${kickedName || ''}) thành công.`
+    });
   });
 
   socket.on('host_qa_next', () => {

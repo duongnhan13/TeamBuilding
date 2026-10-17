@@ -73,53 +73,64 @@
       <div id="join-error-box" style="display: none; background: rgba(244, 63, 94, 0.25); border: 1.5px solid var(--rose); border-radius: 14px; padding: 12px; margin-bottom: 14px; color: #fecdd3; font-size: 0.95rem; text-align: center; font-weight: 800;">
       </div>
 
-      <!-- METHOD 1: FINGERPRINT CODE (FIRST & FASTEST) -->
-      <div class="login-method-card" style="background: rgba(251, 191, 36, 0.08); border: 1.5px solid rgba(251, 191, 36, 0.35); border-radius: 18px; padding: 16px; margin-bottom: 14px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-          <label for="input-fingerprint-quick" style="font-weight: 900; font-size: 1rem; color: #fef08a; display: flex; align-items: center; gap: 6px;">
-            <span>👆</span> Nhập mã vân tay (chấm công):
-          </label>
+      <!-- SMART UNIFIED LOGIN: EITHER FINGERPRINT OR NAME -->
+      <div class="login-method-card" style="background: rgba(251, 191, 36, 0.08); border: 1.5px solid rgba(251, 191, 36, 0.4); border-radius: 18px; padding: 16px; margin-bottom: 14px;">
+        <label for="smart-search-input" style="font-weight: 900; font-size: 0.98rem; color: #fef08a; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span>👆 Nhập mã vân tay HOẶC gõ tên bạn:</span>
           <span style="background: rgba(16, 185, 129, 0.25); border: 1px solid var(--emerald); color: #6ee7b7; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">
-            ⚡ Nhanh nhất
+            ⚡ Tự động tìm
           </span>
-        </div>
-        <input type="tel" id="input-fingerprint-quick" class="input-field party-search-input" 
-               placeholder="Gõ mã (ví dụ: 6, 2310, 1770...)" 
-               autocomplete="off"
-               style="font-size: 1.25rem; font-weight: 900; text-align: center; letter-spacing: 2px; height: 50px; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(251, 191, 36, 0.5); color: #fef08a;">
-        
-        <!-- Instant feedback when matching member found -->
-        <div id="fp-match-badge" style="display: none; margin-top: 10px; padding: 10px 14px; background: rgba(16, 185, 129, 0.25); border: 1.5px solid var(--emerald); border-radius: 12px; text-align: center; font-weight: 900; color: #6ee7b7; font-size: 1.05rem; animation: popIn 0.3s ease;">
-          ✨ Xin chào: <span id="fp-match-name" style="color: #ffffff; text-decoration: underline;"></span> 🥂
-        </div>
-      </div>
-
-      <!-- OR SEPARATOR -->
-      <div style="display: flex; align-items: center; margin: 12px 0; text-align: center;">
-        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
-        <span style="padding: 0 12px; color: #94a3b8; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Hoặc chọn tên</span>
-        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
-      </div>
-
-      <!-- METHOD 2: SELECT NAME FROM LIST -->
-      <div style="margin-bottom: 14px;">
-        <label for="select-member" style="font-weight: 700; font-size: 0.92rem; color: #cbd5e1; display: block; margin-bottom: 6px;">
-          📋 Danh sách 47 cán bộ nhân viên phòng TCKT:
         </label>
-        <input type="text" id="member-quick-filter" class="input-field party-search-input" placeholder="🔍 Gõ tên bạn để tìm nhanh..." style="margin-bottom: 8px; font-size: 0.95rem;">
-        <select id="select-member" class="input-field party-select-input" style="font-size: 1rem; font-weight: 800; height: 48px;">
-          <option value="">-- Bấm vào đây để chọn tên bạn --</option>
+        
+        <input type="text" id="smart-search-input" class="input-field party-search-input" 
+               placeholder="Gõ mã số (vd: 6, 2310) hoặc gõ Tên..." 
+               autocomplete="off"
+               style="font-size: 1.15rem; font-weight: 800; text-align: center; height: 50px; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(251, 191, 36, 0.5); color: #fef08a;">
+        
+        <!-- Live Quick-Pick Suggestion Chips -->
+        <div id="smart-suggestion-box" style="display: none; margin-top: 10px; max-height: 140px; overflow-y: auto; padding: 4px; display: flex; flex-wrap: wrap; gap: 8px;">
+        </div>
+
+        <!-- Instant feedback when matching member found by fingerprint code -->
+        <div id="fp-match-badge" style="display: none; margin-top: 10px; padding: 10px 14px; background: rgba(16, 185, 129, 0.25); border: 1.5px solid var(--emerald); border-radius: 12px; text-align: center; font-weight: 900; color: #6ee7b7; font-size: 1rem; animation: popIn 0.3s ease;">
+          ✨ Khớp mã vân tay: <span id="fp-match-name" style="color: #ffffff; text-decoration: underline;"></span> 🥂
+        </div>
+      </div>
+
+      <!-- OR DROPDOWN (47 MEMBERS) -->
+      <div style="display: flex; align-items: center; margin: 10px 0; text-align: center;">
+        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
+        <span style="padding: 0 10px; color: #94a3b8; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Hoặc chọn từ danh sách 47 người</span>
+        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <select id="select-member" class="input-field party-select-input" style="font-size: 0.95rem; font-weight: 800; height: 46px;">
+          <option value="">-- Bấm vào đây để chọn tên bạn (47 người) --</option>
         </select>
       </div>
 
-      <!-- Auto Profile Card (Pops up when selected) -->
-      <div class="member-quick-card party-vip-badge" id="member-profile-card" style="display: none; margin-bottom: 14px;">
+      <!-- Selected Member Confirmation & Preview Card -->
+      <div class="member-quick-card party-vip-badge" id="member-profile-card" style="display: none; margin-bottom: 14px; background: rgba(16, 185, 129, 0.15); border: 1.5px solid var(--emerald); border-radius: 16px; padding: 14px 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">⭐ THÀNH VIÊN THAM DỰ:</div>
-            <div class="member-quick-name" id="card-member-name" style="font-size: 1.35rem; font-weight: 900; color: #fff;">Nguyễn Thị Thùy Dung</div>
+          <div style="flex: 1;">
+            <div style="font-size: 0.75rem; color: #6ee7b7; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">
+              ✅ XÁC NHẬN THÀNH VIÊN VÀO BÀN TIỆC:
+            </div>
+            <div class="member-quick-name" id="card-member-name" style="font-size: 1.3rem; font-weight: 900; color: #fff; margin-top: 2px;">
+              Nguyễn Thị Thùy Dung
+            </div>
+            <div id="card-member-meta" style="font-size: 0.82rem; color: #fef08a; margin-top: 2px;">
+              Mã vân tay: 2310
+            </div>
+            <!-- Prevent Mistaken Identity Button -->
+            <button type="button" id="btn-change-member" class="btn btn-secondary btn-sm" style="margin-top: 8px; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1;">
+              🔄 Bấm nhầm? Chọn lại người khác
+            </button>
           </div>
-          <div style="font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6));" id="card-member-avatar">😎</div>
+          <div style="font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6)); margin-left: 10px;" id="card-member-avatar">
+            😎
+          </div>
         </div>
       </div>
 
