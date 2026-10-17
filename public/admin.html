@@ -200,8 +200,23 @@
           </button>
         </div>
 
+        <!-- SQUIZZ Specific MC Controls (Shown in Squizz Mode) -->
+        <div id="admin-squizz-controls-panel" class="glass-panel" style="display: none; padding: 12px 20px; justify-content: space-between; align-items: center; gap: 10px; background: rgba(244, 63, 94, 0.08); border: 1.5px solid rgba(244, 63, 94, 0.35);">
+          <span style="font-size: 0.92rem; font-weight: 800; color: #fecdd3; display: flex; align-items: center; gap: 6px;">
+            <span>⏱️</span> ĐIỀU KHIỂN BÌNH CHỌN BỘ 1 (SQUIZZ):
+          </span>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary btn-sm" id="btn-squizz-pause" style="font-weight: 800;">
+              ⏸️ Tạm Dừng Timer
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-squizz-add-10s" style="font-weight: 800;">
+              ⏱️ +10s
+            </button>
+          </div>
+        </div>
+
         <!-- QA Specific MC Controls (Dedicated to Part 2 MC) -->
-        <div id="admin-qa-controls-panel" class="glass-panel" style="padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; background: rgba(56, 189, 248, 0.08); border: 1.5px solid rgba(56, 189, 248, 0.35);">
+        <div id="admin-qa-controls-panel" class="glass-panel" style="display: none; padding: 16px 20px; flex-direction: column; gap: 12px; background: rgba(56, 189, 248, 0.08); border: 1.5px solid rgba(56, 189, 248, 0.35);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 0.95rem; font-weight: 800; color: var(--cyan); display: flex; align-items: center; gap: 6px;">
               <span>🎮</span> ĐIỀU KHIỂN BỘ 2 (ĐẤU TRÍ Q&A):

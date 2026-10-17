@@ -46,11 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function switchView(name) {
     Object.keys(views).forEach(key => {
-      if (views[key]) views[key].style.display = (key === name) ? 'flex' : 'none';
+      const v = views[key];
+      if (v) {
+        if (key === name) {
+          v.style.display = (key === 'lobby') ? 'grid' : 'flex';
+          v.classList.remove('view-transition');
+          void v.offsetWidth; // trigger reflow for smooth re-animation
+          v.classList.add('view-transition');
+        } else {
+          v.style.display = 'none';
+        }
+      }
     });
-    if (name === 'lobby') {
-      views.lobby.style.display = 'grid';
-    }
   }
 
   function escapeHtml(str) {
@@ -87,11 +94,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
       renderSquizz(data.squizz.question, data.squizz.currentIndex, data.squizzQuestions.length, data.squizz.timeLimit);
       projState.squizz.isRevealed = data.squizz.isRevealed;
+      if (data.squizz.isPaused && elSqTimerNum) elSqTimerNum.textContent = '⏸️';
+      if (data.squizz.isOpen === false) {
+        if (elSqLock) { elSqLock.textContent = '🔒 Đã chốt bình chọn'; elSqLock.style.color = 'var(--rose)'; }
+        if (elSqTimerNum) elSqTimerNum.textContent = '🔒';
+      }
       if (data.squizz.tally) renderSquizzTally(data.squizz.tally, data.squizz.isRevealed);
       if (data.squizz.isRevealed) showSpotlight(data.squizz.tally, data.squizz.question, data.squizz.tally.winner);
       switchView('squizz');
     } else if (data.mode === 'QA' && data.qa && data.qa.question) {
       renderQa(data.qa.question, data.qa.currentIndex, data.qaQuestions.length, data.qa.timeLimit);
+      if (data.qa.isPaused && elQaTimerNum) elQaTimerNum.textContent = '⏸️';
+      if (data.qa.isOpen === false && elQaTimerNum) elQaTimerNum.textContent = '🔒';
       switchView('qa');
     } else if (data.mode === 'PODIUM') {
       switchView('podium');
@@ -386,11 +400,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.soundFX) window.soundFX.playJoin();
   });
 
-  socket.on('squizz_timer_tick', ({ timeRemaining }) => {
-    elSqTimerNum.textContent = timeRemaining;
-    if (window.soundFX) {
+  socket.on('squizz_timer_tick', ({ timeRemaining, isPaused }) => {
+    projState.squizz.timeRemaining = timeRemaining;
+    if (isPaused) {
+      elSqTimerNum.textContent = '⏸️';
+    } else {
+      elSqTimerNum.textContent = timeRemaining;
+    }
+    if (window.soundFX && !isPaused) {
       if (timeRemaining <= 5 && timeRemaining > 0) window.soundFX.playUrgentTick();
       else window.soundFX.playTick();
+    }
+  });
+
+  socket.on('squizz_timer_paused', ({ isPaused, timeRemaining }) => {
+    if (elSqTimerNum) {
+      elSqTimerNum.textContent = isPaused ? '⏸️' : (timeRemaining !== undefined ? timeRemaining : projState.squizz.timeRemaining);
     }
   });
 
@@ -406,8 +431,9 @@ document.addEventListener('DOMContentLoaded', () => {
       elSqLock.textContent = '● Đang mở bình chọn';
       elSqLock.style.color = 'var(--emerald)';
     } else {
-      elSqLock.textContent = '● Đã chốt bình chọn';
+      elSqLock.textContent = '🔒 Đã chốt bình chọn';
       elSqLock.style.color = 'var(--rose)';
+      if (elSqTimerNum) elSqTimerNum.textContent = '🔒';
     }
   });
 
@@ -491,6 +517,12 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.on('qa_timer_paused', ({ isPaused, timeRemaining }) => {
     if (elQaTimerNum) {
       elQaTimerNum.textContent = isPaused ? '⏸️' : timeRemaining;
+    }
+  });
+
+  socket.on('qa_lock_changed', ({ isOpen }) => {
+    if (!isOpen && elQaTimerNum) {
+      elQaTimerNum.textContent = '🔒';
     }
   });
 

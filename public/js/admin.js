@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     squizzIndex: 0,
     qaIndex: 0,
     isSquizzLocked: false,
+    isSquizzPaused: false,
+    isQaLocked: false,
     timerLimit: 30,
     qaIsPaused: false,
     qaAutoReveal: true
@@ -32,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const elTotalCount = document.getElementById('admin-total-count');
   const elSecretTally = document.getElementById('admin-secret-tally');
   const btnToggleLock = document.getElementById('btn-toggle-lock');
+
+  const adminSquizzControlsPanel = document.getElementById('admin-squizz-controls-panel');
+  const btnSquizzPause = document.getElementById('btn-squizz-pause');
+  const btnSquizzAdd10s = document.getElementById('btn-squizz-add-10s');
 
   const adminQaControlsPanel = document.getElementById('admin-qa-controls-panel');
   const btnQaAutoToggle = document.getElementById('btn-qa-auto-toggle');
@@ -73,6 +79,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.activation) {
       adminState.activation = data.activation;
       updateActivationBadges(data.activation);
+    }
+
+    if (data.squizz) {
+      adminState.isSquizzPaused = data.squizz.isPaused || false;
+      adminState.isSquizzLocked = data.squizz.isOpen === false;
+      if (btnSquizzPause) {
+        btnSquizzPause.textContent = adminState.isSquizzPaused ? '▶️ Tiếp Tục Timer' : '⏸️ Tạm Dừng Timer';
+      }
+    }
+    if (data.qa) {
+      adminState.qaIsPaused = data.qa.isPaused || false;
+      adminState.isQaLocked = data.qa.isOpen === false;
+      adminState.qaAutoReveal = data.qa.autoReveal !== undefined ? data.qa.autoReveal : true;
+      if (btnQaPause) {
+        btnQaPause.textContent = adminState.qaIsPaused ? '▶️ Tiếp Tục Timer' : '⏸️ Tạm Dừng Timer';
+      }
+      if (btnQaAutoToggle) {
+        btnQaAutoToggle.textContent = adminState.qaAutoReveal ? '⚙️ Tự động 15s: BẬT' : '⚙️ Tự động 15s: TẮT';
+        btnQaAutoToggle.style.color = adminState.qaAutoReveal ? '#6ee7b7' : '#fca5a5';
+      }
     }
 
     if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
@@ -136,6 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateModeBadge(mode) {
     if (!elModeBadge) return;
+    if (adminSquizzControlsPanel) {
+      adminSquizzControlsPanel.style.display = (mode === 'SQUIZZ') ? 'flex' : 'none';
+    }
     if (adminQaControlsPanel) {
       adminQaControlsPanel.style.display = (mode === 'QA') ? 'flex' : 'none';
     }
@@ -145,9 +174,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mode === 'SQUIZZ') {
       elModeBadge.textContent = 'BỘ 1: SQUIZZ (BÓC PHỐT)';
       elModeBadge.style.color = 'var(--rose)';
+      if (btnToggleLock) {
+        btnToggleLock.textContent = adminState.isSquizzLocked ? '🔓 MỞ LẠI BÌNH CHỌN' : '🔒 KHÓA BÌNH CHỌN';
+      }
     } else if (mode === 'QA') {
       elModeBadge.textContent = 'BỘ 2: ĐẤU TRÍ Q&A';
       elModeBadge.style.color = 'var(--primary)';
+      if (btnToggleLock) {
+        btnToggleLock.textContent = adminState.isQaLocked ? '🔓 MỞ LẠI ĐÁP ÁN' : '🔒 KHÓA ĐÁP ÁN';
+      }
     } else if (mode === 'PODIUM') {
       elModeBadge.textContent = 'TRAO GIẢI PODIUM';
       elModeBadge.style.color = 'var(--gold)';
@@ -280,12 +315,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Socket Events
   socket.on('squizz_question_started', ({ currentIndex, total, question }) => {
+    adminState.isSquizzPaused = false;
+    adminState.isSquizzLocked = false;
+    if (btnSquizzPause) {
+      btnSquizzPause.textContent = '⏸️ Tạm Dừng Timer';
+      btnSquizzPause.style.background = '';
+      btnSquizzPause.style.borderColor = '';
+      btnSquizzPause.style.color = '';
+    }
     updateSquizzTeleprompter(question, currentIndex, total);
   });
 
-  socket.on('squizz_timer_tick', ({ timeRemaining }) => {
-    elTimerDisplay.textContent = `${timeRemaining}s`;
-    elTimerDisplay.style.color = timeRemaining <= 5 ? 'var(--rose)' : 'var(--cyan)';
+  socket.on('squizz_timer_tick', ({ timeRemaining, isPaused }) => {
+    if (isPaused) {
+      elTimerDisplay.textContent = `⏸️ ${timeRemaining}s`;
+      elTimerDisplay.style.color = 'var(--gold)';
+    } else {
+      elTimerDisplay.textContent = `${timeRemaining}s`;
+      elTimerDisplay.style.color = timeRemaining <= 5 ? 'var(--rose)' : 'var(--cyan)';
+    }
+  });
+
+  socket.on('squizz_timer_paused', ({ isPaused, timeRemaining }) => {
+    adminState.isSquizzPaused = isPaused;
+    if (btnSquizzPause) {
+      btnSquizzPause.textContent = isPaused ? '▶️ Tiếp Tục Timer' : '⏸️ Tạm Dừng Timer';
+      if (isPaused) {
+        btnSquizzPause.style.background = 'rgba(245, 158, 11, 0.3)';
+        btnSquizzPause.style.borderColor = 'var(--gold)';
+        btnSquizzPause.style.color = '#fef08a';
+      } else {
+        btnSquizzPause.style.background = '';
+        btnSquizzPause.style.borderColor = '';
+        btnSquizzPause.style.color = '';
+      }
+    }
+    if (isPaused) {
+      elTimerDisplay.textContent = `⏸️ ${timeRemaining !== undefined ? timeRemaining : ''}s`;
+      elTimerDisplay.style.color = 'var(--gold)';
+    }
   });
 
   socket.on('squizz_live_update', ({ tally, totalVotes, totalPlayers }) => {
@@ -295,19 +363,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('squizz_lock_changed', ({ isOpen }) => {
     adminState.isSquizzLocked = !isOpen;
-    btnToggleLock.textContent = isOpen ? '🔒 KHÓA BÌNH CHỌN' : '🔓 MỞ LẠI BÌNH CHỌN';
+    if (adminState.mode === 'SQUIZZ' && btnToggleLock) {
+      btnToggleLock.textContent = isOpen ? '🔒 KHÓA BÌNH CHỌN' : '🔓 MỞ LẠI BÌNH CHỌN';
+    }
   });
 
   socket.on('qa_question_started', ({ currentIndex, total, question }) => {
+    adminState.qaIsPaused = false;
+    adminState.isQaLocked = false;
+    if (btnQaPause) {
+      btnQaPause.textContent = '⏸️ Tạm Dừng Timer';
+      btnQaPause.style.background = '';
+      btnQaPause.style.borderColor = '';
+      btnQaPause.style.color = '';
+    }
     updateQaTeleprompter(question, currentIndex, total);
     if (adminQaWrongMonitor) adminQaWrongMonitor.style.display = 'none';
     if (adminQaWrongList) adminQaWrongList.innerHTML = '';
     if (adminQaWrongCountBadge) adminQaWrongCountBadge.textContent = '0';
   });
 
-  socket.on('qa_timer_tick', ({ timeRemaining }) => {
-    elTimerDisplay.textContent = `${timeRemaining}s`;
-    elTimerDisplay.style.color = timeRemaining <= 5 ? 'var(--rose)' : 'var(--cyan)';
+  socket.on('qa_timer_tick', ({ timeRemaining, isPaused }) => {
+    if (isPaused) {
+      elTimerDisplay.textContent = `⏸️ ${timeRemaining}s`;
+      elTimerDisplay.style.color = 'var(--gold)';
+    } else {
+      elTimerDisplay.textContent = `${timeRemaining}s`;
+      elTimerDisplay.style.color = timeRemaining <= 5 ? 'var(--rose)' : 'var(--cyan)';
+    }
+  });
+
+  socket.on('qa_lock_changed', ({ isOpen }) => {
+    adminState.isQaLocked = !isOpen;
+    if (adminState.mode === 'QA' && btnToggleLock) {
+      btnToggleLock.textContent = isOpen ? '🔒 KHÓA ĐÁP ÁN' : '🔓 MỞ LẠI ĐÁP ÁN';
+    }
   });
 
   socket.on('qa_live_update', ({ stats, totalAnswered, totalPlayers }) => {
@@ -377,6 +467,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminState.mode === 'SQUIZZ') {
       const newOpen = adminState.isSquizzLocked;
       socket.emit('host_squizz_toggle_lock', { open: newOpen });
+    } else if (adminState.mode === 'QA') {
+      const newOpen = adminState.isQaLocked;
+      socket.emit('host_qa_toggle_lock', { open: newOpen });
     }
   });
 
@@ -388,6 +481,19 @@ document.addEventListener('DOMContentLoaded', () => {
       socket.emit('host_qa_reveal');
     }
   });
+
+  // Squizz MC Control Buttons
+  if (btnSquizzPause) {
+    btnSquizzPause.addEventListener('click', () => {
+      socket.emit('host_squizz_pause_timer', { pause: !adminState.isSquizzPaused });
+    });
+  }
+
+  if (btnSquizzAdd10s) {
+    btnSquizzAdd10s.addEventListener('click', () => {
+      socket.emit('host_squizz_add_time', { seconds: 10 });
+    });
+  }
 
   // QA MC Control Buttons
   if (btnQaAutoToggle) {

@@ -60,7 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showScreen(name) {
     Object.keys(screens).forEach(key => {
-      if (screens[key]) screens[key].style.display = key === name ? 'flex' : 'none';
+      const scr = screens[key];
+      if (scr) {
+        if (key === name) {
+          scr.style.display = 'flex';
+          scr.classList.remove('view-transition');
+          void scr.offsetWidth; // force reflow for smooth re-animation
+          scr.classList.add('view-transition');
+        } else {
+          scr.style.display = 'none';
+        }
+      }
     });
     if (elPlayerHeader) {
       elPlayerHeader.style.display = (name === 'join') ? 'none' : 'flex';
@@ -501,13 +511,95 @@ document.addEventListener('DOMContentLoaded', () => {
     playerState.currentMode = state.mode;
 
     if (state.mode === 'SQUIZZ' && state.squizz && state.squizz.question) {
+      window._currentSquizzIndex = state.squizz.currentIndex;
+      window._currentSquizzQ = state.squizz.question;
       renderPlayerSquizz(state.squizz.question, state.squizz.currentIndex, 12);
-      if (state.squizz.myVote) {
-        setSquizzVoted(state.squizz.myVote);
+      
+      const cachedVote = state.squizz.myVote || sessionStorage.getItem('tckt_sq_vote_' + state.squizz.currentIndex);
+      if (cachedVote) {
+        setSquizzVoted(cachedVote);
       }
+
+      if (state.squizz.isOpen === false) {
+        const btnVote = document.getElementById('btn-submit-vote');
+        const btnText = document.getElementById('btn-submit-opentext');
+        if (btnVote) { btnVote.disabled = true; btnVote.textContent = '🔒 ĐÃ KHÓA BÌNH CHỌN'; }
+        if (btnText) { btnText.disabled = true; btnText.textContent = '🔒 ĐÃ KHÓA'; }
+      }
+
       showScreen('squizz');
     } else if (state.mode === 'QA' && state.qa && state.qa.question) {
+      window._currentQaIndex = state.qa.currentIndex;
+      window._currentQaQ = state.qa.question;
       renderPlayerQa(state.qa.question, state.qa.currentIndex, 15);
+
+      if (elPlayerQaTimer) {
+        if (state.qa.isPaused) {
+          elPlayerQaTimer.textContent = `⏸️ Tạm dừng (${state.qa.timeRemaining}s)`;
+          elPlayerQaTimer.style.background = 'rgba(245, 158, 11, 0.4)';
+        } else if (state.qa.isOpen === false) {
+          elPlayerQaTimer.textContent = '🔒 ĐÃ KHÓA';
+          elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.45)';
+        } else {
+          elPlayerQaTimer.textContent = `⏱️ ${state.qa.timeRemaining}s`;
+          elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.25)';
+        }
+      }
+
+      // Restore answer from server state or sessionStorage
+      const rawAns = (state.qa.myAnswer !== null && state.qa.myAnswer !== undefined)
+        ? state.qa.myAnswer
+        : sessionStorage.getItem('tckt_qa_ans_' + state.qa.currentIndex);
+
+      if (rawAns !== null && rawAns !== undefined) {
+        if (typeof rawAns === 'number' || (!isNaN(rawAns) && rawAns !== '')) {
+          const optIdx = parseInt(rawAns, 10);
+          playerState.myAnswer = optIdx;
+          document.querySelectorAll('.mobile-opt-btn').forEach(b => {
+            b.disabled = true;
+            if (parseInt(b.getAttribute('data-opt'), 10) === optIdx) {
+              b.classList.add('selected');
+              b.style.opacity = '1';
+            } else {
+              b.style.opacity = '0.4';
+            }
+          });
+        } else if (typeof rawAns === 'string' && rawAns) {
+          playerState.myAnswer = rawAns;
+          if (btnSubmitQaOpenText) {
+            btnSubmitQaOpenText.disabled = true;
+            btnSubmitQaOpenText.textContent = 'ĐÃ GỬI ĐÁP ÁN ✅';
+          }
+        }
+      }
+
+      // If question was already locked on server
+      if (state.qa.isOpen === false) {
+        document.querySelectorAll('.mobile-opt-btn').forEach(b => b.disabled = true);
+        if (btnSubmitQaOpenText) btnSubmitQaOpenText.disabled = true;
+      }
+
+      // If question was already revealed on server
+      if (state.qa.isRevealed && state.qa.correctAnswer !== null && state.qa.correctAnswer !== undefined) {
+        if (playerState.myAnswer !== null && typeof playerState.myAnswer === 'number') {
+          const isCorrect = (playerState.myAnswer === state.qa.correctAnswer);
+          elPlayerQaResult.style.display = 'block';
+          if (isCorrect) {
+            elPlayerQaResult.style.background = 'rgba(16, 185, 129, 0.2)';
+            elPlayerQaResult.style.border = '1px solid var(--emerald)';
+            elPlayerQaResultTitle.style.color = '#34d399';
+            elPlayerQaResultTitle.textContent = '🎉 CHÍNH XÁC!';
+            elPlayerQaResultPoints.textContent = 'Bạn đã ghi điểm trong câu hỏi này!';
+          } else {
+            elPlayerQaResult.style.background = 'rgba(244, 63, 94, 0.2)';
+            elPlayerQaResult.style.border = '1px solid var(--rose)';
+            elPlayerQaResultTitle.style.color = '#fb7185';
+            elPlayerQaResultTitle.textContent = '😅 RẤT TIẾC, CHƯA ĐÚNG!';
+            elPlayerQaResultPoints.textContent = 'Cố gắng ở câu tiếp theo nhé!';
+          }
+        }
+      }
+
       showScreen('qa');
     } else {
       showScreen('waiting');
@@ -541,6 +633,11 @@ document.addEventListener('DOMContentLoaded', () => {
     playerState.myVote = null;
     currentlySelectedColleague = '';
 
+    const btnVote = document.getElementById('btn-submit-vote');
+    const btnText = document.getElementById('btn-submit-opentext');
+    if (btnVote) { btnVote.disabled = false; btnVote.textContent = 'GỬI BÌNH CHỌN 🗳️'; }
+    if (btnText) { btnText.disabled = false; btnText.textContent = 'GỬI CÂU TRẢ LỜI 🚀'; }
+
     if (q.type === 'OPEN_TEXT') {
       // Open-ended text mode
       if (elSqVoteForm) elSqVoteForm.style.display = 'none';
@@ -564,9 +661,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   socket.on('squizz_question_started', ({ currentIndex, total, question }) => {
+    window._currentSquizzIndex = currentIndex;
+    window._currentSquizzQ = question;
     renderPlayerSquizz(question, currentIndex, total);
     showScreen('squizz');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (navigator.vibrate) navigator.vibrate(50);
+  });
+
+  socket.on('squizz_lock_changed', ({ isOpen }) => {
+    const btnVote = document.getElementById('btn-submit-vote');
+    const btnText = document.getElementById('btn-submit-opentext');
+    if (btnVote) {
+      btnVote.disabled = !isOpen;
+      btnVote.textContent = isOpen ? 'GỬI BÌNH CHỌN 🗳️' : '🔒 ĐÃ KHÓA BÌNH CHỌN';
+    }
+    if (btnText) {
+      btnText.disabled = !isOpen;
+      btnText.textContent = isOpen ? 'GỬI CÂU TRẢ LỜI 🚀' : '🔒 ĐÃ KHÓA';
+    }
   });
 
   // Submit Member Vote
@@ -595,12 +708,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('squizz_vote_accepted', ({ chosenName }) => {
     setSquizzVoted(chosenName);
+    try {
+      const curIdx = window._currentSquizzIndex !== undefined ? window._currentSquizzIndex : 0;
+      sessionStorage.setItem('tckt_sq_vote_' + curIdx, chosenName);
+    } catch(e) {}
     if (window.soundFX) window.soundFX.playCorrect();
     if (navigator.vibrate) navigator.vibrate([40, 40, 40]);
   });
 
   document.getElementById('btn-change-vote').addEventListener('click', () => {
     elSqVoteDone.style.display = 'none';
+    try {
+      const curIdx = window._currentSquizzIndex !== undefined ? window._currentSquizzIndex : 0;
+      sessionStorage.removeItem('tckt_sq_vote_' + curIdx);
+    } catch(e) {}
     const currentQ = window._currentSquizzQ;
     if (currentQ && currentQ.type === 'OPEN_TEXT') {
       if (elSqOpenTextForm) elSqOpenTextForm.style.display = 'block';
@@ -635,6 +756,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elPlayerQaGrid) elPlayerQaGrid.style.display = 'none';
       if (elPlayerQaOpenTextForm) elPlayerQaOpenTextForm.style.display = 'block';
       if (inputQaOpenText) inputQaOpenText.value = '';
+      if (btnSubmitQaOpenText) {
+        btnSubmitQaOpenText.disabled = false;
+        btnSubmitQaOpenText.textContent = 'GỬI ĐÁP ÁN 🚀';
+      }
     } else {
       if (elPlayerQaGrid) elPlayerQaGrid.style.display = 'grid';
       if (elPlayerQaOpenTextForm) elPlayerQaOpenTextForm.style.display = 'none';
@@ -655,19 +780,56 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   socket.on('qa_question_started', ({ currentIndex, total, timeLimit, question }) => {
+    window._currentQaIndex = currentIndex;
+    window._currentQaQ = question;
     renderPlayerQa(question, currentIndex, total);
-    if (elPlayerQaTimer) elPlayerQaTimer.textContent = `⏱️ ${timeLimit || 15}s`;
+    if (elPlayerQaTimer) {
+      elPlayerQaTimer.textContent = `⏱️ ${timeLimit || 15}s`;
+      elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.25)';
+    }
     showScreen('qa');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (navigator.vibrate) navigator.vibrate(50);
   });
 
-  socket.on('qa_timer_tick', ({ timeRemaining }) => {
+  socket.on('qa_timer_tick', ({ timeRemaining, isPaused }) => {
     if (elPlayerQaTimer) {
-      elPlayerQaTimer.textContent = `⏱️ ${timeRemaining}s`;
-      if (timeRemaining <= 5) {
-        elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.45)';
+      if (isPaused) {
+        elPlayerQaTimer.textContent = `⏸️ Tạm dừng (${timeRemaining}s)`;
+        elPlayerQaTimer.style.background = 'rgba(245, 158, 11, 0.4)';
       } else {
+        elPlayerQaTimer.textContent = `⏱️ ${timeRemaining}s`;
+        if (timeRemaining <= 5) {
+          elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.45)';
+        } else {
+          elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.25)';
+        }
+      }
+    }
+  });
+
+  socket.on('qa_timer_paused', ({ isPaused, timeRemaining }) => {
+    if (elPlayerQaTimer) {
+      if (isPaused) {
+        elPlayerQaTimer.textContent = `⏸️ Tạm dừng (${timeRemaining !== undefined ? timeRemaining : ''}s)`;
+        elPlayerQaTimer.style.background = 'rgba(245, 158, 11, 0.4)';
+      } else {
+        elPlayerQaTimer.textContent = `⏱️ ${timeRemaining !== undefined ? timeRemaining : ''}s`;
         elPlayerQaTimer.style.background = 'rgba(244, 63, 94, 0.25)';
+      }
+    }
+  });
+
+  socket.on('qa_lock_changed', ({ isOpen }) => {
+    if (!isOpen) {
+      document.querySelectorAll('.mobile-opt-btn').forEach(b => {
+        b.disabled = true;
+      });
+      if (btnSubmitQaOpenText) {
+        btnSubmitQaOpenText.disabled = true;
+      }
+      if (elPlayerQaTimer) {
+        elPlayerQaTimer.textContent = '🔒 ĐÃ KHÓA ĐÁP ÁN';
       }
     }
   });
@@ -677,6 +839,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (playerState.myAnswer !== null) return;
       const optIdx = parseInt(btn.getAttribute('data-opt'), 10);
       playerState.myAnswer = optIdx;
+
+      try {
+        const curIdx = window._currentQaIndex !== undefined ? window._currentQaIndex : 0;
+        sessionStorage.setItem('tckt_qa_ans_' + curIdx, optIdx);
+      } catch(e) {}
 
       // Highlight selected
       document.querySelectorAll('.mobile-opt-btn').forEach(b => {
@@ -701,6 +868,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       playerState.myAnswer = text;
+      try {
+        const curIdx = window._currentQaIndex !== undefined ? window._currentQaIndex : 0;
+        sessionStorage.setItem('tckt_qa_ans_' + curIdx, text);
+      } catch(e) {}
       socket.emit('player_answer_qa', { optionIndex: -1, textAnswer: text });
       btnSubmitQaOpenText.disabled = true;
       btnSubmitQaOpenText.textContent = 'ĐÃ GỬI ĐÁP ÁN ✅';
