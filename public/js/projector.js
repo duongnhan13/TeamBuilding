@@ -80,7 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(console.error);
 
   // Connect as Projector
-  socket.emit('projector_join');
+  socket.on('connect', () => {
+    socket.emit('projector_join');
+  });
+  if (socket.connected) {
+    socket.emit('projector_join');
+  }
 
   socket.on('host_init', (data) => {
     projState.mode = data.mode;
@@ -327,20 +332,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     displayList.forEach((item, idx) => {
-      const pct = Math.round((item.count / maxVotes) * 100);
+      const pct = Math.max(12, Math.round((item.count / maxVotes) * 100));
       const row = document.createElement('div');
       row.className = 'tally-item';
 
-      const nameClass = !isRevealed ? 'tally-name mystery-blur-name' : 'tally-name mystery-unblurred';
+      const blurClass = !isRevealed ? 'mystery-blur-name' : 'mystery-unblurred';
 
       row.innerHTML = `
         <div class="tally-bar" style="width: ${pct}%"></div>
         <div class="tally-content">
-          <div class="${nameClass}" style="font-size: 1.25rem;">
-            <span style="color: var(--cyan); margin-right: 8px;">#${idx + 1}</span>
-            <span>${item.name}</span>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="color: var(--cyan); font-weight: 900; font-size: 1.35rem; min-width: 36px; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);">#${idx + 1}</span>
+            <span class="${blurClass}" style="font-size: 1.35rem; font-weight: 800; letter-spacing: 0.5px;">${escapeHtml(item.name)}</span>
           </div>
-          <div class="tally-votes" style="font-size: 1.35rem;">${item.count} phiếu</div>
+          <div class="tally-votes" style="font-size: 1.4rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);">${item.count} phiếu</div>
         </div>
       `;
       elSqTallyList.appendChild(row);

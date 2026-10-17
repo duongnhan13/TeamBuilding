@@ -63,7 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Connect as Admin
-  socket.emit('admin_join');
+  socket.on('connect', () => {
+    socket.emit('admin_join');
+  });
+  if (socket.connected) {
+    socket.emit('admin_join');
+  }
 
   socket.on('host_init', (data) => {
     adminState.mode = data.mode;
@@ -268,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateSecretTally(tally) {
     if (!elSecretTally || !tally) return;
-    elVotedCount.textContent = tally.totalVotes || 0;
+    if (elVotedCount) elVotedCount.textContent = tally.totalVotes || 0;
 
     const isText = (adminState.squizzQuestions[adminState.squizzIndex] && adminState.squizzQuestions[adminState.squizzIndex].type === 'OPEN_TEXT') || tally.isTextQuestion;
 
@@ -278,13 +283,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = document.createElement('div');
         row.style.display = 'flex';
         row.style.flexDirection = 'column';
-        row.style.padding = '6px 10px';
+        row.style.padding = '8px 12px';
         row.style.background = 'rgba(255, 255, 255, 0.08)';
         row.style.borderRadius = '8px';
         row.style.fontSize = '0.9rem';
         row.innerHTML = `
-          <div style="font-weight: 700; color: #fff;">"${r.text}"</div>
-          <div style="font-size: 0.75rem; color: var(--cyan); margin-top: 2px;">👤 ${r.voter}</div>
+          <div style="font-weight: 700; color: #fff;">"${escapeHtml(r.text)}"</div>
+          <div style="font-size: 0.78rem; color: var(--cyan); margin-top: 3px;">👤 ${escapeHtml(r.voter)}</div>
         `;
         elSecretTally.appendChild(row);
       });
@@ -297,17 +302,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     elSecretTally.innerHTML = '';
-    tally.tallyList.slice(0, 6).forEach((item, idx) => {
+    tally.tallyList.forEach((item, idx) => {
       const row = document.createElement('div');
       row.style.display = 'flex';
       row.style.justifyContent = 'space-between';
-      row.style.padding = '5px 10px';
-      row.style.background = idx === 0 ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.05)';
-      row.style.borderRadius = '6px';
-      row.style.fontSize = '0.9rem';
+      row.style.alignItems = 'center';
+      row.style.padding = '6px 12px';
+      row.style.background = idx === 0 ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.06)';
+      row.style.border = idx === 0 ? '1px solid var(--gold)' : '1px solid rgba(255, 255, 255, 0.08)';
+      row.style.borderRadius = '8px';
+      row.style.fontSize = '0.92rem';
       row.innerHTML = `
-        <span style="font-weight: 700;">#${idx + 1} ${item.name}</span>
-        <span style="color: var(--gold); font-weight: 800;">${item.count} phiếu</span>
+        <span style="font-weight: 800; color: ${idx === 0 ? '#fef08a' : '#fff'};">#${idx + 1} ${escapeHtml(item.name)}</span>
+        <span style="color: var(--gold); font-weight: 900; font-size: 1rem;">${item.count} phiếu</span>
       `;
       elSecretTally.appendChild(row);
     });
@@ -317,6 +324,8 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.on('squizz_question_started', ({ currentIndex, total, question }) => {
     adminState.isSquizzPaused = false;
     adminState.isSquizzLocked = false;
+    if (elVotedCount) elVotedCount.textContent = '0';
+    if (elSecretTally) elSecretTally.innerHTML = '<div style="color: var(--text-muted); font-style: italic; font-size: 0.9rem;">Chưa có phiếu nào...</div>';
     if (btnSquizzPause) {
       btnSquizzPause.textContent = '⏸️ Tạm Dừng Timer';
       btnSquizzPause.style.background = '';

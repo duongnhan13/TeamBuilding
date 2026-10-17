@@ -753,9 +753,10 @@ io.on('connection', (socket) => {
   }
 
   // --- SQUIZZ EVENTS ---
-  socket.on('player_vote_squizz', ({ name, text }) => {
-    const playerId = socket.playerId;
+  socket.on('player_vote_squizz', ({ name, text, playerId: clientPlayerId }) => {
+    const playerId = socket.playerId || clientPlayerId;
     if (!playerId) return;
+    if (!socket.playerId) socket.playerId = playerId;
     if (gameState.mode !== 'SQUIZZ' || !gameState.squizz.isOpen) {
       return socket.emit('action_error', { message: 'Thời gian bình chọn đã đóng!' });
     }
@@ -772,10 +773,11 @@ io.on('connection', (socket) => {
     socket.emit('squizz_vote_accepted', { chosenName: trimmed });
 
     const tally = calculateSquizzTally();
-    io.to('host').emit('squizz_live_update', {
+    const act = getMemberActivationStatus();
+    io.emit('squizz_live_update', {
       tally,
       totalVotes: tally.totalVotes,
-      totalPlayers: getConnectedPlayers().length
+      totalPlayers: act.activatedCount || getConnectedPlayers().length
     });
   });
 
@@ -802,10 +804,11 @@ io.on('connection', (socket) => {
       question: q
     });
 
-    io.to('host').emit('squizz_live_update', {
+    const act = getMemberActivationStatus();
+    io.emit('squizz_live_update', {
       tally: calculateSquizzTally(),
       totalVotes: 0,
-      totalPlayers: getConnectedPlayers().length
+      totalPlayers: act.activatedCount || getConnectedPlayers().length
     });
 
     startSquizzTimer();
@@ -863,10 +866,11 @@ io.on('connection', (socket) => {
         timeLimit: gameState.squizz.timeLimit,
         question: q
       });
-      io.to('host').emit('squizz_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('squizz_live_update', {
         tally: calculateSquizzTally(),
         totalVotes: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
       startSquizzTimer();
     }
@@ -892,10 +896,11 @@ io.on('connection', (socket) => {
         timeLimit: gameState.squizz.timeLimit,
         question: q
       });
-      io.to('host').emit('squizz_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('squizz_live_update', {
         tally: calculateSquizzTally(),
         totalVotes: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
       startSquizzTimer();
     }
@@ -934,9 +939,10 @@ io.on('connection', (socket) => {
   });
 
   // --- QA EVENTS ---
-  socket.on('player_answer_qa', ({ optionIndex }) => {
-    const playerId = socket.playerId;
+  socket.on('player_answer_qa', ({ optionIndex, textAnswer, playerId: clientPlayerId }) => {
+    const playerId = socket.playerId || clientPlayerId;
     if (!playerId) return;
+    if (!socket.playerId) socket.playerId = playerId;
     if (gameState.mode !== 'QA' || !gameState.qa.isOpen) {
       return socket.emit('action_error', { message: 'Thời gian trả lời đã kết thúc!' });
     }
@@ -965,6 +971,7 @@ io.on('connection', (socket) => {
 
     gameState.qa.answers[playerId] = {
       optionIndex,
+      textAnswer: textAnswer || '',
       isCorrect,
       points,
       timeTakenMs
@@ -977,10 +984,11 @@ io.on('connection', (socket) => {
     });
 
     const stats = calculateQaStats();
-    io.to('host').emit('qa_live_update', {
+    const act = getMemberActivationStatus();
+    io.emit('qa_live_update', {
       stats,
       totalAnswered: stats.totalAnswered,
-      totalPlayers: getConnectedPlayers().length
+      totalPlayers: act.activatedCount || getConnectedPlayers().length
     });
 
     // If everyone in a full room (10+ players) has answered, reveal early; otherwise let the timer finish or MC control
@@ -1104,10 +1112,11 @@ io.on('connection', (socket) => {
       }
     });
 
-    io.to('host').emit('qa_live_update', {
+    const act = getMemberActivationStatus();
+    io.emit('qa_live_update', {
       stats: calculateQaStats(),
       totalAnswered: 0,
-      totalPlayers: getConnectedPlayers().length
+      totalPlayers: act.activatedCount || getConnectedPlayers().length
     });
 
     startQaTimer();
@@ -1202,10 +1211,11 @@ io.on('connection', (socket) => {
         }
       });
 
-      io.to('host').emit('qa_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('qa_live_update', {
         stats: calculateQaStats(),
         totalAnswered: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
 
       startQaTimer();
@@ -1237,10 +1247,11 @@ io.on('connection', (socket) => {
         }
       });
 
-      io.to('host').emit('qa_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('qa_live_update', {
         stats: calculateQaStats(),
         totalAnswered: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
 
       startQaTimer();
@@ -1354,10 +1365,11 @@ io.on('connection', (socket) => {
         gameState.squizz.votes[pId] = normalizeName(voteChoice);
 
         const tally = calculateSquizzTally();
-        io.to('host').emit('squizz_live_update', {
+        const act = getMemberActivationStatus();
+        io.emit('squizz_live_update', {
           tally,
           totalVotes: tally.totalVotes,
-          totalPlayers: getConnectedPlayers().length
+          totalPlayers: act.activatedCount || getConnectedPlayers().length
         });
       }, delay);
       delay += 40; // 40ms stagger so votes count up live
@@ -1401,10 +1413,11 @@ io.on('connection', (socket) => {
         };
 
         const stats = calculateQaStats();
-        io.to('host').emit('qa_live_update', {
+        const act = getMemberActivationStatus();
+        io.emit('qa_live_update', {
           stats,
           totalAnswered: stats.totalAnswered,
-          totalPlayers: getConnectedPlayers().length
+          totalPlayers: act.activatedCount || getConnectedPlayers().length
         });
       }, delay);
       delay += 50; // stagger answers
@@ -1423,10 +1436,11 @@ io.on('connection', (socket) => {
         total: squizzQuestions.length,
         question: q
       });
-      io.to('host').emit('squizz_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('squizz_live_update', {
         tally: calculateSquizzTally(),
         totalVotes: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
     } else if (gameState.mode === 'QA') {
       gameState.qa.isOpen = true;
@@ -1443,10 +1457,11 @@ io.on('connection', (socket) => {
         timeLimit: gameState.qa.timeLimit,
         question: q
       });
-      io.to('host').emit('qa_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('qa_live_update', {
         stats: calculateQaStats(),
         totalAnswered: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
       startQaTimer();
     }
@@ -1484,10 +1499,11 @@ io.on('connection', (socket) => {
         timeLimit: gameState.squizz.timeLimit,
         question: q
       });
-      io.to('host').emit('squizz_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('squizz_live_update', {
         tally: calculateSquizzTally(),
         totalVotes: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
       startSquizzTimer();
     } else if (mode === 'QA') {
@@ -1517,10 +1533,11 @@ io.on('connection', (socket) => {
           timeLimit: gameState.qa.timeLimit
         }
       });
-      io.to('host').emit('qa_live_update', {
+      const act = getMemberActivationStatus();
+      io.emit('qa_live_update', {
         stats: calculateQaStats(),
         totalAnswered: 0,
-        totalPlayers: getConnectedPlayers().length
+        totalPlayers: act.activatedCount || getConnectedPlayers().length
       });
       startQaTimer();
     }

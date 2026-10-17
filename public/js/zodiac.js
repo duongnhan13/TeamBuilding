@@ -105,7 +105,7 @@
   // Generate glowing Năm Tuổi badge HTML for Game 1 winner announcement
   function generateZodiacBadgesHtml(zodiacInfo) {
     if (!zodiacInfo || !zodiacInfo.lunar) return '';
-    const { lunar, parts } = zodiacInfo;
+    const { lunar } = zodiacInfo;
 
     return `
       <div class="spotlight-nam-tuoi-card" style="display: inline-flex; align-items: center; justify-content: center; gap: 12px; background: rgba(245, 158, 11, 0.15); border: 2px solid var(--gold); border-radius: 999px; padding: 10px 24px; box-shadow: 0 4px 25px rgba(245, 158, 11, 0.4); margin-bottom: 14px;">
@@ -115,7 +115,7 @@
             Tuổi ${lunar.canChi} (${lunar.animal})
           </div>
           <div style="font-size: 0.85rem; color: #cbd5e1; font-weight: 600;">
-            ${parts && parts.year ? `Năm sinh: ${parts.year} • ` : ''}${lunar.trait}
+            ${lunar.trait}
           </div>
         </div>
       </div>

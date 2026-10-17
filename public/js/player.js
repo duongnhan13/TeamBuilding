@@ -689,7 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Vui lòng chạm chọn 1 đồng nghiệp trong danh sách!');
       return;
     }
-    socket.emit('player_vote_squizz', { name: chosen });
+    socket.emit('player_vote_squizz', { name: chosen, playerId: playerState.id });
   });
 
   // Submit Open Text Answer
@@ -702,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputSquizzOpenText) inputSquizzOpenText.focus();
         return;
       }
-      socket.emit('player_vote_squizz', { text });
+      socket.emit('player_vote_squizz', { text, playerId: playerState.id });
     });
   }
 
@@ -855,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      socket.emit('player_answer_qa', { optionIndex: optIdx });
+      socket.emit('player_answer_qa', { optionIndex: optIdx, playerId: playerState.id });
       if (navigator.vibrate) navigator.vibrate(40);
     });
   });
@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const curIdx = window._currentQaIndex !== undefined ? window._currentQaIndex : 0;
         sessionStorage.setItem('tckt_qa_ans_' + curIdx, text);
       } catch(e) {}
-      socket.emit('player_answer_qa', { optionIndex: -1, textAnswer: text });
+      socket.emit('player_answer_qa', { optionIndex: -1, textAnswer: text, playerId: playerState.id });
       btnSubmitQaOpenText.disabled = true;
       btnSubmitQaOpenText.textContent = 'ĐÃ GỬI ĐÁP ÁN ✅';
     });
