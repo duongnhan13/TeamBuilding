@@ -477,6 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="drink-icon-box">${drink.icon || '🧋'}</div>
             <div style="flex: 1;">
               <div class="drink-name">${drink.name}</div>
+              ${drink.subName ? `<div style="font-size: 0.76rem; color: #94a3b8; font-style: italic; margin-top: 1px;">${drink.subName}</div>` : ''}
               ${drink.badge ? `<span class="drink-badge">${drink.badge}</span>` : ''}
             </div>
           </div>

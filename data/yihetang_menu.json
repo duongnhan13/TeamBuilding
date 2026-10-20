@@ -1,141 +1,328 @@
 {
   "categories": [
     {
-      "category": "Trà Sữa Nướng (Signature)",
+      "category": "Must Try (Bán Chạy Nhất ⭐)",
+      "items": [
+        {
+          "id": "tra-sua-nuong-must",
+          "name": "Trà Sữa Nướng",
+          "subName": "YiHe Roasted Milk Tea",
+          "badge": "Signature ⭐",
+          "desc": "Best-seller làm nên tên tuổi Yihetang, hương vị caramel nướng thơm ngậy quyện hồng trà đậm đà.",
+          "icon": "🧋"
+        },
+        {
+          "id": "danh-danh-co-tranh-must",
+          "name": "Dành Dành Có Tranh",
+          "subName": "Gardenia Cream",
+          "badge": "Hot Trend 🔥",
+          "desc": "Trà hoa dành dành thanh khiết kết hợp cùng lớp kem bồng bềnh béo mịn đặc biệt.",
+          "icon": "🌸"
+        },
+        {
+          "id": "hoa-qua-son-must",
+          "name": "Hoa Quả Sơn Cực Phẩm",
+          "subName": "Fruit Tea",
+          "badge": "Trái Cây Tươi 🍉",
+          "desc": "Trà trái cây nhiệt đới tươi mát thơm lừng với dưa hấu, chanh leo, quất, cam vàng thanh nhiệt.",
+          "icon": "🍹"
+        },
+        {
+          "id": "tra-nho-kem-cheese-must",
+          "name": "Trà Nho Kem Cheese",
+          "subName": "Grape Cheese Foam Tea",
+          "badge": "Kem Cheese 🧀",
+          "desc": "Nước ép nho tươi tím mộng mơ kết hợp cùng lớp váng phô mai mặn béo ngậy.",
+          "icon": "🍇"
+        },
+        {
+          "id": "matcha-mochi-must",
+          "name": "Matcha Mochi",
+          "subName": "Matcha Mochi",
+          "badge": "Được Yêu Thích 💚",
+          "desc": "Vị trà xanh Uji đậm đà hòa quyện cùng topping mochi dẻo bùi béo ngậy khó cưỡng.",
+          "icon": "🍵"
+        },
+        {
+          "id": "americano-cam-must",
+          "name": "Americano Cam",
+          "subName": "Orange Americano",
+          "badge": "Sảng Khoái 🍊",
+          "desc": "Cà phê đậm vị kết hợp nước cốt cam vàng mọng nước sảng khoái và tỉnh táo.",
+          "icon": "☕"
+        }
+      ]
+    },
+    {
+      "category": "Trà Sữa Đậm Vị (Classic)",
       "items": [
         {
           "id": "tra-sua-nuong",
-          "name": "Trà Sữa Nướng (Yi He Roasted)",
-          "badge": "Best Seller ⭐",
-          "desc": "Hương vị caramel nướng đặc trưng kết hợp hồng trà đậm vị và sữa béo ngậy.",
+          "name": "Trà Sữa Nướng",
+          "subName": "YiHe Roasted Milk Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Hồng trà thượng hạng quyện vị caramel nướng độc quyền béo thơm ngất ngây.",
           "icon": "🧋"
         },
         {
           "id": "xanh-sua-nuong",
           "name": "Xanh Sữa Nướng",
-          "badge": "Được Yêu Thích 💚",
-          "desc": "Sự hòa quyện tuyệt hảo giữa lục trà hoa lài thanh mát và caramel nướng ngọt ngào.",
+          "subName": "Grilled Green Milk Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Lục trà hoa nhài thanh mát kết hợp caramel nướng béo dịu tao nhã.",
           "icon": "🍵"
         },
         {
-          "id": "tra-olong-do-sua",
-          "name": "Trà Ô Long Đỏ Sữa",
-          "badge": "Đậm Vị 👑",
-          "desc": "Trà ô long đỏ cao cấp dậy hương nồng nàn quyện cùng cốt sữa thanh béo.",
-          "icon": "🧋"
+          "id": "xanh-sua-bang-bang",
+          "name": "Xanh Sữa Băng Băng",
+          "subName": "Mint Milk Tea",
+          "badge": "Mát Lạnh ❄️",
+          "desc": "Trà sữa bạc hà the mát sảng khoái bùng nổ năng lượng tích cực.",
+          "icon": "❄️"
         },
         {
           "id": "tra-sua-long-chau",
           "name": "Trà Sữa Long Châu",
-          "badge": "Mới ✨",
-          "desc": "Trà sữa đậm đà hòa quyện cùng trân châu hoàng kim dai giòn sần sật.",
+          "subName": "Bubble Milk Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Trà sữa đậm vị đi kèm trân châu hoàng kim giòn dai mềm dẻo tuyệt hảo.",
           "icon": "🧋"
         },
         {
-          "id": "xanh-nhai-sua",
-          "name": "Xanh Nhài Sữa (Mạc Lệ Hoa)",
-          "badge": "Thanh Nhẹ 🌸",
-          "desc": "Vị trà xanh ướp hoa lài thanh khiết, thơm dịu, ít ngọt, chuẩn phong cách tao nhã.",
+          "id": "matcha-latte",
+          "name": "Matcha Latte",
+          "subName": "Matcha Latte",
+          "badge": "Thanh Béo 🍵",
+          "desc": "Cốt sữa tươi béo ngậy hòa quyện cùng matcha nguyên chất thơm ngát.",
           "icon": "🍵"
         },
         {
           "id": "matcha-mochi",
-          "name": "Matcha Mochi Sữa Nướng",
+          "name": "Matcha Mochi",
+          "subName": "Matcha Mochi",
           "badge": "Hot Trend 🔥",
-          "desc": "Matcha Uji Nhật Bản kết hợp cùng lớp mochi dẻo béo ngậy và sữa nướng thơm lừng.",
+          "desc": "Matcha Uji Nhật Bản kết hợp cùng lớp mochi dẻo mềm béo bùi.",
+          "icon": "🍵"
+        },
+        {
+          "id": "matcha-danh-danh",
+          "name": "Matcha Dành Dành",
+          "subName": "Gardenia Matcha",
+          "badge": "Hương Hoa Độc Đáo 🌸",
+          "desc": "Sự kết hợp tinh tế giữa trà hoa dành dành và matcha thanh dịu.",
+          "icon": "🍵"
+        },
+        {
+          "id": "co-thu-duong-do-tran-chau",
+          "name": "Cổ Thụ Đường Đỏ Trân Châu",
+          "subName": "Brown Sugar Bubble Tea",
+          "badge": "Món Mới ✨",
+          "desc": "Dòng trà cổ thụ đậm vị hòa cùng sốt đường đỏ sóng sánh và trân châu dẻo thơm.",
+          "icon": "🧋"
+        }
+      ]
+    },
+    {
+      "category": "Trà Sữa Healthy (Premium Tea)",
+      "items": [
+        {
+          "id": "mac-le-hoa",
+          "name": "Mạc Lệ Hoa",
+          "subName": "Jasmine Cream Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Trà hoa nhài thanh khiết phủ lớp kem mịn màng dịu ngọt.",
+          "icon": "🌸"
+        },
+        {
+          "id": "bach-lan-hoa",
+          "name": "Bạch Lan Hoa",
+          "subName": "Orchid Cream Tea",
+          "badge": "Hương Lan Dịu Ngọt 🌺",
+          "desc": "Trà hoa phong lan ngát hương kết hợp cùng kem tươi thanh tao béo ngậy.",
+          "icon": "🌺"
+        },
+        {
+          "id": "bach-lan-tra-sua",
+          "name": "Bạch Lan Trà Sữa",
+          "subName": "Orchid Milk Tea",
+          "badge": "Thanh Khiết 🌸",
+          "desc": "Hương hoa lan quý phái hòa quyện cùng vị sữa ngọt ngào dịu êm.",
+          "icon": "🧋"
+        },
+        {
+          "id": "xanh-nhai-sua",
+          "name": "Xanh Nhài Sữa",
+          "subName": "Jasmine Milk Tea",
+          "badge": "Yêu Thích 🌿",
+          "desc": "Lục trà hoa nhài thanh mát dịu lành, hương hoa thơm lâu, ít ngấy.",
+          "icon": "🍵"
+        },
+        {
+          "id": "danh-danh-co-tranh",
+          "name": "Dành Dành Có Tranh",
+          "subName": "Gardenia Cream",
+          "badge": "Best Seller 👑",
+          "desc": "Trà hoa dành dành thanh tao cùng lớp váng kem bồng bềnh sang trọng.",
+          "icon": "🌸"
+        },
+        {
+          "id": "danh-danh-khong-tranh",
+          "name": "Dành Dành Không Tranh",
+          "subName": "Gardenia Milk Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Trà sữa hoa dành dành mộc mạc thơm dịu, êm đềm và thanh lịch.",
+          "icon": "🧋"
+        },
+        {
+          "id": "co-thu-tra-kem",
+          "name": "Cổ Thụ Trà Kem",
+          "subName": "Gu Shu Cream Top",
+          "badge": "Món Mới ✨",
+          "desc": "Vị trà cổ thụ thượng hạng đậm hương hòa quyện với lớp kem béo mượt trên mặt.",
           "icon": "🍵"
         }
       ]
     },
     {
-      "category": "Trà Hoa Quả Tươi Mát",
+      "category": "Trà Trái Cây (Fruit Tea)",
       "items": [
         {
-          "id": "hoa-qua-son",
-          "name": "Hoa Quả Sơn Cực Phẩm (Xô 1000ml)",
-          "badge": "Signature Fruit 🍉",
-          "desc": "Siêu phẩm trà trái cây nhiệt đới tươi mát: Dưa hấu, quất, cam vàng, dứa và chanh leo.",
-          "icon": "🍹"
+          "id": "mach-thao-chanh-thom",
+          "name": "Mạch Thảo Chanh Thơm",
+          "subName": "Wheatgrass Lemon Juice",
+          "badge": "Best Seller 👑",
+          "desc": "Mạch thảo tươi mát kết hợp chanh vàng thanh lọc cơ thể và giải nhiệt tuyệt vời.",
+          "icon": "🍋"
         },
         {
           "id": "tra-nho-thach-vai",
           "name": "Trà Nho Thạch Vải",
-          "badge": "Bestseller 🍇",
-          "desc": "Hương nho ngọt thanh kết hợp thạch vải giòn sựt sảng khoái đánh tan mệt mỏi.",
+          "subName": "Grape Lychee Iced Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Hương nho ngọt thanh kết hợp thạch vải giòn sựt sảng khoái đánh tan căng thẳng.",
           "icon": "🍇"
         },
         {
           "id": "tra-xoai-chanh-day",
           "name": "Trà Xoài Chanh Dây",
-          "badge": "Chua Ngọt 🥭",
-          "desc": "Xoài cát chín mọng ngọt dịu hòa cùng chanh leo chua thanh tươi mới.",
+          "subName": "Passion Fruit Mango Iced Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Xoài chín thơm ngào ngạt hòa cùng chanh leo chua thanh tươi mới.",
           "icon": "🥭"
         },
         {
-          "id": "tra-dao-hong-dai",
-          "name": "Trà Đào Hồng Đài",
-          "badge": "Dịu Ngọt 🍑",
-          "desc": "Trà hoa quả đào hồng thơm ngát với từng miếng đào giòn ngọt tự nhiên.",
-          "icon": "🍑"
+          "id": "hoa-qua-son",
+          "name": "Hoa Quả Sơn Cực Phẩm",
+          "subName": "Fruit Tea",
+          "badge": "Trái Cây Tươi 🍉",
+          "desc": "Siêu phẩm trà trái cây nhiệt đới ngập tràn dưa hấu, chanh leo, quất tươi mát.",
+          "icon": "🍹"
         },
         {
           "id": "mac-le-tra-cam",
-          "name": "Mạc Lệ Trà Cam Vàng",
-          "badge": "Vitamin C 🍊",
-          "desc": "Lục trà nhài thượng hạng hòa cùng nước cốt cam vàng tươi nguyên chất.",
+          "name": "Mạc Lệ Trà Cam",
+          "subName": "Fresh Squeezed Orange Juice",
+          "badge": "Best Seller 👑",
+          "desc": "Lục trà hoa nhài thơm ngát kết hợp cam tươi vắt nguyên chất dồi dào Vitamin C.",
           "icon": "🍊"
+        },
+        {
+          "id": "xoai-mochi",
+          "name": "Xoài Mochi",
+          "subName": "Mango Mochi",
+          "badge": "Béo Ngon 🥭",
+          "desc": "Trà xoài nhiệt đới thơm sánh ăn kèm viên mochi dẻo mịn bùi thơm.",
+          "icon": "🥭"
+        },
+        {
+          "id": "co-thu-do-vai",
+          "name": "Cổ Thụ Đỏ Vải",
+          "subName": "Lychee Gu Shu Iced Tea",
+          "badge": "Món Mới ✨",
+          "desc": "Vị ngọt ngào của quả vải mọng nước trên nền trà cổ thụ đỏ đậm vị.",
+          "icon": "🍒"
+        },
+        {
+          "id": "co-thu-tra-mo",
+          "name": "Cổ Thụ Trà Mơ",
+          "subName": "Gu Shu Green Plum",
+          "badge": "Món Mới ✨",
+          "desc": "Quả mơ xanh chua thanh dịu ngọt hòa cùng trà cổ thụ thượng hạng.",
+          "icon": "🍑"
         }
       ]
     },
     {
-      "category": "Trà Kem Cheese (Macchiato)",
+      "category": "Trà Kem Cheese & Nguyên Chất",
       "items": [
         {
           "id": "tra-nho-kem-cheese",
           "name": "Trà Nho Kem Cheese",
-          "badge": "Đỉnh Chóp 🧀",
-          "desc": "Nước ép nho tươi tím mộng mơ phủ lớp váng sữa phô mai mặn béo ngậy khó cưỡng.",
+          "subName": "Grape Cream Cheese Tea",
+          "badge": "Yêu Thích 🧀",
+          "desc": "Nước ép nho tươi phủ lớp kem phô mai New Zealand mặn mặn béo ngậy đỉnh cao.",
           "icon": "🍇"
         },
         {
-          "id": "tra-xoai-kem-cheese",
-          "name": "Trà Xoài Kem Cheese",
-          "badge": "Yêu Thích 🥭",
-          "desc": "Xoài xay sánh mịn phủ lớp kem cheese bồng bềnh thơm nức.",
-          "icon": "🥭"
+          "id": "matcha-lan-hoa",
+          "name": "Matcha Lan Hoa",
+          "subName": "Orchid Matcha",
+          "badge": "Thơm Ngát 🍵",
+          "desc": "Matcha Uji thơm lừng kết hợp cốt hoa lan thanh tao quý phái.",
+          "icon": "🍵"
         },
         {
-          "id": "matcha-kem-cheese",
-          "name": "Matcha Nướng Kem Cheese",
-          "badge": "Béo Ngậy 🍵",
-          "desc": "Trà xanh nướng đậm vị kết hợp phô mai New Zealand sánh mịn ngọt dịu.",
+          "id": "luc-tra-nhai-thuy-phong",
+          "name": "Lục Trà Nhài Thúy Phong",
+          "subName": "Pure Jasmine Tea",
+          "badge": "Nguyên Chất 🌿",
+          "desc": "Trà xanh ướp hoa nhài tinh khôi, vị chát nhẹ hậu ngọt thanh tao thuần khiết.",
           "icon": "🍵"
+        },
+        {
+          "id": "luc-tra-lan-hoa",
+          "name": "Lục Trà Lan Hoa",
+          "subName": "Pure Orchid Tea",
+          "badge": "Nguyên Chất 🌺",
+          "desc": "Lục trà thượng hạng kết tinh cùng hương hoa phong lan ngát hương bền lâu.",
+          "icon": "🌺"
+        },
+        {
+          "id": "danh-danh-tra-hoa",
+          "name": "Dành Dành Trà Hoa",
+          "subName": "Pure Gardenia Tea",
+          "badge": "Best Seller 👑",
+          "desc": "Trà hoa dành dành nguyên chất thanh lọc cơ thể, hương hoa ngát dịu dàng.",
+          "icon": "🌸"
         }
       ]
     },
     {
-      "category": "Sữa Tươi & Smoothie",
+      "category": "Cà Phê (Coffee Series)",
       "items": [
         {
-          "id": "sua-tuoi-tran-chau-duong-den",
-          "name": "Sữa Tươi Trân Châu Đường Đen",
-          "badge": "Kinh Điển 🧋",
-          "desc": "Sữa tươi thanh trùng Đà Lạt hòa cùng trân châu đường đen nóng dẻo thơm lừng.",
-          "icon": "🥛"
+          "id": "americano",
+          "name": "Americano",
+          "subName": "Americano",
+          "badge": "Kinh Điển ☕",
+          "desc": "Cà phê đen nguyên chất phong cách Americano đậm vị, tỉnh táo và không đường.",
+          "icon": "☕"
         },
         {
-          "id": "smoothie-wei-bo",
-          "name": "Smoothie Wei Bơ Sáp",
-          "badge": "Dưỡng Nhan 🥑",
-          "desc": "Bơ sáp tươi xay nhuyễn sánh mịn, thơm ngậy, đẹp da và giữ dáng chuẩn nàng thơ.",
-          "icon": "🥑"
+          "id": "americano-cam",
+          "name": "Americano Cam",
+          "subName": "Orange Americano",
+          "badge": "Best Seller 🍊",
+          "desc": "Sự kết hợp bùng nổ giữa cà phê nồng nàn và nước cốt cam vàng chua ngọt tươi mới.",
+          "icon": "🍊"
         },
         {
-          "id": "bo-bo-dua",
-          "name": "Bơ Bơ Dừa Thơm Béo",
-          "badge": "Hấp Dẫn 🥥",
-          "desc": "Sự kết hợp ăn ý giữa bơ tươi và nước cốt dừa béo bùi sảng khoái.",
-          "icon": "🥥"
+          "id": "ca-phe-nuong",
+          "name": "Cà Phê Nướng",
+          "subName": "Roasted Coffee",
+          "badge": "Best Seller 👑",
+          "desc": "Hạt cà phê rang nướng thơm lừng kết hợp cốt sữa béo ngậy độc đáo kiểu Yihetang.",
+          "icon": "☕"
         }
       ]
     }
@@ -162,18 +349,17 @@
     ],
     "ice": [
       "100% (Chuẩn)",
-      "70%",
       "50% (Ít đá)",
-      "Không đá",
-      "Uống nóng / Ấm"
+      "0% (Không đá)",
+      "Uống nóng / Ấm 🔥"
     ],
     "toppings": [
-      "Trân châu hoàng kim",
-      "Trân châu trắng",
-      "Pudding trứng",
-      "Kem cheese (Macchiato)",
-      "Thạch dừa",
-      "Đậu đỏ"
+      "Trân Châu Hoàng Kim",
+      "Trân Châu Trắng",
+      "Trân Châu Đen",
+      "Thạch Dừa",
+      "Kem Cheese",
+      "Mochi"
     ]
   }
 }
