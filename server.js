@@ -1991,6 +1991,10 @@ io.on('connection', (socket) => {
 
 // Cloudflare Quick Tunnel Manager
 function startCloudflareTunnel(port) {
+  // Only run on Windows local development
+  if (process.platform !== 'win32') {
+    return;
+  }
   const binaryPath = path.join(__dirname, 'cloudflared.exe');
   if (!fs.existsSync(binaryPath)) {
     console.log('ℹ️ Không tìm thấy file cloudflared.exe. Chạy ở chế độ Wi-Fi nội bộ.');
