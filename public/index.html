@@ -6,8 +6,9 @@
   <title>Cổng 20/10 - BVĐK Phương Đông Phòng TCKT</title>
   <link rel="stylesheet" href="/css/style.css">
   <script>
-    // If mobile device, automatically redirect straight to the 20/10 Greeting Card & Order screen
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768) {
+    // If mobile device and not explicitly requesting portal, redirect straight to the 20/10 Greeting Card & Order screen
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('portal') && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768)) {
       window.location.replace('/player.html');
     }
   </script>

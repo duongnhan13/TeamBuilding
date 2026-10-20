@@ -59,6 +59,8 @@ function get2010Status() {
       dob: m.dob || '',
       avatar: m.avatar || '🌸',
       wish: m.wish || '',
+      zodiacSign: m.zodiacSign || '',
+      zodiacIcon: m.zodiacIcon || '',
       hasOpenedCard: !!entry.hasOpenedCard,
       openedAt: entry.openedAt || null,
       hasOrdered: !!entry.hasOrdered,
@@ -149,6 +151,13 @@ let cloudflaredProc = null;
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Friendly Route Aliases
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/tonghop', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/host', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/player', (req, res) => res.sendFile(path.join(__dirname, 'public', 'player.html')));
+app.get('/thiep', (req, res) => res.sendFile(path.join(__dirname, 'public', 'player.html')));
 
 // API Endpoints
 app.get('/api/info', async (req, res) => {
@@ -404,6 +413,7 @@ app.get('/api/2010/export-excel', (req, res) => {
       'STT',
       'Mã số (MS)',
       'Họ và Tên',
+      'Cung hoàng đạo',
       'Chức danh',
       'Trạng thái',
       'Món đã chọn',
@@ -432,10 +442,13 @@ app.get('/api/2010/export-excel', (req, res) => {
         }
       };
 
+      const zodiacStr = m.zodiacSign ? `${m.zodiacSign} ${m.zodiacIcon || ''}`.trim() : '';
+
       return [
         m.stt,
         m.ms,
         m.name,
+        zodiacStr,
         m.role,
         statusStr,
         o.drinkName || '',
@@ -454,6 +467,7 @@ app.get('/api/2010/export-excel', (req, res) => {
       { wch: 6 },
       { wch: 12 },
       { wch: 26 },
+      { wch: 16 },
       { wch: 22 },
       { wch: 16 },
       { wch: 32 },

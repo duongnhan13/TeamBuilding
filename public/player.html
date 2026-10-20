@@ -153,10 +153,15 @@
       <!-- The Letter Card (Reveals after tap) -->
       <div class="greeting-card-modal" id="letter-card">
         <div class="card-emblem">💐✨</div>
-        <div style="text-align: center; margin-bottom: 6px;">
+        <!-- Recipient & Zodiac Pills -->
+        <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
           <span class="card-recipient-pill">
             <span id="card-avatar-pill">👑</span>
             <span id="card-role-pill">Trưởng phòng</span> • MS: <span id="card-ms-pill">6</span>
+          </span>
+          <span class="card-zodiac-pill" id="card-zodiac-pill" style="display: none;">
+            <span id="card-zodiac-icon">♎</span>
+            <span id="card-zodiac-name">Thiên Bình</span>
           </span>
         </div>
         <div class="card-header-title">
@@ -174,16 +179,16 @@
           — Đại gia đình Phòng Tài Chính Kế Toán • BVĐK Phương Đông — 💖
         </div>
 
-        <!-- Gift invitation call to action -->
+        <!-- Gift invitation call to action (Royal Crimson Velvet) -->
         <div class="gift-invitation-box">
-          <div style="font-size: 2.2rem; margin-bottom: 6px;">🧋🎁</div>
-          <h3 style="font-size: 1.25rem; font-weight: 900; color: #fef08a; margin-bottom: 6px;">
+          <div class="gift-invitation-icon">🧋🎁</div>
+          <h3 class="gift-invitation-title">
             MÓN QUÀ NGỌT NGÀO DÀNH RIÊNG CHO BẠN
           </h3>
-          <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 14px;">
+          <p class="gift-invitation-desc">
             Ban tổ chức xin gửi tặng bạn <strong>1 cốc trà sữa Yi He Tang</strong> mát lạnh theo đúng sở thích!
           </p>
-          <button id="btn-goto-order" class="btn" style="width: 100%; height: 48px; font-size: 1rem; font-weight: 900; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); border-radius: 14px;">
+          <button id="btn-goto-order" class="btn btn-gift-order">
             CHỌN MÓN TRÀ SỮA YIHETANG CỦA BẠN 🧋
           </button>
         </div>
@@ -284,6 +289,13 @@
       </div>
 
     </section>
+
+    <!-- Footer Quick Link to Admin -->
+    <div style="text-align: center; margin: 30px 0 20px; opacity: 0.85;">
+      <a href="/admin.html" style="display: inline-flex; align-items: center; gap: 6px; color: #fbcfe8; font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 7px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 999px; transition: all 0.2s ease;">
+        📊 Xem Bảng Quản Lý & Gom Đơn (Admin) 🧋
+      </a>
+    </div>
 
   </div>
 

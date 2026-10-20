@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     members: [],
     stats: { totalMembers: 32, openedCount: 0, orderedCount: 0, unopenedCount: 32 },
     summary: {},
-    activeTab: 'LIST', // 'LIST' or 'SUMMARY'
     currentFilter: 'ALL', // 'ALL', 'ORDERED', 'OPENED', 'UNOPENED'
     searchQuery: ''
   };
@@ -24,11 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const barOpened = document.getElementById('bar-opened');
   const barOrdered = document.getElementById('bar-ordered');
 
-  const tabBtnList = document.getElementById('tab-btn-list');
-  const tabBtnSummary = document.getElementById('tab-btn-summary');
-  const tabContentList = document.getElementById('tab-content-list');
-  const tabContentSummary = document.getElementById('tab-content-summary');
   const tabSummaryTotalCups = document.getElementById('tab-summary-total-cups');
+  const summaryGroupsContainer = document.getElementById('summary-groups-container');
+  const zaloCopyText = document.getElementById('zalo-copy-text');
+  const btnCopyZalo = document.getElementById('btn-copy-zalo');
+  const btnCopyZaloTab = document.getElementById('btn-copy-zalo-tab');
+  const btnRefreshData = document.getElementById('btn-refresh-data');
 
   const pillAllCount = document.getElementById('pill-all-count');
   const pillOrderedCount = document.getElementById('pill-ordered-count');
@@ -37,13 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterPillsGroup = document.getElementById('filter-pills-group');
   const adminSearchInput = document.getElementById('admin-search-input');
   const adminMembersTbody = document.getElementById('admin-members-tbody');
-
-  const summaryGroupsContainer = document.getElementById('summary-groups-container');
-  const zaloCopyText = document.getElementById('zalo-copy-text');
-  const btnCopyZalo = document.getElementById('btn-copy-zalo');
-  const btnCopyZaloTab = document.getElementById('btn-copy-zalo-tab');
-  const btnRefreshData = document.getElementById('btn-refresh-data');
-  const btnReloadExcel = document.getElementById('btn-reload-excel');
 
   // Socket setup
   socket.on('connect', () => {
@@ -64,10 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   socket.on('2010_order_placed', (payload) => {
-    showToast(`🧋 ${payload.name} (MS: ${payload.ms}) vừa đặt "${payload.order.drinkName}"!`, '#10b981');
+    showToast(`🧋 ${payload.name} (MS: ${payload.ms}) vừa đặt "${payload.order ? payload.order.drinkName : ''}"!`, '#10b981');
   });
 
-  // Fetch initial data
+  // Fetch data from API
   async function fetchStatus() {
     try {
       const res = await fetch('/api/2010/status');
@@ -85,8 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     adminState.summary = data.summary || {};
 
     renderKPIs();
-    renderTable();
     renderSummary();
+    renderTable();
   }
 
   // Render KPI cards
@@ -132,6 +125,109 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/"/g, '&quot;');
   }
 
+  // Render Bulk Order Summary
+  function renderSummary() {
+    if (!summaryGroupsContainer) return;
+    summaryGroupsContainer.innerHTML = '';
+
+    const summary = adminState.summary || {};
+    const keys = Object.keys(summary);
+    let totalCups = 0;
+
+    let zaloText = `📋 DANH SÁCH ĐẶT TRÀ SỮA YI HE TANG - 20/10 PHÒNG TCKT\n`;
+    zaloText += `📅 Thời gian xuất: ${new Date().toLocaleTimeString('vi-VN')} ngày ${new Date().toLocaleDateString('vi-VN')}\n`;
+
+    if (keys.length === 0) {
+      summaryGroupsContainer.innerHTML = `
+        <div style="background: rgba(245, 158, 11, 0.08); border: 1.5px dashed rgba(245, 158, 11, 0.4); border-radius: 18px; padding: 28px 20px; text-align: center;">
+          <div style="font-size: 2.4rem; margin-bottom: 8px;">🧋✨</div>
+          <h4 style="font-size: 1.2rem; font-weight: 900; color: #fef08a; margin-bottom: 6px;">
+            HỆ THỐNG GOM ĐƠN TỰ ĐỘNG ĐANG HOẠT ĐỘNG
+          </h4>
+          <p style="font-size: 0.94rem; color: #cbd5e1; max-width: 620px; margin: 0 auto 16px; line-height: 1.6;">
+            Hiện tại chưa có ai gửi order. Ngay khi các chị em mở thiệp trên điện thoại và chọn món, hệ thống sẽ <strong>tự động gom số lượng theo món (Size M, Size L), topping và ghi chú</strong> ngay tại bảng này để bạn gọi quán hoặc copy vào Zalo!
+          </p>
+          <a href="/player.html" target="_blank" class="btn" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; font-size: 0.92rem; font-weight: 800; border-radius: 12px; padding: 9px 20px; text-decoration: none;">
+            💌 Mở giao diện thiệp để đặt thử 1 món ↗
+          </a>
+        </div>
+      `;
+      if (tabSummaryTotalCups) tabSummaryTotalCups.textContent = '0';
+      if (zaloCopyText) zaloCopyText.value = 'Chưa có đơn hàng nào được đặt.';
+      return;
+    }
+
+    let summaryItemsText = `\n🧋 TỔNG HỢP THEO MÓN:\n`;
+    let index = 1;
+
+    keys.forEach((key) => {
+      const item = summary[key];
+      totalCups += item.totalCount;
+
+      const topEntries = Object.entries(item.toppings || {});
+      const topStr = topEntries.length > 0 ? topEntries.map(([t, c]) => `${t} (x${c})`).join(', ') : 'Không có';
+
+      summaryItemsText += `${index++}. ${item.drinkName}: ${item.totalCount} ly (Size M: ${item.sizeM}, Size L: ${item.sizeL})\n`;
+      if (topEntries.length > 0) summaryItemsText += `   + Topping: ${topStr}\n`;
+      if (item.notes && item.notes.length > 0) {
+        summaryItemsText += `   + Ghi chú: ${item.notes.join('; ')}\n`;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'summary-drink-group';
+      card.innerHTML = `
+        <div style="flex: 1; min-width: 250px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <strong style="font-size: 1.18rem; color: #6ee7b7;">${escapeHtml(item.drinkName)}</strong>
+          </div>
+          <div style="font-size: 0.88rem; color: #cbd5e1; margin-top: 5px;">
+            ✨ Topping kèm theo: <span style="color: #fef08a; font-weight: 700;">${escapeHtml(topStr)}</span>
+          </div>
+          ${item.notes && item.notes.length > 0 ? `
+            <div style="font-size: 0.82rem; color: #fbcfe8; margin-top: 5px; font-style: italic;">
+              💬 Ghi chú (${item.notes.length}): ${escapeHtml(item.notes.join(' | '))}
+            </div>
+          ` : ''}
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="text-align: right;">
+            <div style="font-size: 0.82rem; color: #94a3b8;">Chi tiết size:</div>
+            <div style="font-size: 0.98rem; font-weight: 800; color: #fef08a;">
+              ${item.sizeM} Size M • ${item.sizeL} Size L
+            </div>
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.2); border: 1.5px solid var(--emerald); border-radius: 14px; padding: 8px 18px; text-align: center; min-width: 72px;">
+            <div style="font-size: 1.5rem; font-weight: 900; color: #6ee7b7; line-height: 1;">
+              ${item.totalCount}
+            </div>
+            <div style="font-size: 0.72rem; color: #cbd5e1; font-weight: 800; text-transform: uppercase; margin-top: 2px;">
+              Cốc
+            </div>
+          </div>
+        </div>
+      `;
+      summaryGroupsContainer.appendChild(card);
+    });
+
+    if (tabSummaryTotalCups) tabSummaryTotalCups.textContent = totalCups;
+
+    // Detailed list text for Zalo
+    let detailsText = `\n👥 CHI TIẾT TỪNG THÀNH VIÊN ĐÃ ĐẶT:\n`;
+    let mIdx = 1;
+    adminState.members.filter(m => m.hasOrdered && m.order).forEach((m) => {
+      const o = m.order;
+      const topList = Array.isArray(o.toppings) && o.toppings.length > 0 ? ` | Topping: ${o.toppings.join(', ')}` : '';
+      const noteStr = o.note ? ` | Note: "${o.note}"` : '';
+      detailsText += `${mIdx++}. ${m.name} (MS: ${m.ms}): ${o.drinkName} (Size ${o.size}, ${o.sugar}, ${o.ice}${topList}${noteStr})\n`;
+    });
+
+    zaloText += `Tổng cộng: ${totalCups} cốc trà sữa\n`;
+    zaloText += summaryItemsText;
+    zaloText += detailsText;
+
+    if (zaloCopyText) zaloCopyText.value = zaloText;
+  }
+
   // Render detailed table
   function renderTable() {
     if (!adminMembersTbody) return;
@@ -146,8 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const nameMatch = (m.name || '').toLowerCase().includes(q);
         const msMatch = String(m.ms || '').toLowerCase().includes(q);
         const roleMatch = (m.role || '').toLowerCase().includes(q);
+        const zodiacMatch = (m.zodiacSign || '').toLowerCase().includes(q);
         const drinkMatch = m.order && (m.order.drinkName || '').toLowerCase().includes(q);
-        if (!nameMatch && !msMatch && !roleMatch && !drinkMatch) return false;
+        if (!nameMatch && !msMatch && !roleMatch && !zodiacMatch && !drinkMatch) return false;
       }
 
       // 2. Status Filter
@@ -160,8 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filtered.length === 0) {
       adminMembersTbody.innerHTML = `
         <tr>
-          <td colspan="8" style="text-align: center; padding: 30px; color: #94a3b8; font-style: italic;">
-            Không có thành viên nào khớp với bộ lọc hiện tại.
+          <td colspan="9" style="text-align: center; padding: 35px; color: #94a3b8; font-style: italic;">
+            Không có thành viên nào khớp với bộ lọc hoặc từ khóa tìm kiếm hiện tại.
           </td>
         </tr>
       `;
@@ -178,6 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (m.hasOpenedCard) {
         statusBadge = '<span class="admin-status-badge badge-opened">🟡 Đã xem thiệp</span>';
       }
+
+      // Zodiac Pill
+      const zodiacHtml = m.zodiacSign 
+        ? `<span class="zodiac-table-pill">${escapeHtml(m.zodiacIcon || '✨')} ${escapeHtml(m.zodiacSign)}</span>`
+        : '<span style="color: #64748b;">--</span>';
 
       // Order Details HTML
       let orderHtml = '<span style="color: #64748b; font-style: italic;">Chưa chọn món</span>';
@@ -222,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <strong style="font-size: 0.98rem; color: #fff;">${escapeHtml(m.name)}</strong>
           </div>
         </td>
+        <td>${zodiacHtml}</td>
         <td style="color: #cbd5e1; font-size: 0.88rem;">${escapeHtml(m.role)}</td>
         <td>${statusBadge}</td>
         <td>${orderHtml}</td>
@@ -253,100 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
-  }
-
-  // Render Bulk Order Summary
-  function renderSummary() {
-    if (!summaryGroupsContainer) return;
-    summaryGroupsContainer.innerHTML = '';
-
-    const summary = adminState.summary;
-    const keys = Object.keys(summary);
-    let totalCups = 0;
-
-    let zaloText = `📋 DANH SÁCH ĐẶT TRÀ SỮA YI HE TANG - 20/10 PHÒNG TCKT\n`;
-    zaloText += `📅 Thời gian xuất: ${new Date().toLocaleTimeString('vi-VN')} ngày ${new Date().toLocaleDateString('vi-VN')}\n`;
-
-    if (keys.length === 0) {
-      summaryGroupsContainer.innerHTML = `
-        <div style="text-align: center; padding: 35px; color: #94a3b8; font-style: italic;">
-          Chưa có thành viên nào đặt món. Danh sách tổng hợp sẽ xuất hiện ngay khi có người order!
-        </div>
-      `;
-      if (tabSummaryTotalCups) tabSummaryTotalCups.textContent = '0';
-      if (zaloCopyText) zaloCopyText.value = 'Chưa có đơn hàng nào được đặt.';
-      return;
-    }
-
-    let summaryItemsText = `\n🧋 TỔNG HỢP THEO MÓN:\n`;
-    let index = 1;
-
-    keys.forEach((key) => {
-      const item = summary[key];
-      totalCups += item.totalCount;
-
-      const topEntries = Object.entries(item.toppings || {});
-      const topStr = topEntries.length > 0 ? topEntries.map(([t, c]) => `${t} (x${c})`).join(', ') : 'Không có';
-
-      summaryItemsText += `${index++}. ${item.drinkName}: ${item.totalCount} ly (Size M: ${item.sizeM}, Size L: ${item.sizeL})\n`;
-      if (topEntries.length > 0) summaryItemsText += `   + Topping: ${topStr}\n`;
-      if (item.notes && item.notes.length > 0) {
-        summaryItemsText += `   + Ghi chú: ${item.notes.join('; ')}\n`;
-      }
-
-      const card = document.createElement('div');
-      card.className = 'summary-drink-group';
-      card.innerHTML = `
-        <div style="flex: 1; min-width: 250px;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <strong style="font-size: 1.15rem; color: #6ee7b7;">${escapeHtml(item.drinkName)}</strong>
-          </div>
-          <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 4px;">
-            ✨ Topping kèm theo: <span style="color: #fef08a;">${escapeHtml(topStr)}</span>
-          </div>
-          ${item.notes && item.notes.length > 0 ? `
-            <div style="font-size: 0.8rem; color: #fbcfe8; margin-top: 4px; font-style: italic;">
-              💬 Ghi chú (${item.notes.length}): ${escapeHtml(item.notes.join(' | '))}
-            </div>
-          ` : ''}
-        </div>
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <div style="text-align: right;">
-            <div style="font-size: 0.82rem; color: #94a3b8;">Chi tiết size:</div>
-            <div style="font-size: 0.95rem; font-weight: 800; color: #fef08a;">
-              ${item.sizeM} Size M • ${item.sizeL} Size L
-            </div>
-          </div>
-          <div style="background: rgba(16, 185, 129, 0.2); border: 1.5px solid var(--emerald); border-radius: 12px; padding: 6px 14px; text-align: center;">
-            <div style="font-size: 1.4rem; font-weight: 900; color: #6ee7b7; line-height: 1;">
-              ${item.totalCount}
-            </div>
-            <div style="font-size: 0.72rem; color: #cbd5e1; font-weight: 700; text-transform: uppercase;">
-              Cốc
-            </div>
-          </div>
-        </div>
-      `;
-      summaryGroupsContainer.appendChild(card);
-    });
-
-    if (tabSummaryTotalCups) tabSummaryTotalCups.textContent = totalCups;
-
-    // Detailed list text for Zalo
-    let detailsText = `\n👥 CHI TIẾT TỪNG THÀNH VIÊN ĐÃ ĐẶT:\n`;
-    let mIdx = 1;
-    adminState.members.filter(m => m.hasOrdered && m.order).forEach((m) => {
-      const o = m.order;
-      const topList = Array.isArray(o.toppings) && o.toppings.length > 0 ? ` | Topping: ${o.toppings.join(', ')}` : '';
-      const noteStr = o.note ? ` | Note: "${o.note}"` : '';
-      detailsText += `${mIdx++}. ${m.name} (MS: ${m.ms}): ${o.drinkName} (Size ${o.size}, ${o.sugar}, ${o.ice}${topList}${noteStr})\n`;
-    });
-
-    zaloText += `Tổng cộng: ${totalCups} cốc trà sữa\n`;
-    zaloText += summaryItemsText;
-    zaloText += detailsText;
-
-    if (zaloCopyText) zaloCopyText.value = zaloText;
   }
 
   // Toast helper
@@ -387,23 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCopyZalo) btnCopyZalo.addEventListener('click', copyZaloHandler);
   if (btnCopyZaloTab) btnCopyZaloTab.addEventListener('click', copyZaloHandler);
 
-  // Tabs Switch
-  if (tabBtnList && tabBtnSummary) {
-    tabBtnList.addEventListener('click', () => {
-      tabBtnList.classList.add('active');
-      tabBtnSummary.classList.remove('active');
-      tabContentList.style.display = 'block';
-      tabContentSummary.style.display = 'none';
-    });
-
-    tabBtnSummary.addEventListener('click', () => {
-      tabBtnSummary.classList.add('active');
-      tabBtnList.classList.remove('active');
-      tabContentSummary.style.display = 'block';
-      tabContentList.style.display = 'none';
-    });
-  }
-
   // Filter Pills
   if (filterPillsGroup) {
     Array.from(filterPillsGroup.children).forEach((pill) => {
@@ -435,28 +427,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Reload Excel Button
-  if (btnReloadExcel) {
-    btnReloadExcel.addEventListener('click', async () => {
-      if (!confirm('Bạn có chắc muốn đồng bộ lại danh sách từ file "Team Building TCKT.xlsx"?')) return;
-      btnReloadExcel.textContent = '⏳ Đang đọc...';
-      try {
-        const res = await fetch('/api/members/reload_excel', { method: 'POST' });
-        const result = await res.json();
-        if (result.success) {
-          showToast(`Đã nạp thành công ${result.count} thành viên từ file Excel!`, '#059669');
-          fetchStatus();
-        } else {
-          alert('Lỗi nạp excel: ' + result.error);
-        }
-      } catch (e) {
-        alert('Lỗi kết nối: ' + e.message);
-      } finally {
-        btnReloadExcel.textContent = '📂 Đọc Lại Excel';
-      }
-    });
-  }
+  // Periodic Auto-refresh (Every 8 seconds) in case of background updates
+  setInterval(fetchStatus, 8000);
 
-  // Init
+  // Initial Fetch
   fetchStatus();
 });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản Lý Thiệp 20/10 & Order Yi He Tang - BVĐK Phương Đông TCKT</title>
+  <title>Bảng Quản Lý 20/10 & Tổng Hợp Order Yi He Tang - BVĐK Phương Đông TCKT</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
     body {
@@ -16,22 +16,26 @@
       min-height: 100vh;
     }
     .admin-2010-container {
-      max-width: 1240px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 20px 16px;
+      padding: 24px 16px 60px;
     }
-    .tab-btn {
-      padding: 10px 22px;
+    .section-anchor-btn {
+      padding: 10px 20px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       color: #cbd5e1;
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       transition: all 0.2s ease;
     }
-    .tab-btn.active {
+    .section-anchor-btn:hover, .section-anchor-btn.active {
       background: linear-gradient(135deg, #f43f5e, #be123c);
       color: #fff;
       border-color: #fda4af;
@@ -77,6 +81,37 @@
     .order-table tr:hover {
       background: rgba(244, 63, 94, 0.06);
     }
+    .zodiac-table-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #fecdd3;
+    }
+    @media (max-width: 768px) {
+      .admin-2010-stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .admin-2010-container {
+        padding: 12px 8px;
+      }
+      header.glass-panel {
+        padding: 16px;
+      }
+      .stat-val-2010 {
+        font-size: 1.8rem;
+      }
+      .order-table th, .order-table td {
+        padding: 10px 8px;
+        font-size: 0.82rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -97,23 +132,23 @@
       </div>
 
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <a href="/api/2010/export-excel" target="_blank" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 0.92rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+        <a href="/player.html" target="_blank" class="btn" style="background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; font-size: 0.9rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.35);">
+          💌 Mở Thử Thiệp (Điện Thoại) ↗
+        </a>
+        <a href="/api/2010/export-excel" target="_blank" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 0.9rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
           📥 Xuất File Excel (.xlsx)
         </a>
-        <button id="btn-copy-zalo" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-size: 0.92rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+        <button id="btn-copy-zalo" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-size: 0.9rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
           📋 Copy Đặt Quán (Zalo)
         </button>
-        <button id="btn-refresh-data" class="btn btn-secondary" style="font-size: 0.92rem; border-radius: 12px;">
+        <button id="btn-refresh-data" class="btn btn-secondary" style="font-size: 0.9rem; border-radius: 12px;">
           🔄 Làm Mới
-        </button>
-        <button id="btn-reload-excel" class="btn btn-secondary" style="font-size: 0.85rem; border-radius: 12px;" title="Tải lại từ file Team Building TCKT.xlsx">
-          📂 Đọc Lại Excel
         </button>
       </div>
     </header>
 
     <!-- KPI Statistics Grid -->
-    <div class="admin-2010-stats-grid">
+    <div class="admin-2010-stats-grid" style="margin-bottom: 22px;">
       <!-- Card 1: Total Members -->
       <div class="stat-card-2010">
         <div class="stat-icon-circle" style="background: rgba(99, 102, 241, 0.2); border: 1px solid var(--primary); color: #818cf8;">
@@ -171,21 +206,78 @@
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-      <button class="tab-btn active" id="tab-btn-list">
-        📋 Danh Sách 32 Thành Viên
-      </button>
-      <button class="tab-btn" id="tab-btn-summary">
-        🧋 Tổng Hợp Đặt Quán Yi He Tang (<span id="tab-summary-total-cups">0</span> cốc)
-      </button>
+    <!-- Quick Section Jump Toolbar -->
+    <div style="display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap;">
+      <a href="#section-summary" class="section-anchor-btn active" id="btn-jump-summary">
+        🧋 BẢNG TỔNG HỢP GOM ĐƠN YIHETANG (<span id="tab-summary-total-cups" style="color: #6ee7b7;">0</span> cốc)
+      </a>
+      <a href="#section-list" class="section-anchor-btn" id="btn-jump-list">
+        📋 THEO DÕI 32 THÀNH VIÊN
+      </a>
     </div>
 
     <!-- ==========================================
-         TAB 1: DETAILED MEMBER LIST VIEW
+         SECTION 1: BULK ORDER SUMMARY FOR YI HE TANG
+         (Always visible directly for the Admin)
          ========================================== -->
-    <section id="tab-content-list" class="glass-panel" style="padding: 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12);">
+    <section id="section-summary" class="glass-panel" style="padding: 24px; border-radius: 20px; border: 1.5px solid rgba(245, 158, 11, 0.35); margin-bottom: 26px; background: rgba(26, 23, 56, 0.92);">
       
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: #fef08a; padding: 3px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 800; margin-bottom: 8px;">
+            ⚡ TỰ ĐỘNG GOM SỐ LƯỢNG THEO THỜI GIAN THỰC
+          </div>
+          <h2 style="font-size: 1.45rem; font-weight: 900; color: #fff; line-height: 1.2;">
+            BẢNG TỔNG HỢP GOM ĐƠN ĐẶT QUÁN YI HE TANG 🧋
+          </h2>
+          <p style="font-size: 0.9rem; color: #cbd5e1; margin-top: 4px;">
+            Thống kê số lượng theo từng món, size M/L và topping để gọi hotline hoặc gửi Zalo nhanh chóng:
+          </p>
+        </div>
+        
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="btn-copy-zalo-tab" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-size: 0.95rem; font-weight: 900; border-radius: 12px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35); padding: 10px 20px;">
+            📋 Sao Chép Nội Dung Đặt Quán (Zalo)
+          </button>
+        </div>
+      </div>
+
+      <!-- Grouped items container (Populated by JS) -->
+      <div id="summary-groups-container">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Text preview for Zalo copy -->
+      <div style="margin-top: 24px; background: rgba(0, 0, 0, 0.45); border-radius: 16px; padding: 18px; border: 1px solid rgba(255,255,255,0.12);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="font-size: 0.88rem; color: #fef08a; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+            <span>📝</span> MẪU VĂN BẢN ĐẶT QUÁN (SẴN SÀNG COPY GỬI ZALO):
+          </div>
+          <button onclick="document.getElementById('btn-copy-zalo').click()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 0.78rem; font-weight: 800; border-radius: 8px; padding: 4px 10px; cursor: pointer;">
+            📋 Copy Ngay
+          </button>
+        </div>
+        <textarea id="zalo-copy-text" readonly style="width: 100%; height: 180px; background: transparent; border: none; color: #e2e8f0; font-family: monospace; font-size: 0.9rem; line-height: 1.5; resize: vertical; outline: none;"></textarea>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         SECTION 2: DETAILED MEMBER TRACKING LIST
+         ========================================== -->
+    <section id="section-list" class="glass-panel" style="padding: 22px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.14);">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 900; color: #fff;">
+            DANH SÁCH CHI TIẾT 32 THÀNH VIÊN TCKT 📋
+          </h2>
+          <p style="font-size: 0.88rem; color: #94a3b8; margin-top: 2px;">
+            Theo dõi trạng thái mở thiệp và món trà sữa cụ thể của từng người:
+          </p>
+        </div>
+      </div>
+
       <!-- Filter and Search Toolbar -->
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 18px;">
         <!-- Filters -->
@@ -197,10 +289,10 @@
         </div>
 
         <!-- Search Box -->
-        <div style="width: 280px;">
+        <div style="width: 320px; max-width: 100%;">
           <input type="text" id="admin-search-input" class="input-field" 
-                 placeholder="🔍 Tìm theo Tên hoặc Mã số (MS)..." 
-                 style="height: 40px; font-size: 0.9rem; border-radius: 12px; background: rgba(0,0,0,0.35);">
+                 placeholder="🔍 Tìm theo Tên, MS, Cung hoàng đạo..." 
+                 style="height: 42px; font-size: 0.92rem; border-radius: 12px; background: rgba(0,0,0,0.35); border: 1px solid rgba(244, 63, 94, 0.35);">
         </div>
       </div>
 
@@ -211,11 +303,12 @@
             <tr>
               <th style="width: 50px;">STT</th>
               <th style="width: 80px;">MS</th>
-              <th style="width: 220px;">Họ và Tên</th>
-              <th style="width: 170px;">Chức danh</th>
+              <th style="width: 200px;">Họ và Tên</th>
+              <th style="width: 150px;">Cung hoàng đạo</th>
+              <th style="width: 160px;">Chức danh</th>
               <th style="width: 130px;">Trạng thái</th>
               <th>Món Đã Chọn (Yi He Tang)</th>
-              <th style="width: 140px;">Thời gian</th>
+              <th style="width: 130px;">Thời gian</th>
               <th style="width: 70px; text-align: center;">Xử lý</th>
             </tr>
           </thead>
@@ -223,40 +316,6 @@
             <!-- Rendered by JS -->
           </tbody>
         </table>
-      </div>
-
-    </section>
-
-    <!-- ==========================================
-         TAB 2: BULK ORDER SUMMARY FOR YI HE TANG
-         ========================================== -->
-    <section id="tab-content-summary" class="glass-panel" style="display: none; padding: 24px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12);">
-      
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-        <div>
-          <h2 style="font-size: 1.35rem; font-weight: 900; color: #fff;">
-            BẢNG TỔNG HỢP GOM ĐƠN ĐẶT QUÁN YI HE TANG 🧋
-          </h2>
-          <p style="font-size: 0.88rem; color: #94a3b8; margin-top: 4px;">
-            Thống kê số lượng theo từng món, size và topping để gọi hotline hoặc đặt Zalo nhanh chóng:
-          </p>
-        </div>
-        <button id="btn-copy-zalo-tab" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-size: 0.92rem; font-weight: 800; border-radius: 12px;">
-          📋 Copy Toàn Bộ Nội Dung Đặt Hàng
-        </button>
-      </div>
-
-      <!-- Grouped items container -->
-      <div id="summary-groups-container">
-        <!-- Rendered by JS -->
-      </div>
-
-      <!-- Text preview for Zalo copy -->
-      <div style="margin-top: 24px; background: rgba(0, 0, 0, 0.4); border-radius: 16px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-        <div style="font-size: 0.85rem; color: #fef08a; font-weight: 800; margin-bottom: 8px;">
-          📝 MẪU VĂN BẢN ĐẶT QUÁN (SẴN SÀNG COPY VÀO ZALO):
-        </div>
-        <textarea id="zalo-copy-text" readonly style="width: 100%; height: 180px; background: transparent; border: none; color: #e2e8f0; font-family: monospace; font-size: 0.88rem; resize: vertical; outline: none;"></textarea>
       </div>
 
     </section>

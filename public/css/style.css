@@ -2122,7 +2122,20 @@ body {
   color: #be123c;
   font-weight: 800;
   font-size: 0.9rem;
-  margin-bottom: 12px;
+}
+
+.card-zodiac-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(245, 158, 11, 0.18));
+  border: 1.5px solid rgba(244, 63, 94, 0.45);
+  padding: 5px 14px;
+  border-radius: 999px;
+  color: #9f1239;
+  font-weight: 800;
+  font-size: 0.88rem;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.15);
 }
 
 .card-header-title {
@@ -2164,15 +2177,81 @@ body {
   margin-bottom: 22px;
 }
 
-/* Yi He Tang Menu Styling */
+/* Yi He Tang Menu Styling - High Contrast Royal Crimson Velvet Gift Card */
 .gift-invitation-box {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
-  border: 2px solid var(--gold);
-  border-radius: 20px;
-  padding: 20px;
+  background: linear-gradient(145deg, #701a35 0%, #4c0519 100%);
+  border: 2px solid #fb7185;
+  border-radius: 22px;
+  padding: 24px 20px;
   text-align: center;
-  margin: 20px 0;
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+  margin: 24px 0 10px;
+  box-shadow: 0 12px 30px rgba(136, 19, 55, 0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.gift-invitation-box::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(251, 113, 133, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.gift-invitation-icon {
+  font-size: 2.6rem;
+  margin-bottom: 8px;
+  animation: bounce 2.2s infinite;
+}
+
+.gift-invitation-title {
+  font-size: 1.28rem;
+  font-weight: 900;
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.gift-invitation-desc {
+  font-size: 0.95rem;
+  color: #ffe4e6 !important;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+
+.gift-invitation-desc strong {
+  color: #fef08a !important;
+  font-weight: 800;
+}
+
+.btn-gift-order {
+  width: 100%;
+  height: 52px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #f43f5e, #e11d48) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #fda4af !important;
+  box-shadow: 0 8px 25px rgba(244, 63, 94, 0.55) !important;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.btn-gift-order:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(244, 63, 94, 0.7) !important;
+  background: linear-gradient(135deg, #fb7185, #f43f5e) !important;
 }
 
 .menu-category-scroll {

@@ -55,6 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardAvatarPill = document.getElementById('card-avatar-pill');
   const cardRolePill = document.getElementById('card-role-pill');
   const cardMsPill = document.getElementById('card-ms-pill');
+  const cardZodiacPill = document.getElementById('card-zodiac-pill');
+  const cardZodiacIcon = document.getElementById('card-zodiac-icon');
+  const cardZodiacName = document.getElementById('card-zodiac-name');
   const cardRecipientName = document.getElementById('card-recipient-name');
   const cardWishText = document.getElementById('card-wish-text');
   const btnGotoOrder = document.getElementById('btn-goto-order');
@@ -328,7 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
       memberPreviewCard.style.display = 'block';
       previewAvatar.textContent = member.avatar || '🌸';
       previewName.textContent = member.name;
-      previewRole.textContent = member.role;
+      const zodiacText = member.zodiacSign ? ` • ${member.zodiacSign} ${member.zodiacIcon || ''}` : '';
+      previewRole.textContent = `${member.role}${zodiacText}`;
       previewMs.textContent = member.ms;
     }
     if (loginErrorBox) loginErrorBox.style.display = 'none';
@@ -384,6 +388,15 @@ document.addEventListener('DOMContentLoaded', () => {
       cardRolePill.textContent = state.selectedMember.role;
       cardMsPill.textContent = state.selectedMember.ms;
       cardRecipientName.textContent = state.selectedMember.name;
+
+      if (cardZodiacPill && state.selectedMember.zodiacSign) {
+        cardZodiacPill.style.display = 'inline-flex';
+        if (cardZodiacIcon) cardZodiacIcon.textContent = state.selectedMember.zodiacIcon || '✨';
+        if (cardZodiacName) cardZodiacName.textContent = state.selectedMember.zodiacSign;
+      } else if (cardZodiacPill) {
+        cardZodiacPill.style.display = 'none';
+      }
+
       cardWishText.textContent = state.selectedMember.wish || 'Chúc bạn luôn xinh đẹp, hạnh phúc, bình an và ngập tràn niềm vui!';
       if (menuUserName) menuUserName.textContent = state.selectedMember.name;
     }
