@@ -380,6 +380,13 @@ app.post('/api/2010/order', (req, res) => {
   };
 
   saveJson('orders_2010.json', orders2010);
+  console.log('[ORDER_AUDIT_LOG]', JSON.stringify({
+    memberId: member.stt,
+    ms: member.ms,
+    name: member.name,
+    order: orders2010[member.stt].order,
+    orderedAt: orders2010[member.stt].orderedAt
+  }));
 
   const updatedStatus = get2010Status();
   io.emit('2010_update', updatedStatus);
@@ -397,6 +404,66 @@ app.post('/api/2010/order', (req, res) => {
     success: true,
     orderData: orders2010[member.stt]
   });
+});
+
+app.post('/api/2010/admin-set-order', (req, res) => {
+  const { memberId, order } = req.body;
+  const member = membersList.find(m => String(m.stt) === String(memberId));
+  if (!member) {
+    return res.status(404).json({ error: 'Không tìm thấy thành viên' });
+  }
+
+  if (!orders2010[member.stt]) {
+    orders2010[member.stt] = {
+      memberId: member.stt,
+      ms: member.ms || member.fingerprint,
+      name: member.name,
+      role: member.role,
+      hasOpenedCard: true,
+      openedAt: new Date().toISOString()
+    };
+  }
+
+  orders2010[member.stt].hasOpenedCard = true;
+  orders2010[member.stt].hasOrdered = true;
+  orders2010[member.stt].orderedAt = new Date().toISOString();
+  orders2010[member.stt].order = {
+    drinkId: order.drinkId || '',
+    drinkName: order.drinkName,
+    category: order.category || '',
+    size: order.size || 'M',
+    sugar: order.sugar || '100% (Chuẩn)',
+    ice: order.ice || '100% (Chuẩn)',
+    toppings: Array.isArray(order.toppings) ? order.toppings : [],
+    note: order.note ? String(order.note).trim() : ''
+  };
+
+  saveJson('orders_2010.json', orders2010);
+  console.log('[ADMIN_SET_ORDER]', JSON.stringify({
+    memberId: member.stt,
+    ms: member.ms,
+    name: member.name,
+    order: orders2010[member.stt].order
+  }));
+
+  const updatedStatus = get2010Status();
+  io.emit('2010_update', updatedStatus);
+  res.json({ success: true, orderData: orders2010[member.stt] });
+});
+
+app.post('/api/2010/admin-restore-backup', (req, res) => {
+  const { orders } = req.body;
+  if (!orders || typeof orders !== 'object') {
+    return res.status(400).json({ error: 'Dữ liệu khôi phục không hợp lệ' });
+  }
+
+  orders2010 = { ...orders2010, ...orders };
+  saveJson('orders_2010.json', orders2010);
+  console.log('[ADMIN_RESTORE_BACKUP] Restored orders count:', Object.keys(orders).length);
+
+  const updatedStatus = get2010Status();
+  io.emit('2010_update', updatedStatus);
+  res.json({ success: true, message: `Đã khôi phục thành công ${Object.keys(orders).length} đơn!` });
 });
 
 app.post('/api/2010/reset-order', (req, res) => {

@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     members: [],
     stats: { totalMembers: 32, openedCount: 0, orderedCount: 0, unopenedCount: 32 },
     summary: {},
+    menu: { categories: [], options: {} },
     currentFilter: 'ALL', // 'ALL', 'ORDERED', 'OPENED', 'UNOPENED'
     searchQuery: ''
   };
@@ -29,6 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCopyZalo = document.getElementById('btn-copy-zalo');
   const btnCopyZaloTab = document.getElementById('btn-copy-zalo-tab');
   const btnRefreshData = document.getElementById('btn-refresh-data');
+  const btnExportBackup = document.getElementById('btn-export-backup');
+  const btnImportBackup = document.getElementById('btn-import-backup');
+  const inputBackupFile = document.getElementById('input-backup-file');
 
   const pillAllCount = document.getElementById('pill-all-count');
   const pillOrderedCount = document.getElementById('pill-ordered-count');
@@ -76,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     adminState.members = data.members || [];
     adminState.stats = data.stats || { totalMembers: 32, openedCount: 0, orderedCount: 0, unopenedCount: 32 };
     adminState.summary = data.summary || {};
+    if (data.menu) adminState.menu = data.menu;
 
     renderKPIs();
     renderSummary();
@@ -334,7 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${statusBadge}</td>
         <td>${orderHtml}</td>
         <td>${timeHtml}</td>
-        <td style="text-align: center;">
+        <td style="text-align: center; white-space: nowrap;">
+          <button class="btn btn-secondary btn-manual-order" data-id="${m.stt}" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #6ee7b7; margin-right: 4px;" title="Đặt hộ hoặc sửa món trà sữa cho thành viên">✏️ Đặt/Sửa</button>
           ${m.hasOrdered ? `<button class="btn btn-secondary btn-reset-order" data-id="${m.stt}" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px;" title="Reset đơn để thành viên đặt lại">🔄</button>` : ''}
         </td>
       `;
@@ -348,6 +354,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const mId = btn.getAttribute('data-id');
         const member = adminState.members.find(m => String(m.stt) === String(mId));
         if (member) openEditWishModal(member);
+      });
+    });
+
+    // Attach manual order handlers
+    document.querySelectorAll('.btn-manual-order').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mId = btn.getAttribute('data-id');
+        const member = adminState.members.find(m => String(m.stt) === String(mId));
+        if (member) openManualOrderModal(member);
       });
     });
 
@@ -450,10 +465,190 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Reset toàn bộ
+  // ==========================================
+  // MANUAL ORDER / EDIT DRINK MODAL (ADMIN)
+  // ==========================================
+  const modalAdminOrder = document.getElementById('modal-admin-order');
+  const modalOrderMeta = document.getElementById('modal-order-meta');
+  const modalOrderMemberId = document.getElementById('modal-order-member-id');
+  const modalOrderDrinkSelect = document.getElementById('modal-order-drink-select');
+  const modalOrderSize = document.getElementById('modal-order-size');
+  const modalOrderSugar = document.getElementById('modal-order-sugar');
+  const modalOrderIce = document.getElementById('modal-order-ice');
+  const modalOrderToppings = document.getElementById('modal-order-toppings');
+  const modalOrderNote = document.getElementById('modal-order-note');
+  const btnCloseOrderModal = document.getElementById('btn-close-order-modal');
+  const btnCancelAdminOrder = document.getElementById('btn-cancel-admin-order');
+  const btnSaveAdminOrder = document.getElementById('btn-save-admin-order');
+
+  function populateAdminDrinkSelect() {
+    if (!modalOrderDrinkSelect || !adminState.menu || !adminState.menu.categories) return;
+    modalOrderDrinkSelect.innerHTML = '';
+    adminState.menu.categories.forEach(cat => {
+      const optGroup = document.createElement('optgroup');
+      optGroup.label = cat.name;
+      cat.items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.name;
+        opt.textContent = `${item.name} (${cat.name})`;
+        opt.setAttribute('data-id', item.id);
+        opt.setAttribute('data-cat', cat.name);
+        optGroup.appendChild(opt);
+      });
+      modalOrderDrinkSelect.appendChild(optGroup);
+    });
+  }
+
+  function openManualOrderModal(m) {
+    if (!modalAdminOrder) return;
+    populateAdminDrinkSelect();
+    modalOrderMemberId.value = m.stt;
+    modalOrderMeta.textContent = `${m.name} • MS: ${m.ms} • ${m.role}`;
+
+    if (m.order && m.order.drinkName) {
+      modalOrderDrinkSelect.value = m.order.drinkName;
+      modalOrderSize.value = m.order.size || 'M';
+      modalOrderSugar.value = m.order.sugar || '100% (Chuẩn)';
+      modalOrderIce.value = m.order.ice || '100% (Chuẩn)';
+      modalOrderToppings.value = Array.isArray(m.order.toppings) ? m.order.toppings.join(', ') : '';
+      modalOrderNote.value = m.order.note || '';
+    } else {
+      modalOrderSize.value = 'M';
+      modalOrderSugar.value = '100% (Chuẩn)';
+      modalOrderIce.value = '100% (Chuẩn)';
+      modalOrderToppings.value = '';
+      modalOrderNote.value = '';
+    }
+    modalAdminOrder.style.display = 'flex';
+  }
+
+  function closeManualOrderModal() {
+    if (modalAdminOrder) modalAdminOrder.style.display = 'none';
+  }
+
+  if (btnCloseOrderModal) btnCloseOrderModal.addEventListener('click', closeManualOrderModal);
+  if (btnCancelAdminOrder) btnCancelAdminOrder.addEventListener('click', closeManualOrderModal);
+
+  if (btnSaveAdminOrder) {
+    btnSaveAdminOrder.addEventListener('click', async () => {
+      const mId = modalOrderMemberId.value;
+      const selectedOpt = modalOrderDrinkSelect.options[modalOrderDrinkSelect.selectedIndex];
+      const drinkName = modalOrderDrinkSelect.value;
+      const drinkId = selectedOpt ? selectedOpt.getAttribute('data-id') : '';
+      const category = selectedOpt ? selectedOpt.getAttribute('data-cat') : '';
+      const size = modalOrderSize.value;
+      const sugar = modalOrderSugar.value;
+      const ice = modalOrderIce.value;
+      const rawTop = modalOrderToppings.value.trim();
+      const toppings = rawTop ? rawTop.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const note = modalOrderNote.value.trim();
+
+      btnSaveAdminOrder.disabled = true;
+      btnSaveAdminOrder.textContent = '⏳ Đang lưu...';
+
+      try {
+        const res = await fetch('/api/2010/admin-set-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            memberId: mId,
+            order: { drinkId, drinkName, category, size, sugar, ice, toppings, note }
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          showToast(`✅ Đã lưu món cho ${modalOrderMeta.textContent}!`, '#10b981');
+          closeManualOrderModal();
+          fetchStatus();
+        } else {
+          alert('Lỗi: ' + result.error);
+        }
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      } finally {
+        btnSaveAdminOrder.disabled = false;
+        btnSaveAdminOrder.textContent = '✅ Lưu Đơn Món Cho Chị Em';
+      }
+    });
+  }
+
+  // ==========================================
+  // BACKUP EXPORT & IMPORT (JSON)
+  // ==========================================
+  if (btnExportBackup) {
+    btnExportBackup.addEventListener('click', () => {
+      const ordersMap = {};
+      adminState.members.forEach(m => {
+        if (m.hasOrdered && m.order) {
+          ordersMap[m.stt] = {
+            memberId: m.stt,
+            ms: m.ms,
+            name: m.name,
+            role: m.role,
+            hasOpenedCard: true,
+            openedAt: m.openedAt || new Date().toISOString(),
+            hasOrdered: true,
+            orderedAt: m.orderedAt || new Date().toISOString(),
+            order: m.order
+          };
+        }
+      });
+      const count = Object.keys(ordersMap).length;
+      if (count === 0) {
+        alert('Hiện tại chưa có đơn nào để tải file sao lưu!');
+        return;
+      }
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(ordersMap, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `yihetang_orders_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast(`💾 Đã tải file backup (${count} đơn) về máy!`, '#10b981');
+    });
+  }
+
+  if (btnImportBackup && inputBackupFile) {
+    btnImportBackup.addEventListener('click', () => {
+      inputBackupFile.click();
+    });
+
+    inputBackupFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          const res = await fetch('/api/2010/admin-restore-backup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orders: parsed })
+          });
+          const r = await res.json();
+          if (r.success) {
+            showToast(r.message || 'Khôi phục thành công!', '#10b981');
+            fetchStatus();
+          } else {
+            alert('Lỗi: ' + r.error);
+          }
+        } catch (err) {
+          alert('File JSON không hợp lệ: ' + err.message);
+        } finally {
+          inputBackupFile.value = '';
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  // Reset toàn bộ (Bảo vệ bằng prompt xác nhận)
   if (btnResetAll) {
     btnResetAll.addEventListener('click', async () => {
-      if (!confirm('⚠️ BẠN CÓ CHẮC MUỐN RESET TOÀN BỘ TRẠNG THÁI?\n\nThao tác này sẽ xóa sạch danh sách ai đã mở thiệp và toàn bộ đơn order trà sữa của cả 32 thành viên để bạn bắt đầu lại đợt gửi thiệp!')) {
+      const confirmWord = prompt('⚠️ CẢNH BÁO NGUY HIỂM: Thao tác này sẽ xóa sạch danh sách ai đã mở thiệp và toàn bộ đơn order trà sữa của cả 32 thành viên!\n\nNếu bạn chắc chắn muốn xóa, hãy gõ đúng chữ "RESET" (viết hoa) vào ô bên dưới:');
+      if (confirmWord !== 'RESET') {
+        if (confirmWord !== null) alert('Đã hủy thao tác. Bạn cần gõ chính xác chữ "RESET" để xác nhận.');
         return;
       }
       btnResetAll.disabled = true;

@@ -211,6 +211,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const member = state.members.find(m => String(m.stt) === String(savedMemberId));
         if (member) {
           selectTargetMember(member);
+
+          // Auto-recovery: If local storage has an order backup but server doesn't, auto-sync back to server
+          const localBackup = localStorage.getItem('tckt_2010_my_order_' + member.stt);
+          if (localBackup && (!member.hasOrdered || !member.order)) {
+            try {
+              const parsedOrder = JSON.parse(localBackup);
+              fetch('/api/2010/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ memberId: member.stt, ms: member.ms, order: parsedOrder })
+              }).catch(() => {});
+              member.hasOrdered = true;
+              member.order = parsedOrder;
+            } catch (e) {}
+          }
+
           // If already ordered, go straight to confirmed screen
           if (member.hasOrdered && member.order) {
             showScreenConfirmed(member.order);
@@ -649,6 +665,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state.selectedMember) {
           state.selectedMember.hasOrdered = true;
           state.selectedMember.order = orderPayload;
+          try {
+            localStorage.setItem('tckt_2010_my_order_' + state.selectedMember.stt, JSON.stringify(orderPayload));
+          } catch (e) {}
         }
 
         socket.emit('2010_submit_order', {
