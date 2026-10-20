@@ -411,6 +411,31 @@ app.post('/api/2010/reset-order', (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/api/2010/reset-all', (req, res) => {
+  orders2010 = {};
+  saveJson('orders_2010.json', orders2010);
+  io.emit('2010_update', get2010Status());
+  res.json({ success: true, message: 'Đã reset toàn bộ trạng thái mở thiệp và order!' });
+});
+
+app.post('/api/2010/update-wish', (req, res) => {
+  const { memberId, wish, zodiacSign, zodiacIcon } = req.body;
+  const member = membersList.find(m => String(m.stt) === String(memberId));
+  if (!member) {
+    return res.status(404).json({ error: 'Không tìm thấy thành viên trong danh sách' });
+  }
+
+  if (wish !== undefined) member.wish = wish.trim();
+  if (zodiacSign !== undefined) member.zodiacSign = zodiacSign.trim();
+  if (zodiacIcon !== undefined) member.zodiacIcon = zodiacIcon.trim();
+
+  saveJson('members.json', membersList);
+  io.emit('members_updated', membersList);
+  io.emit('2010_update', get2010Status());
+
+  res.json({ success: true, member });
+});
+
 app.get('/api/2010/export-excel', (req, res) => {
   try {
     const XLSX = require('xlsx');

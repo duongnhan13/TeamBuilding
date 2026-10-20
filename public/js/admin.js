@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filtered.length === 0) {
       adminMembersTbody.innerHTML = `
         <tr>
-          <td colspan="9" style="text-align: center; padding: 35px; color: #94a3b8; font-style: italic;">
+          <td colspan="10" style="text-align: center; padding: 35px; color: #94a3b8; font-style: italic;">
             Không có thành viên nào khớp với bộ lọc hoặc từ khóa tìm kiếm hiện tại.
           </td>
         </tr>
@@ -326,6 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
         </td>
         <td>${zodiacHtml}</td>
         <td style="color: #cbd5e1; font-size: 0.88rem;">${escapeHtml(m.role)}</td>
+        <td style="text-align: center;">
+          <button class="btn btn-secondary btn-edit-wish" data-id="${m.stt}" style="padding: 4px 10px; font-size: 0.78rem; font-weight: 800; border-radius: 8px; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.4); color: #fecdd3;" title="Xem & sửa lời chúc của thành viên này">
+            💌 Xem / Sửa
+          </button>
+        </td>
         <td>${statusBadge}</td>
         <td>${orderHtml}</td>
         <td>${timeHtml}</td>
@@ -335,6 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       adminMembersTbody.appendChild(tr);
+    });
+
+    // Attach wish edit handlers
+    document.querySelectorAll('.btn-edit-wish').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mId = btn.getAttribute('data-id');
+        const member = adminState.members.find(m => String(m.stt) === String(mId));
+        if (member) openEditWishModal(member);
+      });
     });
 
     // Attach reset handlers
@@ -355,6 +369,110 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       });
+    });
+  }
+
+  // ==========================================
+  // EDIT WISH MODAL LOGIC
+  // ==========================================
+  const modalEditWish = document.getElementById('modal-edit-wish');
+  const modalEditAvatar = document.getElementById('modal-edit-avatar');
+  const modalEditName = document.getElementById('modal-edit-name');
+  const modalEditMeta = document.getElementById('modal-edit-meta');
+  const modalEditMemberId = document.getElementById('modal-edit-member-id');
+  const modalEditZodiacSign = document.getElementById('modal-edit-zodiac-sign');
+  const modalEditZodiacIcon = document.getElementById('modal-edit-zodiac-icon');
+  const modalEditWishText = document.getElementById('modal-edit-wish-text');
+  const btnCloseEditModal = document.getElementById('btn-close-edit-modal');
+  const btnCancelEditWish = document.getElementById('btn-cancel-edit-wish');
+  const btnSaveEditWish = document.getElementById('btn-save-edit-wish');
+  const btnResetAll = document.getElementById('btn-reset-all');
+
+  function openEditWishModal(m) {
+    if (!modalEditWish) return;
+    modalEditMemberId.value = m.stt;
+    modalEditAvatar.textContent = m.avatar || '🌸';
+    modalEditName.textContent = m.name;
+    modalEditMeta.textContent = `${m.role} • MS: ${m.ms}`;
+    modalEditZodiacSign.value = m.zodiacSign || '';
+    modalEditZodiacIcon.value = m.zodiacIcon || '';
+    modalEditWishText.value = m.wish || '';
+    modalEditWish.style.display = 'flex';
+  }
+
+  function closeEditWishModal() {
+    if (modalEditWish) modalEditWish.style.display = 'none';
+  }
+
+  if (btnCloseEditModal) btnCloseEditModal.addEventListener('click', closeEditWishModal);
+  if (btnCancelEditWish) btnCancelEditWish.addEventListener('click', closeEditWishModal);
+
+  if (btnSaveEditWish) {
+    btnSaveEditWish.addEventListener('click', async () => {
+      const mId = modalEditMemberId.value;
+      const newWish = modalEditWishText.value.trim();
+      const newZodiacSign = modalEditZodiacSign.value.trim();
+      const newZodiacIcon = modalEditZodiacIcon.value.trim();
+
+      if (!newWish) {
+        alert('Lời chúc không được để trống!');
+        return;
+      }
+
+      btnSaveEditWish.disabled = true;
+      btnSaveEditWish.textContent = '⏳ Đang lưu...';
+
+      try {
+        const res = await fetch('/api/2010/update-wish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            memberId: mId,
+            wish: newWish,
+            zodiacSign: newZodiacSign,
+            zodiacIcon: newZodiacIcon
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          showToast(`💾 Đã cập nhật lời chúc cho ${modalEditName.textContent}!`, '#059669');
+          closeEditWishModal();
+          fetchStatus();
+        } else {
+          alert('Lỗi: ' + result.error);
+        }
+      } catch (e) {
+        alert('Lỗi kết nối: ' + e.message);
+      } finally {
+        btnSaveEditWish.disabled = false;
+        btnSaveEditWish.textContent = '💾 Lưu Lời Chúc Mới';
+      }
+    });
+  }
+
+  // Reset toàn bộ
+  if (btnResetAll) {
+    btnResetAll.addEventListener('click', async () => {
+      if (!confirm('⚠️ BẠN CÓ CHẮC MUỐN RESET TOÀN BỘ TRẠNG THÁI?\n\nThao tác này sẽ xóa sạch danh sách ai đã mở thiệp và toàn bộ đơn order trà sữa của cả 32 thành viên để bạn bắt đầu lại đợt gửi thiệp!')) {
+        return;
+      }
+      btnResetAll.disabled = true;
+      btnResetAll.textContent = '⏳ Đang reset...';
+      try {
+        const res = await fetch('/api/2010/reset-all', { method: 'POST' });
+        const result = await res.json();
+        if (result.success) {
+          showToast('✅ Đã reset toàn bộ trạng thái thành công!', '#059669');
+          fetchStatus();
+        } else {
+          alert('Lỗi: ' + result.error);
+        }
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      } finally {
+        btnResetAll.disabled = false;
+        btnResetAll.textContent = '⚠️ Reset Toàn Bộ';
+      }
     });
   }
 
