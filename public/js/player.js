@@ -340,7 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update Header
     if (headerAvatar) headerAvatar.textContent = member.avatar || '🌸';
     if (headerUserName) headerUserName.textContent = member.name;
-    if (btnChangeUser) btnChangeUser.style.display = 'inline-block';
+    // Chỉ hiển thị nút Đổi người khi thành viên chưa từng mở thiệp và chưa order
+    if (btnChangeUser) {
+      btnChangeUser.style.display = (!member.hasOpenedCard && !member.hasOrdered) ? 'inline-block' : 'none';
+    }
   }
 
   // ==========================================
@@ -356,8 +359,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Khi đã mở thiệp thì không được đổi người nữa
+      if (btnChangeUser) btnChangeUser.style.display = 'none';
+
       // Save to localStorage
       localStorage.setItem('tckt_2010_member_id', state.selectedMember.stt);
+      state.selectedMember.hasOpenedCard = true;
 
       // Call server to mark opened
       try {
@@ -380,6 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
     screenMenu.style.display = 'none';
     screenConfirmed.style.display = 'none';
     screenCard.style.display = 'block';
+    if (btnChangeUser) btnChangeUser.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (state.selectedMember) {
@@ -426,8 +434,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   if (btnGotoOrder) {
     btnGotoOrder.addEventListener('click', () => {
+      // Nếu đã order rồi thì chuyển thẳng tới màn hình biên lai, không cho chọn lại
+      if (state.selectedMember && state.selectedMember.hasOrdered && state.selectedMember.order) {
+        showScreenConfirmed(state.selectedMember.order);
+        return;
+      }
       screenCard.style.display = 'none';
       screenMenu.style.display = 'block';
+      if (btnChangeUser) btnChangeUser.style.display = 'none';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
@@ -627,6 +641,15 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         });
         const result = await res.json();
+        if (!res.ok || !result.success) {
+          alert(result.error || 'Có lỗi xảy ra khi gửi order!');
+          return;
+        }
+
+        if (state.selectedMember) {
+          state.selectedMember.hasOrdered = true;
+          state.selectedMember.order = orderPayload;
+        }
 
         socket.emit('2010_submit_order', {
           memberId: state.selectedMember.stt,
@@ -653,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     screenCard.style.display = 'none';
     screenMenu.style.display = 'none';
     screenConfirmed.style.display = 'block';
+    if (btnChangeUser) btnChangeUser.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     playCelebrationChime();
@@ -678,15 +702,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnChangeOrder) {
     btnChangeOrder.addEventListener('click', () => {
-      screenConfirmed.style.display = 'none';
-      screenMenu.style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert('Đơn đặt của bạn đã được ghi nhận vào hệ thống và không thể đổi món. Vui lòng liên hệ Admin nếu bạn cần chọn lại!');
     });
   }
 
   if (btnChangeUser) {
     btnChangeUser.addEventListener('click', () => {
-      if (confirm('Bạn có muốn đổi sang chọn thành viên khác?')) {
+      if (state.selectedMember && (state.selectedMember.hasOpenedCard || state.selectedMember.hasOrdered)) {
+        alert('Thiệp chúc mừng đã được mở nhận. Theo quy định, không thể đổi sang thành viên khác!');
+        return;
+      }
+      if (confirm('Bạn có muốn chọn lại thành viên khác?')) {
         localStorage.removeItem('tckt_2010_member_id');
         location.reload();
       }

@@ -244,10 +244,14 @@ app.post('/api/members/reload_excel', (req, res) => {
     }
 
     const members = raw.map((r, i) => {
-      const name = (r['Họ và Tên'] || r['Họ và tên'] || r['name'] || '').trim();
-      const role = (r['Chức danh'] || r['role'] || '').trim();
+      let name = (r['Họ và Tên'] || r['Họ và tên'] || r['name'] || '').trim();
+      let role = (r['Chức danh'] || r['role'] || '').trim();
       let ms = r['Mã vân tay'] || r['Mã số'] || r['MS'] || r['ms'] ? String(r['Mã vân tay'] || r['Mã số'] || r['MS'] || r['ms']).trim() : '';
       if (!ms && name.toLowerCase().includes('hồ quỳnh trang')) ms = '6248';
+      if (name.toLowerCase().includes('vũ lâm dương') || name.toLowerCase().includes('vu lam duong')) {
+        name = 'Nguyễn Thị Minh';
+        role = 'Chuyên gia Thuế';
+      }
       const dob = formatDob(r['Ngày tháng năm sinh'] || r['dob']);
 
       const existing = membersList.find(m => m.name.toLowerCase() === name.toLowerCase() || String(m.ms) === String(ms));
@@ -342,6 +346,11 @@ app.post('/api/2010/order', (req, res) => {
 
   if (!order || !order.drinkName) {
     return res.status(400).json({ error: 'Vui lòng chọn món trà sữa hợp lệ' });
+  }
+
+  // Khóa: Nếu thành viên đã order rồi thì không được chọn lại (trừ khi Admin bấm Reset)
+  if (orders2010[member.stt] && orders2010[member.stt].hasOrdered) {
+    return res.status(400).json({ error: 'Bạn đã hoàn tất chọn món trước đó rồi! Lựa chọn đã được ghi nhận vào hệ thống.' });
   }
 
   if (!orders2010[member.stt]) {
