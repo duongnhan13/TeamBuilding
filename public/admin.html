@@ -3,629 +3,268 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bảng Điều Khiển Quản Lý (Admin / MC) - Team Building TCKT</title>
+  <title>Quản Lý Thiệp 20/10 & Order Yi He Tang - BVĐK Phương Đông TCKT</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .admin-container {
-      max-width: 1200px;
+    body {
+      background-color: #0f1026;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(244, 63, 94, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 90% 15%, rgba(245, 158, 11, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(124, 58, 237, 0.2) 0%, transparent 50%);
+      color: #ffffff;
+      min-height: 100vh;
+    }
+    .admin-2010-container {
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 20px 16px;
     }
-    .admin-grid {
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 20px;
+    .tab-btn {
+      padding: 10px 22px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    @media (max-width: 900px) {
-      .admin-grid {
-        grid-template-columns: 1fr;
-      }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+      color: #fff;
+      border-color: #fda4af;
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.35);
     }
-    .mc-teleprompter {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08));
-      border: 2px solid var(--gold);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 20px;
-    }
-    .teleprompter-label {
+    .filter-pill {
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
       font-size: 0.85rem;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .teleprompter-script {
-      font-size: 1.45rem;
       font-weight: 700;
-      line-height: 1.5;
-      color: #fef08a;
-      font-style: italic;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .soundboard-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
+    .filter-pill.active {
+      background: rgba(244, 63, 94, 0.25);
+      border-color: #f43f5e;
+      color: #fff;
     }
-    .timer-badge {
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: var(--cyan);
-      font-family: monospace;
+    .order-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .order-table th {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 14px 12px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fbcfe8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+    }
+    .order-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 0.92rem;
+      vertical-align: middle;
+    }
+    .order-table tr:hover {
+      background: rgba(244, 63, 94, 0.06);
     }
   </style>
 </head>
 <body>
-  <div class="admin-container">
+  <div class="admin-2010-container">
     
-    <!-- Top Admin Header -->
-    <header class="glass-panel host-header" style="margin-bottom: 16px;">
-      <div class="host-brand">
-        <div class="host-logo-icon">🎛️</div>
+    <!-- Top Brand & Action Bar -->
+    <header class="glass-panel" style="padding: 20px 24px; border-radius: 20px; border: 1.5px solid rgba(244, 63, 94, 0.35); margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="font-size: 2.8rem; line-height: 1;">🌸</div>
         <div>
-          <div class="host-title">
-            BẢNG ĐIỀU KHIỂN MC <span class="gold-gradient-text">(ADMIN CONTROLLER)</span>
-          </div>
-          <div class="host-subtitle">Điều khiển màn hình máy chiếu từ xa • Team Building TCKT</div>
+          <h1 style="font-size: 1.5rem; font-weight: 900; line-height: 1.2;">
+            QUẢN LÝ THIỆP 20/10 & ORDER YIHETANG
+          </h1>
+          <p style="font-size: 0.9rem; color: #fbcfe8; font-weight: 700; margin-top: 2px;">
+            Phòng Tài Chính Kế Toán • Bệnh viện ĐK Phương Đông 🧋
+          </p>
         </div>
       </div>
 
-      <div class="host-stats-pill">
-        <div class="stat-item">
-          <span>Người chơi:</span>
-          <span class="stat-num" id="admin-player-count">0</span>
-          <span style="color: var(--text-muted); font-size: 0.85rem;">người</span>
-        </div>
-        <div class="stat-item">
-          <span>Trạng thái:</span>
-          <span id="admin-mode-badge" style="color: var(--cyan); font-weight: 800;">SẢNH CHỜ</span>
-        </div>
-        <div class="admin-activation-badge" id="btn-toggle-activation-modal" title="Bấm để xem ai đã vào / ai chưa vào">
-          <span id="admin-act-green-dot">🟢</span>
-          <span id="admin-act-summary">0/47 Đã Điểm Danh</span>
-          <span style="font-size: 0.75rem; background: rgba(244, 63, 94, 0.4); padding: 1px 6px; border-radius: 999px; color: #fecdd3;" id="admin-act-missing-badge">47 chưa vào</span>
-        </div>
-      </div>
-
-      <div class="ctrl-btn-group">
-        <button class="btn btn-secondary btn-icon" id="btn-sound-toggle" title="Âm thanh MC">
-          🔊
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <a href="/api/2010/export-excel" target="_blank" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 0.92rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+          📥 Xuất File Excel (.xlsx)
+        </a>
+        <button id="btn-copy-zalo" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-size: 0.92rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+          📋 Copy Đặt Quán (Zalo)
         </button>
-        <button class="btn btn-emerald" id="btn-open-add-q">
-          ➕ Quản Lý & Thêm Câu Hỏi
+        <button id="btn-refresh-data" class="btn btn-secondary" style="font-size: 0.92rem; border-radius: 12px;">
+          🔄 Làm Mới
         </button>
-        <button class="btn btn-secondary" id="btn-open-settings">
-          👥 Quản Lý 47 Thành Viên
+        <button id="btn-reload-excel" class="btn btn-secondary" style="font-size: 0.85rem; border-radius: 12px;" title="Tải lại từ file Team Building TCKT.xlsx">
+          📂 Đọc Lại Excel
         </button>
       </div>
     </header>
 
-    <!-- Admin Quick Testing & Simulation Bar -->
-    <div class="admin-test-bar" style="margin-bottom: 20px;">
-      <div class="admin-test-title">🛠️ TEST & GIẢ LẬP:</div>
-      <button class="btn btn-primary btn-sm" id="btn-add-bots-20" title="Thêm 20 người ảo để test">
-        🤖 +20 Bot
+    <!-- KPI Statistics Grid -->
+    <div class="admin-2010-stats-grid">
+      <!-- Card 1: Total Members -->
+      <div class="stat-card-2010">
+        <div class="stat-icon-circle" style="background: rgba(99, 102, 241, 0.2); border: 1px solid var(--primary); color: #818cf8;">
+          👥
+        </div>
+        <div>
+          <div class="stat-val-2010" id="stat-total-members">32</div>
+          <div class="stat-lbl-2010">Tổng Chị Em (TCKT)</div>
+        </div>
+      </div>
+
+      <!-- Card 2: Opened Greeting Card -->
+      <div class="stat-card-2010">
+        <div class="stat-icon-circle" style="background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: #fef08a;">
+          💌
+        </div>
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: baseline; gap: 6px;">
+            <div class="stat-val-2010" id="stat-opened-count" style="color: #fef08a;">0</div>
+            <span style="color: #94a3b8; font-size: 0.9rem; font-weight: 700;">/ 32</span>
+          </div>
+          <div class="stat-lbl-2010">Đã Mở Nhận Lời Chúc</div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 999px; margin-top: 6px; overflow: hidden;">
+            <div id="bar-opened" style="width: 0%; height: 100%; background: var(--gold); transition: width 0.4s ease;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Ordered Yi He Tang -->
+      <div class="stat-card-2010">
+        <div class="stat-icon-circle" style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--emerald); color: #6ee7b7;">
+          🧋
+        </div>
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: baseline; gap: 6px;">
+            <div class="stat-val-2010" id="stat-ordered-count" style="color: #6ee7b7;">0</div>
+            <span style="color: #94a3b8; font-size: 0.9rem; font-weight: 700;">/ 32</span>
+          </div>
+          <div class="stat-lbl-2010">Đã Order Trà Sữa</div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 999px; margin-top: 6px; overflow: hidden;">
+            <div id="bar-ordered" style="width: 0%; height: 100%; background: var(--emerald); transition: width 0.4s ease;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Unopened -->
+      <div class="stat-card-2010">
+        <div class="stat-icon-circle" style="background: rgba(244, 63, 94, 0.2); border: 1px solid var(--rose); color: #fca5a5;">
+          ⏳
+        </div>
+        <div>
+          <div class="stat-val-2010" id="stat-unopened-count" style="color: #fca5a5;">32</div>
+          <div class="stat-lbl-2010">Chưa Mở Thiệp</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+      <button class="tab-btn active" id="tab-btn-list">
+        📋 Danh Sách 32 Thành Viên
       </button>
-      <button class="btn btn-primary btn-sm" id="btn-add-bots-50" title="Thêm 50 người ảo để test">
-        🤖 +50 Bot
-      </button>
-      <button class="btn btn-emerald btn-sm" id="btn-admin-simulate" title="Mô phỏng tất cả người chơi tự động bình chọn / trả lời">
-        ⚡ Tự Động Vote / Trả Lời
-      </button>
-      <button class="btn btn-secondary btn-sm" id="btn-admin-reset-q" title="Xóa dữ liệu câu này để test lại">
-        🔄 Reset Câu Này
-      </button>
-      <button class="btn btn-secondary btn-sm" id="btn-admin-reset-lobby" title="Reset trò chơi về sảnh chờ">
-        🧹 Về Sảnh
-      </button>
-      <button class="btn btn-rose btn-sm" id="btn-admin-clear-players" title="Xóa toàn bộ người chơi">
-        🗑️ Xóa Hết Người Chơi
+      <button class="tab-btn" id="tab-btn-summary">
+        🧋 Tổng Hợp Đặt Quán Yi He Tang (<span id="tab-summary-total-cups">0</span> cốc)
       </button>
     </div>
 
-    <!-- Main Content Layout -->
-    <div class="admin-grid">
+    <!-- ==========================================
+         TAB 1: DETAILED MEMBER LIST VIEW
+         ========================================== -->
+    <section id="tab-content-list" class="glass-panel" style="padding: 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12);">
       
-      <!-- LEFT COLUMN: GAME CONTROLLER & TELEPROMPTER -->
-      <div style="display: flex; flex-direction: column; gap: 16px;">
-        
-        <!-- Mode Switcher Buttons -->
-        <div class="glass-panel" style="padding: 14px 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-          <button class="btn btn-secondary" id="btn-mode-lobby" style="flex: 1;">
-            🏠 Sảnh Chờ
-          </button>
-          <button class="btn btn-rose" id="btn-mode-squizz" style="flex: 1.5; font-weight: 800;">
-            🚀 BỘ 1: SQUIZZ (BÓC PHỐT)
-          </button>
-          <button class="btn btn-primary" id="btn-mode-qa" style="flex: 1.5; font-weight: 800;">
-            🧠 BỘ 2: ĐẤU TRÍ Q&A
-          </button>
-          <button class="btn btn-gold" id="btn-mode-podium" style="flex: 1;">
-            🥇 Trao Giải
-          </button>
+      <!-- Filter and Search Toolbar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 18px;">
+        <!-- Filters -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="filter-pills-group">
+          <div class="filter-pill active" data-filter="ALL">Tất cả (<span id="pill-all-count">32</span>)</div>
+          <div class="filter-pill" data-filter="ORDERED" style="color: #6ee7b7;">🟢 Đã đặt món (<span id="pill-ordered-count">0</span>)</div>
+          <div class="filter-pill" data-filter="OPENED" style="color: #fef08a;">🟡 Đã mở chưa đặt (<span id="pill-opened-count">0</span>)</div>
+          <div class="filter-pill" data-filter="UNOPENED" style="color: #fca5a5;">🔴 Chưa mở thiệp (<span id="pill-unopened-count">32</span>)</div>
         </div>
 
-        <!-- Question Navigation Bar -->
-        <div class="glass-panel" style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-          <button class="btn btn-secondary" id="btn-prev-q">
-            ⬅️ Câu Trước
-          </button>
-
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-weight: 800; color: var(--gold);" id="admin-current-q-pill">CÂU 1 / 12</span>
-            <select id="admin-jump-select" class="input-field" style="margin: 0; padding: 6px 12px; width: auto; font-size: 0.95rem; height: 38px;">
-              <option value="">-- Nhảy tới câu bất kỳ --</option>
-            </select>
-          </div>
-
-          <button class="btn btn-secondary" id="btn-next-q">
-            Câu Tiếp ➡️
-          </button>
+        <!-- Search Box -->
+        <div style="width: 280px;">
+          <input type="text" id="admin-search-input" class="input-field" 
+                 placeholder="🔍 Tìm theo Tên hoặc Mã số (MS)..." 
+                 style="height: 40px; font-size: 0.9rem; border-radius: 12px; background: rgba(0,0,0,0.35);">
         </div>
-
-        <!-- MC Teleprompter Box -->
-        <div class="mc-teleprompter" id="mc-teleprompter-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <div class="teleprompter-label">🎙️ KỊCH BẢN XƯỚNG TÊN MC CẦM MIC ĐỌC:</div>
-            <span id="admin-target-badge" style="font-size: 0.9rem; color: var(--cyan); font-weight: 700;">
-              🎯 Mục tiêu: Bóc phốt
-            </span>
-          </div>
-
-          <div style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 12px;" id="admin-q-text">
-            Ai là người luôn luôn có mặt ở phòng làm việc sớm nhất, chuyên nhận trọng trách mở cửa, bật đèn và bật điều hòa đón anh em?
-          </div>
-
-          <div class="teleprompter-script" id="admin-mc-voice">
-            "Xin chúc mừng đồng chí có tên to nhất trên màn hình! Mời đồng chí đứng lên nhận chén rượu danh dự của người khai mở văn phòng!"
-          </div>
-
-          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(245, 158, 11, 0.4); display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 0.85rem; font-weight: 800; color: var(--rose); text-transform: uppercase;">Hình phạt:</span>
-            <span style="font-size: 1.15rem; font-weight: 800; color: #fef08a;" id="admin-punishment">
-              Uống 1 chén danh dự khai tiệc! 🍻
-            </span>
-          </div>
-        </div>
-
-        <!-- Master Action Buttons -->
-        <div class="glass-panel" style="padding: 20px; display: flex; gap: 16px;">
-          <button class="btn btn-secondary" id="btn-toggle-lock" style="flex: 1; font-size: 1.1rem; padding: 16px;">
-            🔒 CHỐT / KHÓA BÌNH CHỌN
-          </button>
-          <button class="btn btn-rose" id="btn-reveal-action" style="flex: 1.8; font-size: 1.25rem; font-weight: 900; padding: 16px; box-shadow: 0 0 25px rgba(244, 63, 94, 0.5);">
-            👑 CÔNG BỐ KẾT QUẢ & XƯỚNG TÊN
-          </button>
-        </div>
-
-        <!-- SQUIZZ Specific MC Controls (Shown in Squizz Mode) -->
-        <div id="admin-squizz-controls-panel" class="glass-panel" style="display: none; padding: 12px 20px; justify-content: space-between; align-items: center; gap: 10px; background: rgba(244, 63, 94, 0.08); border: 1.5px solid rgba(244, 63, 94, 0.35);">
-          <span style="font-size: 0.92rem; font-weight: 800; color: #fecdd3; display: flex; align-items: center; gap: 6px;">
-            <span>⏱️</span> ĐIỀU KHIỂN BÌNH CHỌN BỘ 1 (SQUIZZ):
-          </span>
-          <div style="display: flex; gap: 8px;">
-            <button class="btn btn-secondary btn-sm" id="btn-squizz-pause" style="font-weight: 800;">
-              ⏸️ Tạm Dừng Timer
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-squizz-add-10s" style="font-weight: 800;">
-              ⏱️ +10s
-            </button>
-          </div>
-        </div>
-
-        <!-- QA Specific MC Controls (Dedicated to Part 2 MC) -->
-        <div id="admin-qa-controls-panel" class="glass-panel" style="display: none; padding: 16px 20px; flex-direction: column; gap: 12px; background: rgba(56, 189, 248, 0.08); border: 1.5px solid rgba(56, 189, 248, 0.35);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.95rem; font-weight: 800; color: var(--cyan); display: flex; align-items: center; gap: 6px;">
-              <span>🎮</span> ĐIỀU KHIỂN BỘ 2 (ĐẤU TRÍ Q&A):
-            </span>
-            <button class="btn btn-sm" id="btn-qa-auto-toggle" style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--emerald); color: #6ee7b7; font-weight: 800;">
-              ⚙️ Tự động 15s: BẬT
-            </button>
-          </div>
-
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn btn-secondary btn-sm" id="btn-qa-pause" style="flex: 1; min-width: 130px; font-weight: 800;">
-              ⏸️ Tạm Dừng Timer
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-qa-add-5s" style="font-weight: 800;">
-              ⏱️ +5s
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-qa-add-10s" style="font-weight: 800;">
-              ⏱️ +10s
-            </button>
-            <button class="btn btn-primary btn-sm" id="btn-qa-reveal-quick" style="flex: 1; min-width: 150px; font-weight: 800;">
-              🔔 Công Bố Đáp Án
-            </button>
-          </div>
-
-          <!-- Switch Projector Display on Screen -->
-          <div style="display: flex; align-items: center; gap: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.15);">
-            <span style="font-size: 0.85rem; font-weight: 700; color: #fef08a;">Chiếu lên máy chiếu:</span>
-            <button class="btn btn-rose btn-sm" id="btn-qa-show-wrong" style="flex: 1; font-weight: 800;">
-              📢 Chiếu Hội Trả Lời Sai 😅
-            </button>
-            <button class="btn btn-gold btn-sm" id="btn-qa-show-leaderboard" style="flex: 1; font-weight: 800;">
-              🏆 Chiếu Bảng Xếp Hạng 🥇
-            </button>
-          </div>
-        </div>
-
       </div>
 
-      <!-- RIGHT COLUMN: LIVE MONITOR & SOUNDBOARD -->
-      <div style="display: flex; flex-direction: column; gap: 16px;">
-        
-        <!-- Live Voting / Answer Status Card -->
-        <div class="glass-panel" style="padding: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h3 style="font-size: 1.1rem; font-weight: 800;">📊 THEO DÕI TRỰC TIẾP (BÍ MẬT MC)</h3>
-            <span class="timer-badge" id="admin-timer-display">--</span>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 0.95rem;">
-            <span>Tiến độ nộp bài:</span>
-            <span style="font-weight: 800; color: var(--cyan);">
-              <span id="admin-voted-count">0</span> / <span id="admin-total-count">0</span>
-            </span>
-          </div>
-
-          <!-- Secret Live Tally Preview for MC (Unblurred!) -->
-          <div style="font-size: 0.8rem; color: var(--gold); text-transform: uppercase; font-weight: 800; margin-bottom: 6px;">
-            👁️ Tỉ lệ dẫn đầu hiện tại (Chỉ MC nhìn thấy rõ):
-          </div>
-          <div id="admin-secret-tally" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
-            <div style="color: var(--text-muted); font-style: italic; font-size: 0.9rem;">
-              Chưa có phiếu nào...
-            </div>
-          </div>
-
-          <!-- Live Wrong Answers Box for Part 2 MC Monitoring -->
-          <div id="admin-qa-wrong-monitor" style="display: none; margin-top: 12px; padding: 12px; background: rgba(244, 63, 94, 0.12); border: 1.5px solid var(--rose); border-radius: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 0.85rem; font-weight: 800; color: #fca5a5;">😅 HỘI TRẢ LỜI SAI:</span>
-              <span id="admin-qa-wrong-count-badge" style="background: var(--rose); color: #fff; font-weight: 900; font-size: 0.8rem; padding: 2px 8px; border-radius: 999px;">0</span>
-            </div>
-            <div id="admin-qa-wrong-list" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
-              <!-- Populated by JS -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Timer Setting Presets -->
-        <div class="glass-panel" style="padding: 16px 20px;">
-          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 10px;">⏱️ CÀI ĐẶT THỜI GIAN ĐẾM NGƯỢC</h3>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="15">15s</button>
-            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="20">20s</button>
-            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="30">30s</button>
-            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="45">45s</button>
-            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="60">60s</button>
-            <button class="btn btn-secondary btn-sm btn-timer-preset" data-sec="0">Thủ công</button>
-          </div>
-        </div>
-
-        <!-- MC Soundboard -->
-        <div class="glass-panel" style="padding: 20px;">
-          <h3 style="font-size: 1.1rem; font-weight: 800;">🔊 ÂM THANH SÂN KHẤU</h3>
-          <div class="soundboard-grid">
-            <button class="btn btn-gold btn-sm" id="snd-cheers">
-              🍻 100% Cạn Chén!
-            </button>
-            <button class="btn btn-emerald btn-sm" id="snd-confetti">
-              🎉 Bắn Pháo Hoa
-            </button>
-            <button class="btn btn-secondary btn-sm" id="snd-applause">
-              👏 Tiếng Vỗ Tay
-            </button>
-            <button class="btn btn-secondary btn-sm" id="snd-drumroll">
-              🥁 Hồi Hộp
-            </button>
-            <button class="btn btn-secondary btn-sm" id="snd-correct">
-              🔔 Ting Ting
-            </button>
-            <button class="btn btn-secondary btn-sm" id="snd-wrong">
-              ❌ Sai Rồi
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- MODAL 1: QUESTION MANAGER & ADDER (STRICT COMPLIANCE WITH SET RULES) -->
-    <div id="modal-add-question" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-      <div class="glass-panel" style="max-width: 800px; width: 94%; max-height: 90vh; display: flex; flex-direction: column; padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <div>
-            <h2 style="font-size: 1.35rem; font-weight: 900;" class="gold-gradient-text">
-              ⚙️ QUẢN LÝ & THÊM CÂU HỎI TRÒ CHƠI
-            </h2>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">
-              Tuân thủ luật chơi: Bộ 1 (Chỉ vote thành viên chuyến đi) • Bộ 2 (Câu hỏi trắc nghiệm 4 đáp án)
-            </div>
-          </div>
-          <button class="btn btn-secondary btn-icon" id="btn-close-add-q">✕</button>
-        </div>
-
-        <!-- Navigation Tabs inside Modal -->
-        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-          <button class="btn btn-primary btn-sm" id="tab-q-add" style="font-weight: 800; padding: 8px 18px;">
-            ➕ Thêm Câu Hỏi Mới
-          </button>
-          <button class="btn btn-secondary btn-sm" id="tab-q-list" style="font-weight: 800; padding: 8px 18px;">
-            📋 Xem & Quản Lý Câu Hỏi Hiện Có
-          </button>
-        </div>
-
-        <!-- TAB CONTENT 1: ADD QUESTION -->
-        <div id="tab-content-q-add" style="flex: 1; overflow-y: auto; padding-right: 4px;">
-          <!-- Section Selector -->
-          <div style="margin-bottom: 12px;">
-            <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 6px;">1. Chọn Bộ câu hỏi muốn thêm:</label>
-            <select id="add-q-section" class="input-field" style="font-weight: 800; font-size: 1rem; padding: 10px 14px;">
-              <option value="SQUIZZ">🚀 BỘ 1: SQUIZZ (Bình chọn người trong chuyến đi - Bóc phốt / Khảo sát)</option>
-              <option value="QA">🧠 BỘ 2: ĐẤU TRÍ Q&A (Câu hỏi trắc nghiệm 4 đáp án Kahoot)</option>
-            </select>
-          </div>
-
-          <!-- Dynamic Rule Banner -->
-          <div id="q-rule-box-squizz" style="background: rgba(244, 63, 94, 0.15); border: 1.5px solid var(--rose); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;">
-            <div style="font-weight: 800; color: #fecdd3; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
-              <span>📌 LUẬT CHƠI BỘ 1: CHỌN NGƯỜI TRONG CHUYẾN ĐI (VOTE THÀNH VIÊN)</span>
-            </div>
-            <div style="font-size: 0.85rem; color: #e2e8f0; margin-top: 4px; line-height: 1.4;">
-              Mọi người tham gia sẽ dùng điện thoại để <strong>bình chọn 1 đồng nghiệp</strong> trong danh sách thành viên chuyến đi. Khi chốt hoặc hết giờ, người nhận nhiều phiếu nhất sẽ được xướng tên và nhận hiệu ứng vinh danh trên màn hình lớn!
-            </div>
-          </div>
-
-          <div id="q-rule-box-qa" style="display: none; background: rgba(56, 189, 248, 0.15); border: 1.5px solid var(--cyan); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;">
-            <div style="font-weight: 800; color: #7dd3fc; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
-              <span>📌 LUẬT CHƠI BỘ 2: CÂU HỎI TRẮC NGHIỆM 4 ĐÁP ÁN (A, B, C, D)</span>
-            </div>
-            <div style="font-size: 0.85rem; color: #e2e8f0; margin-top: 4px; line-height: 1.4;">
-              Mỗi câu hỏi có <strong>4 đáp án A, B, C, D</strong> với 1 đáp án chính xác. Người chơi bấm chọn nhanh trên điện thoại để tính điểm tốc độ và tranh vị trí Quán quân trên bảng xếp hạng!
-            </div>
-          </div>
-
-          <!-- Question Title / Category -->
-          <div style="margin-bottom: 12px;">
-            <label id="lbl-q-title" style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Tiêu đề danh hiệu / Biệt danh (Bộ 1):</label>
-            <input type="text" id="add-q-title" class="input-field" placeholder="Ví dụ: Thần giữ cửa Phương Đông, Siêu quậy chuyến đi, Chiến thần Karaoke..." maxlength="70">
-          </div>
-
-          <!-- Question Content -->
-          <div style="margin-bottom: 12px;">
-            <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Nội dung câu hỏi đầy đủ:</label>
-            <textarea id="add-q-text" class="input-field" style="height: 80px; font-size: 0.95rem; resize: none;" placeholder="Nhập câu hỏi chiếu lên màn hình máy chiếu..."></textarea>
-          </div>
-
-          <!-- BỘ 1 SPECIFIC FIELDS -->
-          <div id="box-squizz-fields">
-            <div style="margin-bottom: 12px;">
-              <label style="font-size: 0.85rem; font-weight: 800; color: var(--gold); display: block; margin-bottom: 4px;">Hiệu ứng sân khấu vinh danh người thắng:</label>
-              <select id="add-q-theme" class="input-field">
-                <option value="royal-gold">👑 Royal Gold (Vương miện vàng, kèn mừng)</option>
-                <option value="party-beer">🍻 Party Beer (Vại bia vàng tiệc tùng, 100% zô)</option>
-                <option value="money-rain">💰 Money Rain (Cơn mưa tiền & vàng nổ tung)</option>
-                <option value="speed-rocket">🚀 Speed Rocket (Tên lửa siêu tốc 17h30)</option>
-                <option value="music-concert">🎤 Music Concert (Sân khấu ca nhạc Rock Neon)</option>
-                <option value="rainbow-magic">🌈 Rainbow Magic (Cầu vồng phép thuật lấp lánh)</option>
-                <option value="arctic-freeze">❄️ Arctic Freeze (Băng tuyết Bắc Cực lạnh giá)</option>
-                <option value="lightning-neon">⚡ Lightning Neon (Tia chớp sấm sét giật điện)</option>
-                <option value="snack-party">🍰 Snack Party (Tiệc trà bánh kẹo vặt sành điệu)</option>
-                <option value="sleeping-cloud">😴 Sleeping Cloud (Mây trăng ru ngủ Zzz)</option>
-                <option value="shopping-spree">📦 Shopping Spree (Chiến thần săn sale freeship)</option>
-                <option value="fish-memory">🐟 Fish Memory (Đại dương cá bơi lội não cá vàng)</option>
-              </select>
-            </div>
-
-            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-              <div style="flex: 1;">
-                <label style="font-size: 0.85rem; font-weight: 800; color: var(--rose); display: block; margin-bottom: 4px;">Hình phạt / Phần thưởng khi được sướng tên:</label>
-                <input type="text" id="add-q-punishment" class="input-field" placeholder="Uống 1 chén danh dự! 🍻">
-              </div>
-              <div style="width: 140px;">
-                <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px;">Thời gian vote (s):</label>
-                <input type="number" id="add-q-time-squizz" class="input-field" value="30" min="0" max="180">
-              </div>
-            </div>
-
-            <div style="margin-bottom: 14px;">
-              <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Lời bình luận MC đọc khi công bố:</label>
-              <input type="text" id="add-q-mcvoice" class="input-field" placeholder="Xin chúc mừng đồng chí được anh em bình chọn nhiều nhất...">
-            </div>
-          </div>
-
-          <!-- BỘ 2 SPECIFIC FIELDS (MULTIPLE CHOICE 4 OPTIONS) -->
-          <div id="box-qa-fields" style="display: none;">
-            <div style="background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.3);">
-              <div style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); margin-bottom: 8px;">
-                🎯 4 Đáp án trắc nghiệm:
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                <div>
-                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-a);">▲ Đáp án A (Đỏ):</label>
-                  <input type="text" id="add-opt-0" class="input-field" placeholder="Nhập đáp án A">
-                </div>
-                <div>
-                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-b);">◆ Đáp án B (Xanh):</label>
-                  <input type="text" id="add-opt-1" class="input-field" placeholder="Nhập đáp án B">
-                </div>
-                <div>
-                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-c);">● Đáp án C (Vàng):</label>
-                  <input type="text" id="add-opt-2" class="input-field" placeholder="Nhập đáp án C">
-                </div>
-                <div>
-                  <label style="font-size: 0.78rem; font-weight: 800; color: var(--opt-d);">■ Đáp án D (Lục):</label>
-                  <input type="text" id="add-opt-3" class="input-field" placeholder="Nhập đáp án D">
-                </div>
-              </div>
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <label style="font-size: 0.85rem; font-weight: 800; color: #fef08a;">Đáp án chính xác:</label>
-                <select id="add-correct-idx" class="input-field" style="width: 160px; font-weight: 800;">
-                  <option value="0">▲ Đáp án A (Đỏ)</option>
-                  <option value="1">◆ Đáp án B (Xanh)</option>
-                  <option value="2">● Đáp án C (Vàng)</option>
-                  <option value="3">■ Đáp án D (Lục)</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-              <div style="flex: 1;">
-                <label style="font-size: 0.85rem; font-weight: 800; color: #fff; display: block; margin-bottom: 4px;">Giải thích chi tiết (Chiếu khi công bố kết quả):</label>
-                <input type="text" id="add-qa-explanation" class="input-field" placeholder="Giải thích vì sao đáp án này đúng...">
-              </div>
-              <div style="width: 140px;">
-                <label style="font-size: 0.85rem; font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px;">Thời gian đếm (s):</label>
-                <input type="number" id="add-q-time-qa" class="input-field" value="15" min="5" max="90">
-              </div>
-            </div>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-            <button class="btn btn-secondary" id="btn-cancel-add-q">Hủy</button>
-            <button class="btn btn-emerald" id="btn-save-add-q" style="font-weight: 800; padding: 12px 24px;">
-              💾 Lưu & Đưa Vào Trò Chơi Ngay
-            </button>
-          </div>
-        </div>
-
-        <!-- TAB CONTENT 2: EXISTING QUESTIONS LIST -->
-        <div id="tab-content-q-list" style="display: none; flex: 1; flex-direction: column; overflow-y: hidden;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-rose btn-sm" id="subtab-q-squizz" style="font-weight: 800;">
-                🚀 Bộ 1: Squizz (<span id="count-q-squizz">12</span> câu)
-              </button>
-              <button class="btn btn-primary btn-sm" id="subtab-q-qa" style="font-weight: 800; opacity: 0.6;">
-                🧠 Bộ 2: Q&A (<span id="count-q-qa">15</span> câu)
-              </button>
-            </div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
-              *Bấm "Nhảy tới" để chiếu câu hỏi lên màn hình ngay
-            </div>
-          </div>
-
-          <div style="flex: 1; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 6px;" id="q-list-container">
+      <!-- Member Table -->
+      <div style="overflow-x: auto;">
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">STT</th>
+              <th style="width: 80px;">MS</th>
+              <th style="width: 220px;">Họ và Tên</th>
+              <th style="width: 170px;">Chức danh</th>
+              <th style="width: 130px;">Trạng thái</th>
+              <th>Món Đã Chọn (Yi He Tang)</th>
+              <th style="width: 140px;">Thời gian</th>
+              <th style="width: 70px; text-align: center;">Xử lý</th>
+            </tr>
+          </thead>
+          <tbody id="admin-members-tbody">
             <!-- Rendered by JS -->
-          </div>
-        </div>
-
+          </tbody>
+        </table>
       </div>
-    </div>
 
-    <!-- MODAL 2: 47 MEMBERS & DOB MANAGEMENT TABLE -->
-    <div id="modal-settings" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-      <div class="glass-panel" style="max-width: 900px; width: 95%; max-height: 88vh; display: flex; flex-direction: column; padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <div>
-            <h2 style="font-size: 1.35rem; font-weight: 900;" class="gold-gradient-text">
-              👥 Quản Lý 47 Thành Viên & Ngày Sinh (Cung Hoàng Đạo)
-            </h2>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">
-              Cập nhật ngày sinh để tính Cung hoàng đạo và Con giáp • Cập nhật mã vân tay chấm công
-            </div>
-          </div>
-          <button class="btn btn-secondary btn-icon" id="btn-close-settings">✕</button>
+    </section>
+
+    <!-- ==========================================
+         TAB 2: BULK ORDER SUMMARY FOR YI HE TANG
+         ========================================== -->
+    <section id="tab-content-summary" class="glass-panel" style="display: none; padding: 24px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12);">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 900; color: #fff;">
+            BẢNG TỔNG HỢP GOM ĐƠN ĐẶT QUÁN YI HE TANG 🧋
+          </h2>
+          <p style="font-size: 0.88rem; color: #94a3b8; margin-top: 4px;">
+            Thống kê số lượng theo từng món, size và topping để gọi hotline hoặc đặt Zalo nhanh chóng:
+          </p>
         </div>
-
-        <!-- Filter bar -->
-        <input type="text" id="member-search-filter" class="input-field" placeholder="🔍 Tìm kiếm thành viên theo tên..." style="margin-bottom: 12px;">
-
-        <!-- Members Table -->
-        <div style="flex: 1; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
-            <thead style="background: rgba(255,255,255,0.08); position: sticky; top: 0;">
-              <tr>
-                <th style="padding: 10px 12px; width: 45px;">STT</th>
-                <th style="padding: 10px 12px;">Họ và Tên</th>
-                <th style="padding: 10px 12px; width: 110px;">Mã vân tay</th>
-                <th style="padding: 10px 12px; width: 140px;">Ngày sinh</th>
-                <th style="padding: 10px 12px; width: 160px;">Năm tuổi (Con giáp)</th>
-                <th style="padding: 10px 12px; width: 80px;">Lưu</th>
-              </tr>
-            </thead>
-            <tbody id="member-table-body">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-          <button class="btn btn-primary" id="btn-reload-excel" title="Đọc lại danh sách và ngày sinh trực tiếp từ file Team Building TCKT.xlsx">
-            🔄 Đọc Lại Từ File Excel
-          </button>
-          <button class="btn btn-secondary" id="btn-cancel-settings">Đóng</button>
-        </div>
+        <button id="btn-copy-zalo-tab" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-size: 0.92rem; font-weight: 800; border-radius: 12px;">
+          📋 Copy Toàn Bộ Nội Dung Đặt Hàng
+        </button>
       </div>
-    </div>
 
-    <!-- MODAL 3: LIVE ACTIVATION / ATTENDANCE MONITOR -->
-    <div id="modal-activation" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-      <div class="glass-panel" style="max-width: 850px; width: 94%; max-height: 88vh; display: flex; flex-direction: column; padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <div>
-            <h2 style="font-size: 1.35rem; font-weight: 900;" class="gold-gradient-text">
-              📡 THEO DÕI ĐIỂM DANH KÍCH HOẠT (47 CÁN BỘ NHÂN VIÊN)
-            </h2>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">
-              Cập nhật thời gian thực người đã điểm danh quét vân tay vào phòng và người chưa vào
-            </div>
-          </div>
-          <button class="btn btn-secondary btn-icon" id="btn-close-activation">✕</button>
-        </div>
-
-        <!-- Filter & Tab Switcher -->
-        <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
-          <button class="btn btn-primary btn-sm" id="tab-act-all" style="font-weight: 800;">
-            Tất cả (47)
-          </button>
-          <button class="btn btn-rose btn-sm" id="tab-act-missing" style="font-weight: 800;">
-            🔴 Chưa vào phòng (<span id="modal-missing-count-badge">0</span>)
-          </button>
-          <button class="btn btn-emerald btn-sm" id="tab-act-active" style="font-weight: 800;">
-            🟢 Đã vào phòng (<span id="modal-active-count-badge">0</span>)
-          </button>
-          <input type="text" id="act-search-filter" class="input-field" placeholder="🔍 Lọc theo tên..." style="flex: 1; min-width: 160px; height: 36px; padding: 6px 12px; margin: 0;">
-        </div>
-
-        <!-- Activation List Table -->
-        <div style="flex: 1; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
-            <thead style="background: rgba(255,255,255,0.08); position: sticky; top: 0;">
-              <tr>
-                <th style="padding: 10px 12px; width: 45px;">STT</th>
-                <th style="padding: 10px 12px;">Họ và Tên</th>
-                <th style="padding: 10px 12px; width: 110px;">Mã vân tay</th>
-                <th style="padding: 10px 12px;">Năm tuổi (Con giáp)</th>
-                <th style="padding: 10px 12px; width: 130px; text-align: center;">Trạng thái</th>
-                <th style="padding: 10px 12px; width: 130px; text-align: center;">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody id="activation-table-body">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-          <button class="btn btn-secondary" id="btn-close-act-bottom">Đóng</button>
-        </div>
+      <!-- Grouped items container -->
+      <div id="summary-groups-container">
+        <!-- Rendered by JS -->
       </div>
-    </div>
+
+      <!-- Text preview for Zalo copy -->
+      <div style="margin-top: 24px; background: rgba(0, 0, 0, 0.4); border-radius: 16px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 0.85rem; color: #fef08a; font-weight: 800; margin-bottom: 8px;">
+          📝 MẪU VĂN BẢN ĐẶT QUÁN (SẴN SÀNG COPY VÀO ZALO):
+        </div>
+        <textarea id="zalo-copy-text" readonly style="width: 100%; height: 180px; background: transparent; border: none; color: #e2e8f0; font-family: monospace; font-size: 0.88rem; resize: vertical; outline: none;"></textarea>
+      </div>
+
+    </section>
 
   </div>
 
   <!-- Scripts -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/audio.js"></script>
-  <script src="/js/confetti.js"></script>
-  <script src="/js/zodiac.js"></script>
   <script src="/js/admin.js"></script>
 </body>
 </html>

@@ -3,346 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Màn Hình Trình Chiếu Máy Chiếu - Team Building TCKT</title>
+  <title>Màn Hình Trình Chiếu 20/10 - BVĐK Phương Đông TCKT</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    /* Full projector optimization */
     body {
+      background-color: #0d0614;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(244, 63, 94, 0.3) 0%, transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(251, 113, 133, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(159, 18, 57, 0.4) 0%, transparent 60%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
       user-select: none;
-      cursor: default;
     }
-    .projector-brand {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .proj-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      position: relative;
+      z-index: 10;
     }
-    .projector-title {
-      font-size: 1.5rem;
+    .proj-hero-title {
+      font-size: 3.4rem;
       font-weight: 900;
-      letter-spacing: -0.5px;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 0%, #fecdd3 40%, #f43f5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 10px 30px rgba(244, 63, 94, 0.4);
+      margin-bottom: 8px;
+    }
+    .proj-qr-box {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(244, 63, 94, 0.5);
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(244, 63, 94, 0.2);
+    }
+    .activity-ticker {
+      display: flex;
+      gap: 16px;
+      overflow-x: hidden;
+      white-space: nowrap;
+      padding: 12px 0;
+    }
+    .activity-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
     }
   </style>
 </head>
 <body>
-  <div class="host-container" id="projector-root">
+  <canvas id="petals-canvas"></canvas>
+
+  <div class="proj-container">
     
-    <!-- Top Display Header (Clean, only info & sound/fullscreen icons) -->
-    <header class="glass-panel host-header">
-      <div class="projector-brand">
-        <div class="host-logo-icon">🎪</div>
+    <!-- Top Display Header -->
+    <header class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 28px; border-radius: 20px; border: 1.5px solid rgba(244, 63, 94, 0.4); margin-bottom: 28px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-size: 2.6rem;">🌸</span>
         <div>
-          <div class="projector-title">
-            GALA DINNER & TEAM BUILDING <span class="gold-gradient-text">PHÒNG KẾ TOÁN</span> 🥂
+          <div style="font-size: 0.85rem; color: #fbcfe8; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">
+            BỆNH VIỆN ĐA KHOA PHƯƠNG ĐÔNG • PHÒNG TÀI CHÍNH KẾ TOÁN
           </div>
-          <div class="host-subtitle">Bệnh viện ĐK Phương Đông • Đêm Hội Gắn Kết 2026</div>
+          <div style="font-size: 1.35rem; font-weight: 900; color: #fff;">
+            LỄ TRAO GỬI YÊU THƯƠNG 20/10 💐
+          </div>
         </div>
       </div>
 
-      <div class="host-stats-pill">
-        <div class="stat-item">
-          <span>Bàn tiệc:</span>
-          <span style="color: var(--gold); font-weight: 800;">TCKT</span>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <!-- Stats Pill -->
+        <div style="display: flex; gap: 16px; background: rgba(0,0,0,0.3); padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 0.95rem; font-weight: 800;">
+            💌 Đã mở thiệp: <span id="proj-opened-count" style="color: #fef08a; font-size: 1.15rem;">0</span>/32
+          </div>
+          <div style="font-size: 0.95rem; font-weight: 800;">
+            🧋 Đã order: <span id="proj-ordered-count" style="color: #6ee7b7; font-size: 1.15rem;">0</span>/32
+          </div>
         </div>
-        <div class="stat-item">
-          <span>Thành viên vào tiệc:</span>
-          <span class="stat-num" id="proj-player-count">0</span>
-          <span style="color: var(--text-muted); font-size: 0.9rem;">người</span>
-        </div>
-      </div>
 
-      <div class="ctrl-btn-group">
-        <button class="btn btn-secondary btn-icon" id="btn-sound-toggle" title="Bật/Tắt Âm Thanh">
-          🔊
-        </button>
-        <button class="btn btn-secondary btn-icon" id="btn-fullscreen" title="Toàn Màn Hình (F11)">
+        <button id="btn-fullscreen" class="btn btn-secondary btn-icon" style="font-size: 1.1rem; width: 44px; height: 44px; border-radius: 50%;" title="Toàn Màn Hình (F11)">
           ⛶
         </button>
       </div>
     </header>
 
-    <!-- Main Stage Container -->
-    <main class="host-main-stage">
+    <!-- Main Hero 2-Column Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 420px; gap: 32px; align-items: center; margin-bottom: 30px;">
       
-      <!-- ================= VIEW 1: LOBBY ================= -->
-      <section id="view-lobby" class="lobby-screen">
-        <!-- Left: QR Code to Join -->
-        <div class="glass-panel qr-card">
-          <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 6px;">QUÉT MÃ VÀO TIỆC NGAY 🎟️</h2>
-          <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 16px;">
-            Mở Camera điện thoại hoặc Zalo quét mã QR tham gia tiệc:
-          </p>
-          <img id="proj-qr-img" class="qr-code-img" src="" alt="QR Code" style="width: 270px; height: 270px;">
-          <div class="join-link-box" id="proj-join-url">Đang kết nối hệ thống...</div>
-          <div id="proj-net-status" style="font-size: 0.9rem; color: #38bdf8; font-weight: 800; margin-top: 6px;">
-            🌐 Kết nối mọi thiết bị (4G / 5G / Wi-Fi)
-          </div>
+      <!-- Left Column: Grand Greeting & Message -->
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(244, 63, 94, 0.25); border: 1px solid rgba(244, 63, 94, 0.5); padding: 8px 22px; border-radius: 999px; color: #fecdd3; font-weight: 800; font-size: 1rem; margin-bottom: 16px;">
+          <span>💐</span> 20 THÁNG 10 • NGÀY PHỤ NỮ VIỆT NAM
         </div>
-
-        <!-- Right: Connected Players & Missing Members Callout -->
-        <div class="glass-panel lobby-players-card" style="display: flex; flex-direction: column;">
-          <div class="lobby-players-header">
-            <div>
-              <h2 style="font-size: 1.6rem; font-weight: 900;">🥂 ĐÃ CÓ MẶT TẠI BÀN TIỆC</h2>
-              <p style="font-size: 0.95rem; color: var(--text-muted);">
-                Quét mã QR & chạm để có mặt ngay lập tức
-              </p>
-            </div>
-            <div style="font-size: 1.3rem; font-weight: 900; color: var(--cyan);">
-              <span id="proj-lobby-ready-count" style="color: #6ee7b7;">0</span> / <span id="proj-lobby-total-members">47</span> thành viên
-            </div>
-          </div>
-
-          <!-- Connected Players Grid -->
-          <div class="player-grid" id="proj-player-grid" style="max-height: 280px; min-height: 120px;">
-            <div style="color: var(--text-muted); font-style: italic; margin: auto;" id="empty-hint">
-              Đang chờ các thành viên quét mã QR vào bàn tiệc...
-            </div>
-          </div>
-
-          <!-- Missing Members Callout Panel (Anh em nhắc nhau) -->
-          <div class="missing-members-box" id="proj-missing-box">
-            <div class="missing-header-row">
-              <div class="missing-title-text">
-                <span>📢 CÒN <span id="proj-missing-count" class="missing-count-badge">47</span> ĐỒNG ĐỘI CHƯA VÀO BÀN TIỆC (NHẮC NHAU NHANH NÀO):</span>
-              </div>
-              <div style="font-size: 0.85rem; color: #fca5a5; font-style: italic;">
-                *Ai ngồi cạnh ới đồng nghiệp vào bàn tiệc cùng nhé!
-              </div>
-            </div>
-            <div class="missing-chips-grid" id="proj-missing-grid">
-              <!-- Filled by JS -->
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= VIEW 2: SQUIZZ (BÓC PHỐT) ================= -->
-      <section id="view-squizz" class="squizz-stage" style="display: none;">
-        <!-- Question Card -->
-        <div class="glass-panel question-header-card">
-          <div class="q-badge-row">
-            <div class="q-badge" id="proj-sq-index">CÂU 1 / 10</div>
-            <div style="font-size: 1.25rem; font-weight: 800; color: var(--gold);" id="proj-sq-title">
-              Thần giữ cửa Phương Đông
-            </div>
-          </div>
-          <h1 class="q-title" id="proj-sq-text" style="font-size: 2.3rem;">
-            Ai là người luôn luôn có mặt ở phòng làm việc sớm nhất, chuyên nhận trọng trách mở cửa, bật đèn và bật điều hòa đón anh em?
-          </h1>
-          <div class="q-target" id="proj-sq-target">
-            🎯 Mục tiêu: Tôn vinh người chăm chỉ nhất phòng
-          </div>
-        </div>
-
-        <!-- Live Tally & Sidebar -->
-        <div class="squizz-live-area">
-          <!-- Live Vote Tally -->
-          <div class="glass-panel live-tally-card">
-            <div class="tally-title">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 1.25rem; font-weight: 800;">📊 BẢNG BÌNH CHỌN THỜI GIAN THỰC</span>
-                <span class="mystery-banner" id="proj-sq-mystery-badge">🕵️‍♂️ ĐANG GIẤU DANH TÍNH (HẾT GIỜ BẬT MÍ!)</span>
-              </div>
-              <span id="proj-sq-lock-status" style="font-size: 0.95rem; color: var(--emerald); font-weight: 700;">● Đang mở bình chọn</span>
-            </div>
-            
-            <!-- Standard Squizz Member Bar Chart -->
-            <div class="tally-list" id="proj-sq-tally-list">
-              <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
-                Đang chờ anh em gửi bình chọn từ điện thoại...
-              </div>
-            </div>
-
-            <!-- Open-Ended Question Word Wall Grid -->
-            <div id="proj-sq-wordwall" class="open-text-wall" style="display: none;">
-              <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
-                Đang chờ anh em gửi câu trả lời...
-              </div>
-            </div>
-          </div>
-
-          <!-- Counter Card -->
-          <div class="squizz-sidebar">
-            <div class="glass-panel vote-counter-card">
-              <div style="font-size: 1rem; font-weight: 800; color: var(--text-muted);">
-                SỐ NGƯỜI ĐÃ BÌNH CHỌN
-              </div>
-              <div class="vote-counter-num" id="proj-sq-voted" style="font-size: 4rem;">0</div>
-              <div style="font-size: 1.2rem; font-weight: 800; color: #fff;">
-                / <span id="proj-sq-total">0</span> người tham gia
-              </div>
-            </div>
-
-            <!-- Timer countdown if enabled -->
-            <div class="glass-panel vote-counter-card" id="proj-sq-timer-card" style="display: none;">
-              <div style="font-size: 0.9rem; font-weight: 800; color: var(--text-muted);">
-                THỜI GIAN CÒN LẠI
-              </div>
-              <div class="vote-counter-num" id="proj-sq-timer-num" style="color: var(--gold); font-size: 3rem;">30</div>
-              <div style="font-size: 0.85rem; color: var(--text-muted);">giây</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= VIEW 3: BỘ Q&A (KAHOOT STYLE) ================= -->
-      <section id="view-qa" class="qa-stage" style="display: none;">
-        <!-- QA Header Card -->
-        <div class="glass-panel qa-header-card">
-          <div class="qa-question-box">
-            <div style="display: flex; align-items: center; gap: 14px;">
-              <span class="qa-category-tag" id="proj-qa-cat" style="font-size: 0.95rem;">⚔️ Lịch sử Việt Nam</span>
-              <span class="q-badge" id="proj-qa-index">CÂU 1 / 15</span>
-            </div>
-            <h1 class="qa-question-text" id="proj-qa-text" style="font-size: 2.1rem;">
-              Ai là người chỉ huy trận chiến sông Bạch Đằng năm 938 đánh tan quân Nam Hán?
-            </h1>
-          </div>
-
-          <!-- Circular Countdown Timer -->
-          <div class="timer-container" style="width: 105px; height: 105px;">
-            <div class="timer-circle" id="proj-qa-timer-ring" style="width: 105px; height: 105px;">
-              <div class="timer-inner" id="proj-qa-timer-num" style="width: 86px; height: 86px; font-size: 2.3rem;">20</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Options Grid (4 Cards A, B, C, D) -->
-        <div class="qa-options-grid">
-          <!-- Option A (Red) -->
-          <div class="qa-option-card opt-a" id="pcard-0">
-            <div class="qa-option-icon">▲</div>
-            <div class="qa-option-label" id="ptext-0">Đáp án A</div>
-            <div class="qa-option-count" id="pcount-0" style="display: none;">0</div>
-          </div>
-
-          <!-- Option B (Blue) -->
-          <div class="qa-option-card opt-b" id="pcard-1">
-            <div class="qa-option-icon">◆</div>
-            <div class="qa-option-label" id="ptext-1">Đáp án B</div>
-            <div class="qa-option-count" id="pcount-1" style="display: none;">0</div>
-          </div>
-
-          <!-- Option C (Yellow) -->
-          <div class="qa-option-card opt-c" id="pcard-2">
-            <div class="qa-option-icon">●</div>
-            <div class="qa-option-label" id="ptext-2">Đáp án C</div>
-            <div class="qa-option-count" id="pcount-2" style="display: none;">0</div>
-          </div>
-
-          <!-- Option D (Green) -->
-          <div class="qa-option-card opt-d" id="pcard-3">
-            <div class="qa-option-icon">■</div>
-            <div class="qa-option-label" id="ptext-3">Đáp án D</div>
-            <div class="qa-option-count" id="pcount-3" style="display: none;">0</div>
-          </div>
-        </div>
-
-        <!-- Explanation Card (Shown on reveal) -->
-        <div class="qa-explanation-box" id="proj-qa-explanation-box" style="display: none; font-size: 1.25rem;">
-          <span style="font-size: 1.8rem;">💡</span>
-          <div id="proj-qa-explanation-text">Giải thích chi tiết...</div>
-        </div>
-
-        <!-- Wrong Answers Box (Hội Lạc Lối Trả Lời Sai) -->
-        <div class="qa-wrong-box glass-panel" id="proj-qa-wrong-box" style="display: none; margin-top: 12px; padding: 14px 20px; border: 1.5px solid rgba(244, 63, 94, 0.45); background: rgba(244, 63, 94, 0.12); border-radius: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div style="font-weight: 900; font-size: 1.25rem; color: #fca5a5; display: flex; align-items: center; gap: 8px;">
-              <span>😅</span> HỘI NHỮNG ĐỒNG ĐỘI "LẠC LỐI" (TRẢ LỜI SAI):
-            </div>
-            <span id="proj-qa-wrong-count-tag" style="background: var(--rose); color: white; font-weight: 900; font-size: 0.95rem; padding: 4px 14px; border-radius: 999px;">
-              0 người
-            </span>
-          </div>
-          <div id="proj-qa-wrong-grid" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 180px; overflow-y: auto;">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <!-- Progress Counter Bar -->
-        <div class="glass-panel" style="padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-          <div style="font-weight: 800; font-size: 1.15rem; color: var(--cyan);">
-            Đã trả lời: <span id="proj-qa-answered">0</span> / <span id="proj-qa-total">0</span> người
-          </div>
-          <div style="font-size: 0.95rem; color: var(--text-muted); font-style: italic;">
-            Hết thời gian hoặc MC bấm công bố, đáp án và danh sách người sai sẽ hiện ngay!
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= VIEW 4: LEADERBOARD ================= -->
-      <section id="view-leaderboard" class="glass-panel" style="display: none; height: 100%; flex-direction: column; padding: 28px 40px;">
-        <h2 style="font-size: 2.3rem; font-weight: 900; margin-bottom: 24px;" class="gold-gradient-text">
-          🏆 BẢNG XẾP HẠNG ĐIỂM SỐ
-        </h2>
-        <div style="flex: 1; overflow-y: auto;" id="proj-leaderboard-list">
-          <!-- Dynamically filled with top ranks -->
-        </div>
-      </section>
-
-      <!-- ================= VIEW 5: FINAL PODIUM ================= -->
-      <section id="view-podium" class="podium-container" style="display: none;">
-        <h1 style="font-size: 3.5rem; font-weight: 900; text-align: center;" class="gold-gradient-text">
-          👑 VINH DANH NHÀ VÔ ĐỊCH 👑
+        
+        <h1 class="proj-hero-title">
+          CHÚC MỪNG PHỤ NỮ PHÒNG TCKT
         </h1>
-        <p style="font-size: 1.35rem; color: var(--text-muted); margin-top: 8px;">
-          Đấu trường Trí Tuệ Team Building TCKT 2026
+        
+        <p style="font-size: 1.35rem; color: #fbcfe8; line-height: 1.6; font-weight: 600; margin-bottom: 24px;">
+          Tôn vinh <strong>32 đóa hoa</strong> tài sắc vẹn toàn, bản lĩnh và duyên dáng của Phòng Tài Chính Kế Toán. Chúc các chị em luôn ngập tràn niềm vui, xinh đẹp rực rỡ và luôn được yêu thương! 💖
         </p>
 
-        <div class="podium-stage">
-          <!-- 2nd Place -->
-          <div class="podium-pedestal">
-            <div class="podium-player-card">
-              <div class="podium-avatar" id="pod-avatar-2">🥈</div>
-              <div class="podium-name" id="pod-name-2">Người về nhì</div>
-              <div class="podium-score" id="pod-score-2">0 điểm</div>
-            </div>
-            <div class="pedestal-block pedestal-2">2</div>
+        <!-- 3 Feature Highlights -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <div class="glass-panel" style="padding: 18px; border-radius: 16px; border: 1px solid rgba(244, 63, 94, 0.3); text-align: center;">
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">💌</div>
+            <div style="font-weight: 800; font-size: 1rem; color: #fff;">Thiệp Riêng Biệt</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Từng lời chúc tâm huyết cho từng chị em</div>
           </div>
-
-          <!-- 1st Place (Champion) -->
-          <div class="podium-pedestal">
-            <div class="podium-player-card">
-              <div style="font-size: 3rem; animation: bounce 1.2s infinite;">👑</div>
-              <div class="podium-avatar" id="pod-avatar-1">🥇</div>
-              <div class="podium-name" style="font-size: 1.8rem; color: #fef08a;" id="pod-name-1">QUÁN QUÂN</div>
-              <div class="podium-score" style="font-size: 1.5rem;" id="pod-score-1">0 điểm</div>
-            </div>
-            <div class="pedestal-block pedestal-1">1</div>
+          <div class="glass-panel" style="padding: 18px; border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.3); text-align: center;">
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">🧋</div>
+            <div style="font-weight: 800; font-size: 1rem; color: #fef08a;">Yi He Tang 100%</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Tự do chọn món, size, đường, đá & topping</div>
           </div>
-
-          <!-- 3rd Place -->
-          <div class="podium-pedestal">
-            <div class="podium-player-card">
-              <div class="podium-avatar" id="pod-avatar-3">🥉</div>
-              <div class="podium-name" id="pod-name-3">Người về ba</div>
-              <div class="podium-score" id="pod-score-3">0 điểm</div>
-            </div>
-            <div class="pedestal-block pedestal-3">3</div>
+          <div class="glass-panel" style="padding: 18px; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.3); text-align: center;">
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">🎁</div>
+            <div style="font-weight: 800; font-size: 1rem; color: #6ee7b7;">Giao Tận Tay</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Món quà ngọt ngào chuyển đến bàn làm việc</div>
           </div>
         </div>
-      </section>
+      </div>
 
-    </main>
+      <!-- Right Column: Big QR Scan Box -->
+      <div class="proj-qr-box">
+        <h3 style="font-size: 1.25rem; font-weight: 900; color: #ffffff; margin-bottom: 8px;">
+          📲 QUÉT MÃ TRÊN ĐIỆN THOẠI
+        </h3>
+        <p style="font-size: 0.88rem; color: #fbcfe8; margin-bottom: 16px;">
+          Để mở thiệp chúc mừng & nhận 1 cốc trà sữa Yi He Tang:
+        </p>
 
-    <!-- ================= FULLSCREEN DRAMATIC SPOTLIGHT WINNER POPUP ================= -->
-    <div id="spotlight-modal" class="spotlight-overlay" style="display: none;">
-      <div class="spotlight-rays" id="spotlight-rays"></div>
-      <div class="spotlight-card" id="spotlight-card">
-        <div class="spotlight-crown" id="spotlight-crown">👑</div>
-        <div class="spotlight-badge" id="spotlight-badge">NHÂN VẬT ĐƯỢC GỌI TÊN NHIỀU NHẤT</div>
-        <div class="spotlight-name" id="spotlight-winner-name">HỒNG PHƯƠNG</div>
-        
-        <!-- Winner Zodiac & Con Giap Display Card -->
-        <div class="spotlight-zodiac-card" id="spotlight-zodiac-card" style="display: none;"></div>
+        <img id="proj-qr-img" src="" alt="Mã QR Tham Gia" style="width: 250px; height: 250px; border-radius: 16px; background: white; padding: 10px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom: 12px;">
 
-        <div class="spotlight-votes" id="spotlight-winner-votes">Đạt 28 / 35 phiếu bình chọn</div>
-        <div class="spotlight-punishment" id="spotlight-punishment">
-          Uống 1 chén danh dự khai tiệc! 🍻
+        <div id="proj-join-url" style="font-family: monospace; font-size: 1rem; font-weight: 800; color: #fef08a; word-break: break-all;">
+          Đang tạo đường link...
         </div>
-        <div class="spotlight-mc-voice" id="spotlight-mc-voice">
-          "Xin chúc mừng đồng chí có tên to nhất trên màn hình! Mời đồng chí đứng lên nhận chén rượu danh dự của người khai mở văn phòng!"
-        </div>
+      </div>
+
+    </div>
+
+    <!-- Live Activity Marquee Ticker -->
+    <div class="glass-panel" style="padding: 14px 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 16px; overflow: hidden;">
+      <span style="font-size: 1.4rem; flex-shrink: 0;">✨</span>
+      <strong style="color: #fef08a; font-size: 0.95rem; flex-shrink: 0;">Hoạt Động Trực Tiếp:</strong>
+      <div id="proj-ticker-content" style="color: #cbd5e1; font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        Chào mừng toàn thể chị em Phòng Tài Chính Kế Toán đến với chương trình 20/10! 🌸
       </div>
     </div>
 
@@ -350,9 +169,6 @@
 
   <!-- Scripts -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/audio.js"></script>
-  <script src="/js/confetti.js"></script>
-  <script src="/js/zodiac.js"></script>
   <script src="/js/projector.js"></script>
 </body>
 </html>

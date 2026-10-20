@@ -1,0 +1,179 @@
+{
+  "categories": [
+    {
+      "category": "Trà Sữa Nướng (Signature)",
+      "items": [
+        {
+          "id": "tra-sua-nuong",
+          "name": "Trà Sữa Nướng (Yi He Roasted)",
+          "badge": "Best Seller ⭐",
+          "desc": "Hương vị caramel nướng đặc trưng kết hợp hồng trà đậm vị và sữa béo ngậy.",
+          "icon": "🧋"
+        },
+        {
+          "id": "xanh-sua-nuong",
+          "name": "Xanh Sữa Nướng",
+          "badge": "Được Yêu Thích 💚",
+          "desc": "Sự hòa quyện tuyệt hảo giữa lục trà hoa lài thanh mát và caramel nướng ngọt ngào.",
+          "icon": "🍵"
+        },
+        {
+          "id": "tra-olong-do-sua",
+          "name": "Trà Ô Long Đỏ Sữa",
+          "badge": "Đậm Vị 👑",
+          "desc": "Trà ô long đỏ cao cấp dậy hương nồng nàn quyện cùng cốt sữa thanh béo.",
+          "icon": "🧋"
+        },
+        {
+          "id": "tra-sua-long-chau",
+          "name": "Trà Sữa Long Châu",
+          "badge": "Mới ✨",
+          "desc": "Trà sữa đậm đà hòa quyện cùng trân châu hoàng kim dai giòn sần sật.",
+          "icon": "🧋"
+        },
+        {
+          "id": "xanh-nhai-sua",
+          "name": "Xanh Nhài Sữa (Mạc Lệ Hoa)",
+          "badge": "Thanh Nhẹ 🌸",
+          "desc": "Vị trà xanh ướp hoa lài thanh khiết, thơm dịu, ít ngọt, chuẩn phong cách tao nhã.",
+          "icon": "🍵"
+        },
+        {
+          "id": "matcha-mochi",
+          "name": "Matcha Mochi Sữa Nướng",
+          "badge": "Hot Trend 🔥",
+          "desc": "Matcha Uji Nhật Bản kết hợp cùng lớp mochi dẻo béo ngậy và sữa nướng thơm lừng.",
+          "icon": "🍵"
+        }
+      ]
+    },
+    {
+      "category": "Trà Hoa Quả Tươi Mát",
+      "items": [
+        {
+          "id": "hoa-qua-son",
+          "name": "Hoa Quả Sơn Cực Phẩm (Xô 1000ml)",
+          "badge": "Signature Fruit 🍉",
+          "desc": "Siêu phẩm trà trái cây nhiệt đới tươi mát: Dưa hấu, quất, cam vàng, dứa và chanh leo.",
+          "icon": "🍹"
+        },
+        {
+          "id": "tra-nho-thach-vai",
+          "name": "Trà Nho Thạch Vải",
+          "badge": "Bestseller 🍇",
+          "desc": "Hương nho ngọt thanh kết hợp thạch vải giòn sựt sảng khoái đánh tan mệt mỏi.",
+          "icon": "🍇"
+        },
+        {
+          "id": "tra-xoai-chanh-day",
+          "name": "Trà Xoài Chanh Dây",
+          "badge": "Chua Ngọt 🥭",
+          "desc": "Xoài cát chín mọng ngọt dịu hòa cùng chanh leo chua thanh tươi mới.",
+          "icon": "🥭"
+        },
+        {
+          "id": "tra-dao-hong-dai",
+          "name": "Trà Đào Hồng Đài",
+          "badge": "Dịu Ngọt 🍑",
+          "desc": "Trà hoa quả đào hồng thơm ngát với từng miếng đào giòn ngọt tự nhiên.",
+          "icon": "🍑"
+        },
+        {
+          "id": "mac-le-tra-cam",
+          "name": "Mạc Lệ Trà Cam Vàng",
+          "badge": "Vitamin C 🍊",
+          "desc": "Lục trà nhài thượng hạng hòa cùng nước cốt cam vàng tươi nguyên chất.",
+          "icon": "🍊"
+        }
+      ]
+    },
+    {
+      "category": "Trà Kem Cheese (Macchiato)",
+      "items": [
+        {
+          "id": "tra-nho-kem-cheese",
+          "name": "Trà Nho Kem Cheese",
+          "badge": "Đỉnh Chóp 🧀",
+          "desc": "Nước ép nho tươi tím mộng mơ phủ lớp váng sữa phô mai mặn béo ngậy khó cưỡng.",
+          "icon": "🍇"
+        },
+        {
+          "id": "tra-xoai-kem-cheese",
+          "name": "Trà Xoài Kem Cheese",
+          "badge": "Yêu Thích 🥭",
+          "desc": "Xoài xay sánh mịn phủ lớp kem cheese bồng bềnh thơm nức.",
+          "icon": "🥭"
+        },
+        {
+          "id": "matcha-kem-cheese",
+          "name": "Matcha Nướng Kem Cheese",
+          "badge": "Béo Ngậy 🍵",
+          "desc": "Trà xanh nướng đậm vị kết hợp phô mai New Zealand sánh mịn ngọt dịu.",
+          "icon": "🍵"
+        }
+      ]
+    },
+    {
+      "category": "Sữa Tươi & Smoothie",
+      "items": [
+        {
+          "id": "sua-tuoi-tran-chau-duong-den",
+          "name": "Sữa Tươi Trân Châu Đường Đen",
+          "badge": "Kinh Điển 🧋",
+          "desc": "Sữa tươi thanh trùng Đà Lạt hòa cùng trân châu đường đen nóng dẻo thơm lừng.",
+          "icon": "🥛"
+        },
+        {
+          "id": "smoothie-wei-bo",
+          "name": "Smoothie Wei Bơ Sáp",
+          "badge": "Dưỡng Nhan 🥑",
+          "desc": "Bơ sáp tươi xay nhuyễn sánh mịn, thơm ngậy, đẹp da và giữ dáng chuẩn nàng thơ.",
+          "icon": "🥑"
+        },
+        {
+          "id": "bo-bo-dua",
+          "name": "Bơ Bơ Dừa Thơm Béo",
+          "badge": "Hấp Dẫn 🥥",
+          "desc": "Sự kết hợp ăn ý giữa bơ tươi và nước cốt dừa béo bùi sảng khoái.",
+          "icon": "🥥"
+        }
+      ]
+    }
+  ],
+  "options": {
+    "sizes": [
+      {
+        "id": "M",
+        "name": "Size M (Vừa)",
+        "desc": "Chuẩn vị"
+      },
+      {
+        "id": "L",
+        "name": "Size L (Lớn)",
+        "desc": "Thoải mái uống"
+      }
+    ],
+    "sugar": [
+      "100% (Chuẩn)",
+      "70%",
+      "50% (Vừa vặn)",
+      "30% (Ít ngọt)",
+      "0% (Không đường)"
+    ],
+    "ice": [
+      "100% (Chuẩn)",
+      "70%",
+      "50% (Ít đá)",
+      "Không đá",
+      "Uống nóng / Ấm"
+    ],
+    "toppings": [
+      "Trân châu hoàng kim",
+      "Trân châu trắng",
+      "Pudding trứng",
+      "Kem cheese (Macchiato)",
+      "Thạch dừa",
+      "Đậu đỏ"
+    ]
+  }
+}

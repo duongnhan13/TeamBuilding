@@ -45,6 +45,76 @@ const zodiacHelper = require('./public/js/zodiac.js');
 let squizzQuestions = loadJson('squizz_questions.json');
 let qaQuestions = loadJson('qa_questions.json');
 let membersList = loadJson('members.json');
+let yihetangMenu = loadJson('yihetang_menu.json', { categories: [], options: {} });
+let orders2010 = loadJson('orders_2010.json', {});
+
+function get2010Status() {
+  const members = membersList.map(m => {
+    const entry = orders2010[String(m.stt)] || orders2010[String(m.ms)] || {};
+    return {
+      stt: String(m.stt),
+      ms: String(m.ms || m.fingerprint || ''),
+      name: m.name || '',
+      role: m.role || '',
+      dob: m.dob || '',
+      avatar: m.avatar || '🌸',
+      wish: m.wish || '',
+      hasOpenedCard: !!entry.hasOpenedCard,
+      openedAt: entry.openedAt || null,
+      hasOrdered: !!entry.hasOrdered,
+      orderedAt: entry.orderedAt || null,
+      order: entry.order || null
+    };
+  });
+
+  const openedCount = members.filter(m => m.hasOpenedCard).length;
+  const orderedCount = members.filter(m => m.hasOrdered).length;
+  const unopenedCount = members.length - openedCount;
+
+  // Aggregate summary
+  const summaryMap = {};
+  members.forEach(m => {
+    if (m.hasOrdered && m.order) {
+      const o = m.order;
+      const key = o.drinkName || 'Món khác';
+      if (!summaryMap[key]) {
+        summaryMap[key] = {
+          drinkName: o.drinkName,
+          category: o.category || '',
+          totalCount: 0,
+          sizeM: 0,
+          sizeL: 0,
+          toppings: {},
+          notes: []
+        };
+      }
+      summaryMap[key].totalCount++;
+      if (o.size === 'L') summaryMap[key].sizeL++;
+      else summaryMap[key].sizeM++;
+
+      if (Array.isArray(o.toppings)) {
+        o.toppings.forEach(top => {
+          summaryMap[key].toppings[top] = (summaryMap[key].toppings[top] || 0) + 1;
+        });
+      }
+      if (o.note && o.note.trim()) {
+        summaryMap[key].notes.push(`${m.name}: ${o.note.trim()}`);
+      }
+    }
+  });
+
+  return {
+    members,
+    stats: {
+      totalMembers: members.length,
+      openedCount,
+      orderedCount,
+      unopenedCount
+    },
+    summary: summaryMap,
+    menu: yihetangMenu
+  };
+}
 
 // Get local IPv4 address
 function getLocalIp() {
@@ -147,38 +217,320 @@ app.post('/api/members/reload_excel', (req, res) => {
     }
     const wb = xlsx.readFile(excelPath);
     const sheetName = wb.SheetNames.includes('Danh sách tham gia') ? 'Danh sách tham gia' : wb.SheetNames[0];
-    const rows = xlsx.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1 });
-    const members = [];
-    for (let i = 1; i < rows.length; i++) {
-      const r = rows[i];
-      if (!r || !r[1]) continue;
-      const stt = String(r[0] || i);
-      const name = String(r[1]).trim();
-      const role = String(r[2] || '').trim();
-      const fp = String(r[3] !== undefined && r[3] !== null ? r[3] : '').trim();
-      let dob = '';
-      if (r[4]) {
-        if (typeof r[4] === 'number') {
-          const p = xlsx.SSF.parse_date_code(r[4]);
-          const dd = String(p.d).padStart(2, '0');
-          const mm = String(p.m).padStart(2, '0');
-          dob = `${dd}/${mm}/${p.y}`;
-        } else {
-          dob = String(r[4]).trim();
-        }
+    const sheet = wb.Sheets[sheetName];
+    const raw = xlsx.utils.sheet_to_json(sheet, { raw: false });
+
+    function formatDob(val) {
+      if (!val) return '';
+      const s = String(val).trim();
+      const parts = s.split(/[\/\-]/);
+      if (parts.length === 3) {
+        let [d, m, y] = parts;
+        if (d.length === 1) d = '0' + d;
+        if (m.length === 1) m = '0' + m;
+        if (y.length === 2) y = (parseInt(y, 10) > 30 ? '19' : '20') + y;
+        return d + '/' + m + '/' + y;
       }
-      members.push({ stt, name, role, fingerprint: fp, dob });
+      return s;
     }
+
+    const members = raw.map((r, i) => {
+      const name = (r['Họ và Tên'] || r['Họ và tên'] || r['name'] || '').trim();
+      const role = (r['Chức danh'] || r['role'] || '').trim();
+      let ms = r['Mã vân tay'] || r['Mã số'] || r['MS'] || r['ms'] ? String(r['Mã vân tay'] || r['Mã số'] || r['MS'] || r['ms']).trim() : '';
+      if (!ms && name.toLowerCase().includes('hồ quỳnh trang')) ms = '6248';
+      const dob = formatDob(r['Ngày tháng năm sinh'] || r['dob']);
+
+      const existing = membersList.find(m => m.name.toLowerCase() === name.toLowerCase() || String(m.ms) === String(ms));
+      return {
+        stt: String(i + 1),
+        ms: ms || String(i + 1),
+        fingerprint: ms || String(i + 1),
+        name: name || `Thành viên ${i + 1}`,
+        role: role,
+        dob: dob,
+        avatar: existing && existing.avatar ? existing.avatar : '🌸',
+        wish: existing && existing.wish ? existing.wish : `Chúc ${name} ngày 20/10 ngập tràn niềm vui, xinh đẹp, hạnh phúc và luôn thành công trong công việc!`
+      };
+    });
+
     if (members.length > 0) {
       membersList = members;
       saveJson('members.json', membersList);
       io.emit('members_updated', membersList);
+      io.emit('2010_update', get2010Status());
       return res.json({ success: true, count: membersList.length, members: membersList });
     }
     res.status(400).json({ error: 'Không tìm thấy dòng dữ liệu nào trong sheet' });
   } catch (err) {
     console.error('Error reloading excel:', err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// 20/10 GREETINGS & YIHETANG ORDER API
+// ==========================================
+app.get('/api/2010/status', (req, res) => {
+  res.json(get2010Status());
+});
+
+app.get('/api/2010/menu', (req, res) => {
+  res.json(yihetangMenu);
+});
+
+app.post('/api/2010/open-card', (req, res) => {
+  const { memberId, ms } = req.body;
+  const member = membersList.find(m => String(m.stt) === String(memberId) || (ms && String(m.ms) === String(ms)));
+  if (!member) {
+    return res.status(404).json({ error: 'Không tìm thấy thành viên trong danh sách' });
+  }
+
+  if (!orders2010[member.stt]) {
+    orders2010[member.stt] = {
+      memberId: member.stt,
+      ms: member.ms || member.fingerprint,
+      name: member.name,
+      role: member.role,
+      hasOpenedCard: false,
+      openedAt: null,
+      hasOrdered: false,
+      orderedAt: null,
+      order: null
+    };
+  }
+
+  if (!orders2010[member.stt].hasOpenedCard) {
+    orders2010[member.stt].hasOpenedCard = true;
+    orders2010[member.stt].openedAt = new Date().toISOString();
+    saveJson('orders_2010.json', orders2010);
+  }
+
+  const updatedStatus = get2010Status();
+  io.emit('2010_update', updatedStatus);
+  io.emit('2010_card_opened', {
+    memberId: member.stt,
+    ms: member.ms,
+    name: member.name,
+    role: member.role,
+    avatar: member.avatar,
+    openedAt: orders2010[member.stt].openedAt
+  });
+
+  res.json({
+    success: true,
+    member,
+    orderData: orders2010[member.stt]
+  });
+});
+
+app.post('/api/2010/order', (req, res) => {
+  const { memberId, ms, order } = req.body;
+  const member = membersList.find(m => String(m.stt) === String(memberId) || (ms && String(m.ms) === String(ms)));
+  if (!member) {
+    return res.status(404).json({ error: 'Không tìm thấy thành viên' });
+  }
+
+  if (!order || !order.drinkName) {
+    return res.status(400).json({ error: 'Vui lòng chọn món trà sữa hợp lệ' });
+  }
+
+  if (!orders2010[member.stt]) {
+    orders2010[member.stt] = {
+      memberId: member.stt,
+      ms: member.ms || member.fingerprint,
+      name: member.name,
+      role: member.role
+    };
+  }
+
+  orders2010[member.stt].hasOpenedCard = true;
+  if (!orders2010[member.stt].openedAt) {
+    orders2010[member.stt].openedAt = new Date().toISOString();
+  }
+  orders2010[member.stt].hasOrdered = true;
+  orders2010[member.stt].orderedAt = new Date().toISOString();
+  orders2010[member.stt].order = {
+    drinkId: order.drinkId || '',
+    drinkName: order.drinkName,
+    category: order.category || '',
+    size: order.size || 'M',
+    sugar: order.sugar || '100% (Chuẩn)',
+    ice: order.ice || '100% (Chuẩn)',
+    toppings: Array.isArray(order.toppings) ? order.toppings : [],
+    note: order.note ? String(order.note).trim() : ''
+  };
+
+  saveJson('orders_2010.json', orders2010);
+
+  const updatedStatus = get2010Status();
+  io.emit('2010_update', updatedStatus);
+  io.emit('2010_order_placed', {
+    memberId: member.stt,
+    ms: member.ms,
+    name: member.name,
+    role: member.role,
+    avatar: member.avatar,
+    order: orders2010[member.stt].order,
+    orderedAt: orders2010[member.stt].orderedAt
+  });
+
+  res.json({
+    success: true,
+    orderData: orders2010[member.stt]
+  });
+});
+
+app.post('/api/2010/reset-order', (req, res) => {
+  const { memberId } = req.body;
+  if (memberId && orders2010[String(memberId)]) {
+    orders2010[String(memberId)].hasOrdered = false;
+    orders2010[String(memberId)].order = null;
+    orders2010[String(memberId)].orderedAt = null;
+    saveJson('orders_2010.json', orders2010);
+    io.emit('2010_update', get2010Status());
+  }
+  res.json({ success: true });
+});
+
+app.get('/api/2010/export-excel', (req, res) => {
+  try {
+    const XLSX = require('xlsx');
+    const statusData = get2010Status();
+    const wb = XLSX.utils.book_new();
+
+    // Sheet 1: Chi tiết từng người
+    const detailHeaders = [
+      'STT',
+      'Mã số (MS)',
+      'Họ và Tên',
+      'Chức danh',
+      'Trạng thái',
+      'Món đã chọn',
+      'Size',
+      'Lượng đường',
+      'Lượng đá',
+      'Topping',
+      'Ghi chú',
+      'Thời gian mở thiệp',
+      'Thời gian đặt hàng'
+    ];
+
+    const detailRows = statusData.members.map(m => {
+      let statusStr = 'Chưa mở thiệp';
+      if (m.hasOrdered) statusStr = 'Đã đặt món';
+      else if (m.hasOpenedCard) statusStr = 'Đã mở thiệp';
+
+      const o = m.order || {};
+      const formatTime = (iso) => {
+        if (!iso) return '';
+        try {
+          const d = new Date(iso);
+          return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN');
+        } catch (e) {
+          return iso;
+        }
+      };
+
+      return [
+        m.stt,
+        m.ms,
+        m.name,
+        m.role,
+        statusStr,
+        o.drinkName || '',
+        o.size || '',
+        o.sugar || '',
+        o.ice || '',
+        Array.isArray(o.toppings) ? o.toppings.join(', ') : '',
+        o.note || '',
+        formatTime(m.openedAt),
+        formatTime(m.orderedAt)
+      ];
+    });
+
+    const ws1 = XLSX.utils.aoa_to_sheet([detailHeaders, ...detailRows]);
+    ws1['!cols'] = [
+      { wch: 6 },
+      { wch: 12 },
+      { wch: 26 },
+      { wch: 22 },
+      { wch: 16 },
+      { wch: 32 },
+      { wch: 8 },
+      { wch: 16 },
+      { wch: 16 },
+      { wch: 28 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 }
+    ];
+    XLSX.utils.book_append_sheet(wb, ws1, 'Chi tiết Order 20-10');
+
+    // Sheet 2: Tổng hợp gom đơn đặt quán
+    const summaryHeaders = [
+      'STT',
+      'Tên Món Trà Sữa Yi He Tang',
+      'Size M',
+      'Size L',
+      'Tổng Số Ly',
+      'Chi tiết Topping kèm theo',
+      'Ghi chú của thành viên'
+    ];
+
+    const summaryRows = [];
+    let idx = 1;
+    let grandTotal = 0;
+    let grandM = 0;
+    let grandL = 0;
+
+    for (const key in statusData.summary) {
+      const item = statusData.summary[key];
+      const topStr = Object.entries(item.toppings).map(([t, c]) => `${t} (x${c})`).join('; ');
+      const noteStr = item.notes.join(' | ');
+      summaryRows.push([
+        idx++,
+        item.drinkName,
+        item.sizeM,
+        item.sizeL,
+        item.totalCount,
+        topStr,
+        noteStr
+      ]);
+      grandTotal += item.totalCount;
+      grandM += item.sizeM;
+      grandL += item.sizeL;
+    }
+
+    summaryRows.push([
+      'TỔNG',
+      'TỔNG CỘNG TẤT CẢ CÁC MÓN',
+      grandM,
+      grandL,
+      grandTotal,
+      '',
+      ''
+    ]);
+
+    const ws2 = XLSX.utils.aoa_to_sheet([summaryHeaders, ...summaryRows]);
+    ws2['!cols'] = [
+      { wch: 6 },
+      { wch: 36 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 14 },
+      { wch: 40 },
+      { wch: 45 }
+    ];
+    XLSX.utils.book_append_sheet(wb, ws2, 'Tổng hợp Đặt Quán');
+
+    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="Danh_Sach_Order_Yihetang_2010_TCKT.xlsx"');
+    res.send(buffer);
+  } catch (err) {
+    console.error('Export error:', err);
+    res.status(500).json({ error: 'Lỗi xuất file excel: ' + err.message });
   }
 });
 
@@ -502,6 +854,86 @@ function getLeaderboard() {
 
 // SOCKET.IO LOGIC
 io.on('connection', (socket) => {
+  // 20/10 Handlers
+  socket.on('2010_join', () => {
+    socket.emit('2010_init', get2010Status());
+  });
+
+  socket.on('2010_open_card', ({ memberId, ms }) => {
+    const member = membersList.find(m => String(m.stt) === String(memberId) || (ms && String(m.ms) === String(ms)));
+    if (member) {
+      if (!orders2010[member.stt]) {
+        orders2010[member.stt] = {
+          memberId: member.stt,
+          ms: member.ms || member.fingerprint,
+          name: member.name,
+          role: member.role,
+          hasOpenedCard: false,
+          openedAt: null,
+          hasOrdered: false,
+          orderedAt: null,
+          order: null
+        };
+      }
+      if (!orders2010[member.stt].hasOpenedCard) {
+        orders2010[member.stt].hasOpenedCard = true;
+        orders2010[member.stt].openedAt = new Date().toISOString();
+        saveJson('orders_2010.json', orders2010);
+      }
+      const st = get2010Status();
+      io.emit('2010_update', st);
+      io.emit('2010_card_opened', {
+        memberId: member.stt,
+        ms: member.ms,
+        name: member.name,
+        role: member.role,
+        avatar: member.avatar,
+        openedAt: orders2010[member.stt].openedAt
+      });
+    }
+  });
+
+  socket.on('2010_submit_order', ({ memberId, ms, order }) => {
+    const member = membersList.find(m => String(m.stt) === String(memberId) || (ms && String(m.ms) === String(ms)));
+    if (member && order && order.drinkName) {
+      if (!orders2010[member.stt]) {
+        orders2010[member.stt] = {
+          memberId: member.stt,
+          ms: member.ms || member.fingerprint,
+          name: member.name,
+          role: member.role
+        };
+      }
+      orders2010[member.stt].hasOpenedCard = true;
+      if (!orders2010[member.stt].openedAt) orders2010[member.stt].openedAt = new Date().toISOString();
+      orders2010[member.stt].hasOrdered = true;
+      orders2010[member.stt].orderedAt = new Date().toISOString();
+      orders2010[member.stt].order = {
+        drinkId: order.drinkId || '',
+        drinkName: order.drinkName,
+        category: order.category || '',
+        size: order.size || 'M',
+        sugar: order.sugar || '100% (Chuẩn)',
+        ice: order.ice || '100% (Chuẩn)',
+        toppings: Array.isArray(order.toppings) ? order.toppings : [],
+        note: order.note ? String(order.note).trim() : ''
+      };
+      saveJson('orders_2010.json', orders2010);
+
+      const st = get2010Status();
+      io.emit('2010_update', st);
+      io.emit('2010_order_placed', {
+        memberId: member.stt,
+        ms: member.ms,
+        name: member.name,
+        role: member.role,
+        avatar: member.avatar,
+        order: orders2010[member.stt].order,
+        orderedAt: orders2010[member.stt].orderedAt
+      });
+    }
+  });
+
   // Biometric Fingerprint / Name Player Join
   socket.on('player_join', ({ id, nickname, memberId, fingerprint, dob, avatar }) => {
     let member = null;
@@ -690,12 +1122,14 @@ io.on('connection', (socket) => {
     socket.join('host');
     socket.join('projector');
     sendHostInit(socket);
+    socket.emit('2010_init', get2010Status());
   });
 
   socket.on('admin_join', () => {
     socket.join('host');
     socket.join('admin');
     sendHostInit(socket);
+    socket.emit('2010_init', get2010Status());
   });
 
   // Squizz Timer & Auto-Reveal

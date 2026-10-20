@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Team Building TCKT - Cổng Trò Chơi</title>
+  <title>Cổng 20/10 - BVĐK Phương Đông Phòng TCKT</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script>
+    // If mobile device, automatically redirect straight to the 20/10 Greeting Card & Order screen
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768) {
+      window.location.replace('/player.html');
+    }
+  </script>
   <style>
+    body {
+      background-color: #0f1026;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(244, 63, 94, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, rgba(136, 19, 55, 0.35) 0%, transparent 55%);
+      color: #ffffff;
+      min-height: 100vh;
+    }
     .portal-hero {
       text-align: center;
-      max-width: 800px;
+      max-width: 850px;
       margin: 40px auto 30px;
       padding: 0 20px;
-    }
-    .portal-title {
-      font-size: 3rem;
-      font-weight: 900;
-      line-height: 1.2;
-      margin-bottom: 12px;
-    }
-    .portal-subtitle {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      margin-bottom: 30px;
     }
     .portal-cards {
       display: grid;
@@ -41,109 +45,93 @@
       cursor: pointer;
       text-decoration: none;
       color: inherit;
+      border-radius: 24px;
     }
     .portal-card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 16px 40px rgba(99, 102, 241, 0.3);
-      border-color: var(--cyan);
+      box-shadow: 0 16px 40px rgba(244, 63, 94, 0.35);
+      border-color: #f43f5e;
     }
     .card-icon {
-      font-size: 4rem;
-      margin-bottom: 18px;
+      font-size: 3.8rem;
+      margin-bottom: 16px;
     }
     .card-name {
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       font-weight: 800;
       margin-bottom: 10px;
     }
     .card-desc {
-      color: var(--text-muted);
+      color: #cbd5e1;
       font-size: 0.95rem;
-      line-height: 1.5;
+      line-height: 1.55;
       margin-bottom: 24px;
-    }
-    .network-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid var(--emerald);
-      color: #6ee7b7;
-      padding: 6px 16px;
-      border-radius: 999px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-    @media (max-width: 768px) {
-      .portal-cards {
-        grid-template-columns: 1fr;
-      }
-      .portal-title {
-        font-size: 2.2rem;
-      }
     }
   </style>
 </head>
 <body>
   <div class="portal-hero">
-    <div class="network-badge" id="net-badge">
-      <span style="font-size: 1.2rem;">📡</span> Đang kết nối mạng nội bộ...
+    <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.4); color: #fecdd3; padding: 6px 18px; border-radius: 999px; font-size: 0.95rem; font-weight: 800; margin-bottom: 16px;">
+      <span>💐</span> BVĐK PHƯƠNG ĐÔNG • PHÒNG TÀI CHÍNH KẾ TOÁN
     </div>
-    <h1 class="portal-title">
-      🎪 TEAM BUILDING <span class="gold-gradient-text">PHÒNG KẾ TOÁN</span>
+    
+    <h1 style="font-size: 2.8rem; font-weight: 900; line-height: 1.25; margin-bottom: 14px;">
+      CHƯƠNG TRÌNH <span class="gold-gradient-text">20 THÁNG 10</span> 🌸
     </h1>
-    <p class="portal-subtitle">
-      Đấu trường tương tác thời gian thực dành cho 40+ người chơi: Bóc phốt vui nhộn & Đấu trí đỉnh cao!
+    
+    <p style="font-size: 1.2rem; color: #fbcfe8; font-weight: 600;">
+      Trao gửi thiệp chúc yêu thương & Tặng 1 cốc trà sữa Yi He Tang ngọt ngào dành riêng cho từng chị em! 🧋
     </p>
   </div>
 
   <div class="portal-cards">
-    <!-- Card 1: Projector Screen -->
-    <a href="/projector.html" class="glass-panel portal-card">
-      <div class="card-icon">🖥️</div>
-      <div class="card-name gradient-text">Màn Hình Trình Chiếu (Máy Chiếu / LED)</div>
+    <!-- Card 1: Mobile Player -->
+    <a href="/player.html" class="glass-panel portal-card" style="border: 1.5px solid rgba(244, 63, 94, 0.4);">
+      <div class="card-icon">📱</div>
+      <div class="card-name" style="color: #fecdd3;">Mở Thiệp Trên Điện Thoại</div>
       <p class="card-desc">
-        Dành riêng cho Màn hình lớn / Máy chiếu. Giao diện sạch sẽ 100%, không nút bấm quản trị, chữ to sắc nét, hiệu ứng bật Spotlight vinh danh hoành tráng và pháo hoa rực rỡ.
+        Dành cho toàn thể 32 chị em trong phòng. Nhập Mã số (MS) hoặc chọn tên để mở phong bao thiệp 20/10 riêng biệt và order 1 cốc trà sữa Yi He Tang theo sở thích.
       </p>
-      <button class="btn btn-primary" style="width: 100%; font-size: 1.05rem;">
-        MỞ MÀN HÌNH MÁY CHIẾU 🚀
+      <button class="btn" style="width: 100%; height: 48px; font-size: 1.05rem; font-weight: 900; background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; border-radius: 14px;">
+        VÀO MỞ THIỆP & ORDER 🧋
       </button>
     </a>
 
     <!-- Card 2: Admin Controller -->
-    <a href="/admin.html" class="glass-panel portal-card">
+    <a href="/admin.html" class="glass-panel portal-card" style="border: 1.5px solid rgba(245, 158, 11, 0.4);">
       <div class="card-icon">🎛️</div>
-      <div class="card-name gold-gradient-text">Bảng Điều Khiển Quản Lý (MC / Admin)</div>
+      <div class="card-name gold-gradient-text">Bảng Quản Lý Đơn Hàng (Admin)</div>
       <p class="card-desc">
-        Dành cho MC cầm iPad / điện thoại / laptop điều khiển: Kịch bản xướng tên MC đọc mic, hẹn giờ đếm ngược, chốt câu, theo dõi số phiếu trực tiếp và bảng âm thanh sân khấu.
+        Theo dõi trực tiếp ai đã mở thiệp nhận lời chúc, ai đã order trà sữa, tổng hợp gom đơn Yi He Tang theo món & size để gọi hotline, copy vào Zalo và xuất file Excel.
       </p>
-      <button class="btn btn-gold" style="width: 100%; font-size: 1.05rem;">
-        MỞ BẢNG ĐIỀU KHIỂN MC 🎙️
+      <button class="btn btn-gold" style="width: 100%; height: 48px; font-size: 1.05rem; font-weight: 900; border-radius: 14px;">
+        MỞ BẢNG QUẢN LÝ ADMIN 📊
       </button>
     </a>
 
-    <!-- Card 3: Mobile Player -->
-    <a href="/player.html" class="glass-panel portal-card">
-      <div class="card-icon">📱</div>
-      <div class="card-name" style="color: #6ee7b7; font-weight: 800;">Người Chơi (Điện Thoại)</div>
+    <!-- Card 3: Projector Screen -->
+    <a href="/projector.html" class="glass-panel portal-card" style="border: 1.5px solid rgba(16, 185, 129, 0.4);">
+      <div class="card-icon">🖥️</div>
+      <div class="card-name" style="color: #6ee7b7;">Màn Hình Trình Chiếu (TV / LED)</div>
       <p class="card-desc">
-        Dành cho toàn thể anh chị em tham gia bằng điện thoại (quét QR hoặc bấm link). Không giới hạn số lượng người chơi, cảm ứng cực nhạy, rung xúc giác và hiệu ứng cụng ly 100%.
+        Giao diện trình chiếu màn hình lớn / TV với hiệu ứng hoa hồng bay lãng mạn, mã QR to rõ để chị em quét điện thoại và bảng tin chúc mừng thời gian thực.
       </p>
-      <button class="btn btn-emerald" style="width: 100%; font-size: 1.05rem;">
-        VÀO CHƠI TRÊN ĐIỆN THOẠI 🎯
+      <button class="btn btn-emerald" style="width: 100%; height: 48px; font-size: 1.05rem; font-weight: 900; border-radius: 14px;">
+        MỞ MÀN HÌNH TRÌNH CHIẾU 🚀
       </button>
     </a>
   </div>
 
   <!-- QR Quick View Box -->
-  <div style="max-width: 500px; margin: 0 auto 50px; text-align: center;" class="glass-panel">
+  <div style="max-width: 460px; margin: 0 auto 60px; text-align: center;" class="glass-panel">
     <div style="padding: 24px;">
-      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px;">📲 Quét Mã QR Này Để Vào Chơi Nhanh:</h3>
-      <img id="portal-qr" src="" alt="Mã QR Tham Gia" style="width: 200px; height: 200px; border-radius: 12px; background: white; padding: 6px; margin-bottom: 12px; display: inline-block;">
-      <div id="join-url-text" style="font-family: monospace; color: var(--cyan); font-weight: 700; word-break: break-all;"></div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
-        💡 Điện thoại cần kết nối cùng mạng Wi-Fi với máy tính này để truy cập.
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; color: #fff;">
+        📲 Quét Mã QR Bằng Điện Thoại:
+      </h3>
+      <img id="portal-qr" src="" alt="Mã QR Tham Gia" style="width: 200px; height: 200px; border-radius: 14px; background: white; padding: 8px; margin-bottom: 12px; display: inline-block;">
+      <div id="join-url-text" style="font-family: monospace; color: #fef08a; font-weight: 700; word-break: break-all;"></div>
+      <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 8px;">
+        💡 Quét mã để vào ngay giao diện mở thiệp và order trà sữa trên điện thoại.
       </p>
     </div>
   </div>
@@ -152,15 +140,10 @@
     fetch('/api/info')
       .then(res => res.json())
       .then(data => {
-        document.getElementById('net-badge').innerHTML = `📡 Máy chủ nội bộ: <strong>http://${data.localIp}:${data.port}</strong>`;
-        if (data.qrCodeData) {
-          document.getElementById('portal-qr').src = data.qrCodeData;
-        }
-        document.getElementById('join-url-text').textContent = data.joinUrl;
+        if (data.qrCodeData) document.getElementById('portal-qr').src = data.qrCodeData;
+        if (data.joinUrl) document.getElementById('join-url-text').textContent = data.joinUrl;
       })
-      .catch(err => {
-        document.getElementById('net-badge').innerHTML = `⚠️ Đang chạy chế độ cục bộ (localhost)`;
-      });
+      .catch(console.error);
   </script>
 </body>
 </html>

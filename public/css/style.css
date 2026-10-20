@@ -1926,5 +1926,600 @@ body {
   50% { opacity: 0.65; transform: scale(0.97); }
 }
 
+/* ==========================================================================
+   20/10 CELEBRATION THEME & YI HE TANG ORDERING SYSTEM
+   ========================================================================== */
+
+:root {
+  --rose-deep: #be123c;
+  --rose-pink: #f43f5e;
+  --rose-light: #fda4af;
+  --rose-gold: linear-gradient(135deg, #fbcfe8 0%, #f472b6 50%, #db2777 100%);
+  --gold-luxury: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #b45309 100%);
+}
+
+/* Canvas for falling rose petals */
+#petals-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* 20/10 Portal & Card Containers */
+.container-2010 {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 16px;
+  position: relative;
+  z-index: 10;
+}
+
+.hero-banner-2010 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.hero-tag-2010 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(244, 63, 94, 0.2);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #fecdd3;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.2);
+}
+
+.title-2010 {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.25;
+  background: linear-gradient(135deg, #fff 0%, #fecdd3 50%, #f43f5e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+
+.subtitle-2010 {
+  font-size: 0.95rem;
+  color: #fbcfe8;
+  font-weight: 600;
+}
+
+/* 3D Interactive Envelope */
+.envelope-stage {
+  perspective: 1200px;
+  margin: 25px auto 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.envelope-wrapper {
+  position: relative;
+  width: 320px;
+  height: 220px;
+  background: linear-gradient(145deg, #9f1239, #881337);
+  border: 2px solid #fb7185;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(159, 18, 57, 0.5), 0 0 25px rgba(244, 63, 94, 0.3);
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+  user-select: none;
+}
+
+.envelope-wrapper:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 26px 50px rgba(159, 18, 57, 0.6), 0 0 35px rgba(244, 63, 94, 0.45);
+}
+
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 160px solid transparent;
+  border-right: 160px solid transparent;
+  border-top: 115px solid #be123c;
+  transform-origin: top;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+}
+
+.envelope-wrapper.open .envelope-flap {
+  transform: rotateX(180deg);
+  z-index: 1;
+}
+
+.wax-seal {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 58px;
+  height: 58px;
+  background: radial-gradient(circle, #f59e0b, #b45309);
+  border: 2px solid #fef08a;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  z-index: 6;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.envelope-wrapper.open .wax-seal {
+  transform: translateX(-50%) scale(0);
+  opacity: 0;
+}
+
+.envelope-tag {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #881337;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  border: 1px solid #fbcfe8;
+  z-index: 4;
+}
+
+/* Greeting Letter Card */
+.greeting-card-modal {
+  display: none;
+  background: linear-gradient(145deg, #fffdf8, #fff7ed);
+  color: #1e1b4b;
+  border-radius: 24px;
+  padding: 30px 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(244, 63, 94, 0.35);
+  border: 3px double #f43f5e;
+  position: relative;
+  margin-top: 15px;
+  animation: cardSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-emblem {
+  text-align: center;
+  font-size: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.card-recipient-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  padding: 6px 16px;
+  border-radius: 999px;
+  color: #be123c;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.card-header-title {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #9f1239;
+  text-align: center;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.card-recipient-name {
+  font-size: 1.65rem;
+  font-weight: 900;
+  text-align: center;
+  color: #be123c;
+  margin-bottom: 16px;
+  text-shadow: 0 1px 2px rgba(244, 63, 94, 0.15);
+}
+
+.card-wish-body {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #334155;
+  background: rgba(254, 242, 242, 0.6);
+  border-left: 4px solid #f43f5e;
+  padding: 18px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.card-footer-sign {
+  text-align: right;
+  font-weight: 800;
+  color: #881337;
+  font-size: 0.95rem;
+  margin-bottom: 22px;
+}
+
+/* Yi He Tang Menu Styling */
+.gift-invitation-box {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+}
+
+.menu-category-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 4px;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.menu-category-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-chip {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cat-chip.active, .cat-chip:hover {
+  background: linear-gradient(135deg, #f43f5e, #be123c);
+  border-color: #fda4af;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.35);
+}
+
+.drinks-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 540px) {
+  .drinks-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.drink-card {
+  background: rgba(30, 27, 75, 0.85);
+  border: 1.5px solid rgba(244, 63, 94, 0.25);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.drink-card:hover {
+  transform: translateY(-4px);
+  border-color: #f43f5e;
+  box-shadow: 0 12px 30px rgba(244, 63, 94, 0.3);
+}
+
+.drink-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.drink-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.drink-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.drink-badge {
+  display: inline-block;
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid var(--gold);
+  color: #fef08a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+.drink-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin: 8px 0 14px;
+  flex-grow: 1;
+}
+
+.btn-select-drink {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f43f5e, #be123c);
+  color: #fff;
+  border: none;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-select-drink:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+}
+
+/* Drink Customization Modal Drawer */
+.order-modal-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 99999;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.order-modal-sheet {
+  background: #1e1b4b;
+  border: 1.5px solid #f43f5e;
+  border-radius: 28px 28px 0 0;
+  width: 100%;
+  max-width: 580px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px 20px 30px;
+  box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.5);
+  animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheet-handle {
+  width: 48px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  margin: 0 auto 16px;
+}
+
+.opt-section-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #fbcfe8;
+  margin: 16px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-opt {
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: #e2e8f0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.pill-opt.selected {
+  background: rgba(244, 63, 94, 0.25);
+  border-color: #f43f5e;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.3);
+}
+
+.topping-checkbox-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: #e2e8f0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.topping-checkbox-chip.selected {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--emerald);
+  color: #6ee7b7;
+}
+
+/* Order Confirmed Receipt View */
+.receipt-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.08));
+  border: 2px solid var(--emerald);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  margin: 20px 0;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25);
+}
+
+.receipt-drink-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #6ee7b7;
+  margin: 10px 0;
+}
+
+.receipt-specs-box {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin: 14px 0;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Admin Dashboard Specifics */
+.admin-2010-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card-2010 {
+  background: rgba(26, 23, 56, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.stat-icon-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.stat-val-2010 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.stat-lbl-2010 {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.admin-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.badge-ordered {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--emerald);
+  color: #6ee7b7;
+}
+
+.badge-opened {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid var(--gold);
+  color: #fef08a;
+}
+
+.badge-unopened {
+  background: rgba(244, 63, 94, 0.2);
+  border: 1px solid var(--rose);
+  color: #fecdd3;
+}
+
+.summary-drink-group {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+
 
 

@@ -1,677 +1,146 @@
-// Projector Presentation View (Dedicated to Big Screen / Audience)
+/**
+ * 20/10 CELEBRATION PROJECTOR DISPLAY SCRIPT
+ * Bệnh viện ĐK Phương Đông • Phòng Tài Chính Kế Toán
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
   const socket = io();
 
-  let projState = {
-    mode: 'LOBBY',
-    players: [],
-    squizz: {
-      currentIndex: 0,
-      total: 12,
-      question: null,
-      timeLimit: 30,
-      timeRemaining: 30,
-      isRevealed: false
-    },
-    qa: {
-      currentIndex: 0,
-      total: 15,
-      question: null,
-      timeLimit: 15,
-      timeRemaining: 15
-    }
-  };
+  // DOM Elements
+  const canvasPetals = document.getElementById('petals-canvas');
+  const projOpenedCount = document.getElementById('proj-opened-count');
+  const projOrderedCount = document.getElementById('proj-ordered-count');
+  const projQrImg = document.getElementById('proj-qr-img');
+  const projJoinUrl = document.getElementById('proj-join-url');
+  const projTickerContent = document.getElementById('proj-ticker-content');
+  const btnFullscreen = document.getElementById('btn-fullscreen');
 
-  // Elements
-  const elPlayerCount = document.getElementById('proj-player-count');
-  const elLobbyReadyCount = document.getElementById('proj-lobby-ready-count');
-  const elLobbyTotalMembers = document.getElementById('proj-lobby-total-members');
-  const elPlayerGrid = document.getElementById('proj-player-grid');
-  const elEmptyHint = document.getElementById('empty-hint');
-  const elQrImg = document.getElementById('proj-qr-img');
-  const elJoinUrl = document.getElementById('proj-join-url');
-  const elNetStatus = document.getElementById('proj-net-status');
-  const elMissingBox = document.getElementById('proj-missing-box');
-  const elMissingCount = document.getElementById('proj-missing-count');
-  const elMissingGrid = document.getElementById('proj-missing-grid');
+  // 1. Falling Petals Canvas Engine
+  function initPetalsCanvas() {
+    if (!canvasPetals) return;
+    const ctx = canvasPetals.getContext('2d');
+    let width = (canvasPetals.width = window.innerWidth);
+    let height = (canvasPetals.height = window.innerHeight);
 
-  // Views
-  const views = {
-    lobby: document.getElementById('view-lobby'),
-    squizz: document.getElementById('view-squizz'),
-    qa: document.getElementById('view-qa'),
-    leaderboard: document.getElementById('view-leaderboard'),
-    podium: document.getElementById('view-podium')
-  };
-
-  function switchView(name) {
-    Object.keys(views).forEach(key => {
-      const v = views[key];
-      if (v) {
-        if (key === name) {
-          v.style.display = (key === 'lobby') ? 'grid' : 'flex';
-          v.classList.remove('view-transition');
-          void v.offsetWidth; // trigger reflow for smooth re-animation
-          v.classList.add('view-transition');
-        } else {
-          v.style.display = 'none';
-        }
-      }
+    window.addEventListener('resize', () => {
+      width = canvasPetals.width = window.innerWidth;
+      height = canvasPetals.height = window.innerHeight;
     });
+
+    const petalColors = ['#f43f5e', '#fb7185', '#fda4af', '#fbcfe8', '#fecdd3', '#e11d48', '#f59e0b'];
+    const petals = [];
+    const count = 48;
+
+    for (let i = 0; i < count; i++) {
+      petals.push({
+        x: Math.random() * width,
+        y: Math.random() * height - height,
+        size: Math.random() * 11 + 8,
+        color: petalColors[Math.floor(Math.random() * petalColors.length)],
+        speedY: Math.random() * 1.6 + 0.9,
+        speedX: Math.random() * 1.4 - 0.7,
+        angle: Math.random() * Math.PI * 2,
+        angularSpeed: (Math.random() - 0.5) * 0.03,
+        oscillationSpeed: Math.random() * 0.02 + 0.01
+      });
+    }
+
+    function renderPetals() {
+      ctx.clearRect(0, 0, width, height);
+
+      petals.forEach((p) => {
+        p.y += p.speedY;
+        p.x += Math.sin(p.y * p.oscillationSpeed) * 1.3 + p.speedX;
+        p.angle += p.angularSpeed;
+
+        if (p.y > height + 25) {
+          p.y = -25;
+          p.x = Math.random() * width;
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.size, p.size * 0.65, Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      requestAnimationFrame(renderPetals);
+    }
+
+    renderPetals();
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>'"]/g, tag => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[tag] || tag));
-  }
-
-  // Load Info
-  fetch('/api/info')
-    .then(r => r.json())
-    .then(data => {
-      if (data.qrCodeData) elQrImg.src = data.qrCodeData;
-      elJoinUrl.textContent = data.joinUrl;
-      if (data.isTunnel) {
-        elNetStatus.innerHTML = `🌐 <strong>ĐÃ NỐI CLOUDFLARE TOÀN CẦU</strong> (4G / 5G / Wi-Fi)`;
+  // 2. Fetch Network / QR Info
+  async function fetchInfo() {
+    try {
+      const res = await fetch('/api/info');
+      const data = await res.json();
+      if (projQrImg && data.qrCodeData) {
+        projQrImg.src = data.qrCodeData;
       }
-    })
-    .catch(console.error);
+      if (projJoinUrl && data.joinUrl) {
+        projJoinUrl.textContent = data.joinUrl;
+      }
+    } catch (e) {
+      console.error('Error fetching server info:', e);
+    }
+  }
 
-  // Connect as Projector
+  // 3. Socket Connection
   socket.on('connect', () => {
     socket.emit('projector_join');
+    socket.emit('2010_join');
   });
-  if (socket.connected) {
-    socket.emit('projector_join');
+
+  socket.on('2010_init', (data) => {
+    updateDisplay(data);
+  });
+
+  socket.on('2010_update', (data) => {
+    updateDisplay(data);
+  });
+
+  socket.on('2010_card_opened', (payload) => {
+    setTicker(`🌸 ${payload.name} (MS: ${payload.ms}) vừa mở thiệp nhận lời chúc 20/10! 💌`);
+  });
+
+  socket.on('2010_order_placed', (payload) => {
+    setTicker(`🧋 ${payload.name} (MS: ${payload.ms}) vừa đặt "${payload.order.drinkName}" (Size ${payload.order.size})! 🚀`);
+  });
+
+  function updateDisplay(data) {
+    if (!data || !data.stats) return;
+    if (projOpenedCount) projOpenedCount.textContent = data.stats.openedCount;
+    if (projOrderedCount) projOrderedCount.textContent = data.stats.orderedCount;
   }
 
-  socket.on('host_init', (data) => {
-    projState.mode = data.mode;
-    projState.players = data.players || [];
-    if (data.activation) {
-      projState.activation = data.activation;
-      updateMissingMembersList(data.activation);
-    }
-    updatePlayers();
-
-    if (data.mode === 'SQUIZZ' && data.squizz && data.squizz.question) {
-      renderSquizz(data.squizz.question, data.squizz.currentIndex, data.squizzQuestions.length, data.squizz.timeLimit);
-      projState.squizz.isRevealed = data.squizz.isRevealed;
-      if (data.squizz.isPaused && elSqTimerNum) elSqTimerNum.textContent = '⏸️';
-      if (data.squizz.isOpen === false) {
-        if (elSqLock) { elSqLock.textContent = '🔒 Đã chốt bình chọn'; elSqLock.style.color = 'var(--rose)'; }
-        if (elSqTimerNum) elSqTimerNum.textContent = '🔒';
-      }
-      if (data.squizz.tally) renderSquizzTally(data.squizz.tally, data.squizz.isRevealed);
-      if (data.squizz.isRevealed) showSpotlight(data.squizz.tally, data.squizz.question, data.squizz.tally.winner);
-      switchView('squizz');
-    } else if (data.mode === 'QA' && data.qa && data.qa.question) {
-      renderQa(data.qa.question, data.qa.currentIndex, data.qaQuestions.length, data.qa.timeLimit);
-      if (data.qa.isPaused && elQaTimerNum) elQaTimerNum.textContent = '⏸️';
-      if (data.qa.isOpen === false && elQaTimerNum) elQaTimerNum.textContent = '🔒';
-      switchView('qa');
-    } else if (data.mode === 'PODIUM') {
-      switchView('podium');
-    } else {
-      switchView('lobby');
-    }
-  });
-
-  socket.on('tunnel_ready', ({ joinUrl, qrCodeData }) => {
-    if (qrCodeData) elQrImg.src = qrCodeData;
-    if (joinUrl) elJoinUrl.textContent = joinUrl;
-    elNetStatus.innerHTML = `🌐 <strong>ĐÃ NỐI CLOUDFLARE TOÀN CẦU</strong> (4G / 5G / Wi-Fi)`;
-  });
-
-  socket.on('player_list_updated', ({ players, total, activation }) => {
-    projState.players = players;
-    if (activation) {
-      projState.activation = activation;
-      updateMissingMembersList(activation);
-    }
-    const currentTotal = (activation && activation.activatedCount !== undefined) ? activation.activatedCount : total;
-    if (elPlayerCount) elPlayerCount.textContent = currentTotal;
-    if (elLobbyReadyCount) elLobbyReadyCount.textContent = currentTotal;
-    updatePlayers();
-
-    const sqTotal = document.getElementById('proj-sq-total');
-    if (sqTotal) sqTotal.textContent = currentTotal;
-    const qaTotal = document.getElementById('proj-qa-total');
-    if (qaTotal) qaTotal.textContent = currentTotal;
-  });
-
-  socket.on('player_joined_toast', () => {
-    if (window.soundFX) window.soundFX.playJoin();
-  });
-
-  function updateMissingMembersList(activation) {
-    if (!activation) return;
-    if (elLobbyTotalMembers) elLobbyTotalMembers.textContent = activation.totalMembers;
-    if (elLobbyReadyCount) elLobbyReadyCount.textContent = activation.activatedCount;
-    if (elMissingCount) elMissingCount.textContent = activation.missingCount;
-
-    if (!elMissingGrid) return;
-    elMissingGrid.innerHTML = '';
-
-    if (activation.missingCount === 0) {
-      elMissingGrid.innerHTML = `
-        <div class="all-checked-in-banner" style="width: 100%;">
-          🎉 TOÀN THỂ ${activation.totalMembers} CÁN BỘ NHÂN VIÊN PHÒNG TCKT ĐÃ ĐIỂM DANH ĐÔNG ĐỦ! SẴN SÀNG KHỞI TRANH! 🚀
-        </div>
-      `;
-      return;
-    }
-
-    activation.missingMembers.forEach(m => {
-      const chip = document.createElement('div');
-      chip.className = 'missing-chip';
-      chip.innerHTML = `<span class="chip-stt">#${m.stt}</span> <span>${escapeHtml(m.name)}</span>`;
-      elMissingGrid.appendChild(chip);
-    });
+  function setTicker(msg) {
+    if (!projTickerContent) return;
+    projTickerContent.style.opacity = '0';
+    setTimeout(() => {
+      projTickerContent.textContent = msg;
+      projTickerContent.style.opacity = '1';
+      projTickerContent.style.transition = 'opacity 0.4s ease';
+    }, 200);
   }
 
-  function updatePlayers() {
-    if (!elPlayerGrid) return;
-    elPlayerGrid.innerHTML = '';
-    
-    // Luôn ưu tiên dùng danh sách thành viên đã kích hoạt/vào tiệc để số lượng và chip hiển thị khớp 100%
-    const list = (projState.activation && projState.activation.activatedMembers && projState.activation.activatedMembers.length > 0)
-      ? projState.activation.activatedMembers
-      : projState.players;
-
-    if (list.length === 0) {
-      if (elEmptyHint) elPlayerGrid.appendChild(elEmptyHint);
-      return;
-    }
-    list.forEach(p => {
-      const chip = document.createElement('div');
-      const isAway = p.connected === false;
-      chip.className = 'player-chip' + (isAway ? ' away' : '');
-      const zodiacText = (p.zodiacInfo && p.zodiacInfo.sign) ? ` <span style="font-size: 0.82rem; opacity: 0.9;">(${p.zodiacInfo.sign.icon})</span>` : '';
-      chip.innerHTML = `<span class="avatar">${p.avatar || '😎'}</span> <span>${escapeHtml(p.name || p.nickname)}${zodiacText}</span>`;
-      elPlayerGrid.appendChild(chip);
-    });
-  }
-
-  // --- SQUIZZ PRESENTATION ---
-  const elSqIndex = document.getElementById('proj-sq-index');
-  const elSqTitle = document.getElementById('proj-sq-title');
-  const elSqText = document.getElementById('proj-sq-text');
-  const elSqTarget = document.getElementById('proj-sq-target');
-  const elSqTallyList = document.getElementById('proj-sq-tally-list');
-  const elSqWordwall = document.getElementById('proj-sq-wordwall');
-  const elSqMysteryBadge = document.getElementById('proj-sq-mystery-badge');
-  const elSqVoted = document.getElementById('proj-sq-voted');
-  const elSqLock = document.getElementById('proj-sq-lock-status');
-  const elSqTimerCard = document.getElementById('proj-sq-timer-card');
-  const elSqTimerNum = document.getElementById('proj-sq-timer-num');
-
-  // Spotlight Elements
-  const spotlightModal = document.getElementById('spotlight-modal');
-  const spotlightCrown = document.getElementById('spotlight-crown');
-  const spotlightBadge = document.getElementById('spotlight-badge');
-  const spotWinnerName = document.getElementById('spotlight-winner-name');
-  const spotWinnerRole = document.getElementById('spotlight-winner-role');
-  const spotZodiacCard = document.getElementById('spotlight-zodiac-card');
-  const spotWinnerVotes = document.getElementById('spotlight-winner-votes');
-  const spotPunishment = document.getElementById('spotlight-punishment');
-  const spotMcVoice = document.getElementById('spotlight-mc-voice');
-
-  function renderSquizz(q, index, total, timeLimit) {
-    projState.squizz.currentIndex = index;
-    projState.squizz.question = q;
-    projState.squizz.timeLimit = timeLimit || 30;
-    projState.squizz.timeRemaining = projState.squizz.timeLimit;
-    projState.squizz.isRevealed = false;
-
-    elSqIndex.textContent = `CÂU ${index + 1} / ${total || 12}`;
-    elSqTitle.textContent = `${q.icon || '🎯'} ${q.title || `Câu hỏi ${index + 1}`}`;
-    elSqText.textContent = q.question;
-    elSqTarget.textContent = `🎯 Mục tiêu: ${q.target || 'Bình chọn vui nhộn'}`;
-    elSqVoted.textContent = '0';
-    elSqLock.textContent = '● Đang mở bình chọn';
-    elSqLock.style.color = 'var(--emerald)';
-
-    if (projState.squizz.timeLimit > 0) {
-      elSqTimerCard.style.display = 'flex';
-      elSqTimerNum.textContent = projState.squizz.timeRemaining;
-    } else {
-      elSqTimerCard.style.display = 'none';
-    }
-
-    spotlightModal.style.display = 'none';
-
-    if (q.type === 'OPEN_TEXT') {
-      if (elSqTallyList) elSqTallyList.style.display = 'none';
-      if (elSqWordwall) {
-        elSqWordwall.style.display = 'grid';
-        elSqWordwall.innerHTML = `
-          <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem; grid-column: 1 / -1;">
-            Đang chờ anh em gửi câu trả lời từ điện thoại...
-          </div>
-        `;
-      }
-      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'none';
-    } else {
-      if (elSqTallyList) {
-        elSqTallyList.style.display = 'flex';
-        elSqTallyList.innerHTML = `
-          <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
-            Đang chờ anh em gửi tên bình chọn từ điện thoại...
-          </div>
-        `;
-      }
-      if (elSqWordwall) elSqWordwall.style.display = 'none';
-      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'inline-flex';
-    }
-  }
-
-  function renderSquizzTally(tally, isRevealed = false) {
-    if (!tally) return;
-    elSqVoted.textContent = tally.totalVotes;
-
-    const isText = (projState.squizz.question && projState.squizz.question.type === 'OPEN_TEXT') || tally.isTextQuestion;
-
-    if (isText) {
-      // Render Word Wall
-      if (elSqTallyList) elSqTallyList.style.display = 'none';
-      if (elSqWordwall) {
-        elSqWordwall.style.display = 'grid';
-        if (!tally.responses || tally.responses.length === 0) {
-          elSqWordwall.innerHTML = `
-            <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem; grid-column: 1 / -1;">
-              Đang chờ anh em gửi câu trả lời từ điện thoại...
-            </div>
-          `;
-          return;
-        }
-
-        elSqWordwall.innerHTML = '';
-        tally.responses.forEach(resp => {
-          const card = document.createElement('div');
-          card.className = 'open-text-card';
-          card.innerHTML = `
-            <div class="open-text-content">"${escapeHtml(resp.text)}"</div>
-            <div class="open-text-author">
-              <span>${resp.avatar || '😎'}</span>
-              <span>${escapeHtml(resp.voter || 'Đồng nghiệp')}</span>
-            </div>
-          `;
-          elSqWordwall.appendChild(card);
-        });
-      }
-      return;
-    }
-
-    // Render Member Vote Bar Chart
-    if (elSqWordwall) elSqWordwall.style.display = 'none';
-    if (!elSqTallyList) return;
-    elSqTallyList.style.display = 'flex';
-
-    if (!tally.tallyList || tally.tallyList.length === 0) {
-      elSqTallyList.innerHTML = `
-        <div style="color: var(--text-muted); font-style: italic; margin: auto; text-align: center; padding: 40px; font-size: 1.1rem;">
-          Đang chờ anh em gửi tên bình chọn từ điện thoại...
-        </div>
-      `;
-      return;
-    }
-
-    const maxVotes = tally.tallyList[0].count || 1;
-    elSqTallyList.innerHTML = '';
-
-    // Mystery blur mode: during active voting, only show top 4-5 with blurred names!
-    const displayList = (!isRevealed) ? tally.tallyList.slice(0, 5) : tally.tallyList;
-
-    if (!isRevealed) {
-      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'inline-flex';
-    } else {
-      if (elSqMysteryBadge) elSqMysteryBadge.style.display = 'none';
-    }
-
-    displayList.forEach((item, idx) => {
-      const pct = Math.max(12, Math.round((item.count / maxVotes) * 100));
-      const row = document.createElement('div');
-      row.className = 'tally-item';
-
-      const blurClass = !isRevealed ? 'mystery-blur-name' : 'mystery-unblurred';
-
-      row.innerHTML = `
-        <div class="tally-bar" style="width: ${pct}%"></div>
-        <div class="tally-content">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="color: var(--cyan); font-weight: 900; font-size: 1.35rem; min-width: 36px; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);">#${idx + 1}</span>
-            <span class="${blurClass}" style="font-size: 1.35rem; font-weight: 800; letter-spacing: 0.5px;">${escapeHtml(item.name)}</span>
-          </div>
-          <div class="tally-votes" style="font-size: 1.4rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);">${item.count} phiếu</div>
-        </div>
-      `;
-      elSqTallyList.appendChild(row);
-    });
-  }
-
-  function showSpotlight(tally, question, winner, winnerDetails) {
-    const theme = (question && question.effectTheme) ? question.effectTheme : 'royal-gold';
-
-    // Apply question-specific theme class
-    spotlightModal.className = `spotlight-overlay theme-${theme}`;
-
-    if (window.soundFX) {
-      window.soundFX.playTheme(theme);
-    }
-    if (window.burstCannons) window.burstCannons();
-
-    // Crown / Theme Icon
-    if (spotlightCrown) {
-      spotlightCrown.textContent = (question && question.icon) ? question.icon : '👑';
-    }
-
-    // Title / Badge
-    if (spotlightBadge) {
-      spotlightBadge.textContent = (question && question.title) ? question.title.toUpperCase() : 'NHÂN VẬT ĐƯỢC GỌI TÊN NHIỀU NHẤT';
-    }
-
-    if (winner) {
-      spotWinnerName.textContent = winner.name.toUpperCase();
-      spotWinnerVotes.textContent = `Đạt ${winner.count} / ${tally.totalVotes} phiếu bình chọn (${Math.round((winner.count / (tally.totalVotes || 1)) * 100)}%)`;
-    } else {
-      spotWinnerName.textContent = 'CHƯA CÓ BÌNH CHỌN';
-      spotWinnerVotes.textContent = '0 phiếu';
-    }
-
-
-
-    // Zodiac & Con Giap Display
-    if (spotZodiacCard) {
-      if (winnerDetails && winnerDetails.zodiac && window.zodiacHelper) {
-        spotZodiacCard.innerHTML = window.zodiacHelper.generateZodiacBadgesHtml(winnerDetails.zodiac, 'normal');
-        spotZodiacCard.style.display = 'flex';
-      } else {
-        spotZodiacCard.style.display = 'none';
-      }
-    }
-
-    spotPunishment.textContent = (question && question.punishment) ? question.punishment : 'Uống 1 chén danh dự khai tiệc! 🍻';
-    spotMcVoice.textContent = (question && question.mcVoice) ? `"${question.mcVoice}"` : '"Xin chúc mừng đồng chí được gọi tên nhiều nhất!"';
-
-    spotlightModal.style.display = 'flex';
-  }
-
-  socket.on('squizz_question_started', ({ currentIndex, total, timeLimit, question }) => {
-    switchView('squizz');
-    renderSquizz(question, currentIndex, total, timeLimit);
-    if (window.soundFX) window.soundFX.playJoin();
-  });
-
-  socket.on('squizz_timer_tick', ({ timeRemaining, isPaused }) => {
-    projState.squizz.timeRemaining = timeRemaining;
-    if (isPaused) {
-      elSqTimerNum.textContent = '⏸️';
-    } else {
-      elSqTimerNum.textContent = timeRemaining;
-    }
-    if (window.soundFX && !isPaused) {
-      if (timeRemaining <= 5 && timeRemaining > 0) window.soundFX.playUrgentTick();
-      else window.soundFX.playTick();
-    }
-  });
-
-  socket.on('squizz_timer_paused', ({ isPaused, timeRemaining }) => {
-    if (elSqTimerNum) {
-      elSqTimerNum.textContent = isPaused ? '⏸️' : (timeRemaining !== undefined ? timeRemaining : projState.squizz.timeRemaining);
-    }
-  });
-
-  socket.on('squizz_live_update', ({ tally, totalVotes, totalPlayers }) => {
-    renderSquizzTally(tally, projState.squizz.isRevealed);
-    elSqVoted.textContent = totalVotes;
-    const totalEl = document.getElementById('proj-sq-total');
-    if (totalEl) totalEl.textContent = totalPlayers;
-  });
-
-  socket.on('squizz_lock_changed', ({ isOpen }) => {
-    if (isOpen) {
-      elSqLock.textContent = '● Đang mở bình chọn';
-      elSqLock.style.color = 'var(--emerald)';
-    } else {
-      elSqLock.textContent = '🔒 Đã chốt bình chọn';
-      elSqLock.style.color = 'var(--rose)';
-      if (elSqTimerNum) elSqTimerNum.textContent = '🔒';
-    }
-  });
-
-  socket.on('squizz_revealed', ({ tally, question, winner, winnerDetails }) => {
-    projState.squizz.isRevealed = true;
-    renderSquizzTally(tally, true);
-    showSpotlight(tally, question, winner, winnerDetails);
-  });
-
-  // Click on spotlight to dismiss
-  spotlightModal.addEventListener('click', () => {
-    spotlightModal.style.display = 'none';
-  });
-
-  // --- QA PRESENTATION ---
-  const elQaCat = document.getElementById('proj-qa-cat');
-  const elQaIndex = document.getElementById('proj-qa-index');
-  const elQaText = document.getElementById('proj-qa-text');
-  const elQaTimerNum = document.getElementById('proj-qa-timer-num');
-  const elQaTimerRing = document.getElementById('proj-qa-timer-ring');
-  const elQaAnswered = document.getElementById('proj-qa-answered');
-  const elQaExplanationBox = document.getElementById('proj-qa-explanation-box');
-  const elQaExplanationText = document.getElementById('proj-qa-explanation-text');
-
-  const elQaWrongBox = document.getElementById('proj-qa-wrong-box');
-  const elQaWrongGrid = document.getElementById('proj-qa-wrong-grid');
-  const elQaWrongCount = document.getElementById('proj-qa-wrong-count-tag');
-
-  function renderQa(q, index, total, timeLimit) {
-    projState.qa.currentIndex = index;
-    projState.qa.question = q;
-    projState.qa.timeLimit = timeLimit || 15;
-    projState.qa.timeRemaining = projState.qa.timeLimit;
-
-    elQaCat.textContent = `${q.icon || '⚔️'} ${q.category || 'Đố vui'}`;
-    elQaIndex.textContent = `CÂU ${index + 1} / ${total || 15}`;
-    elQaText.textContent = q.question;
-    elQaTimerNum.textContent = projState.qa.timeRemaining;
-    elQaTimerRing.style.background = `conic-gradient(var(--cyan) 100%, transparent 0)`;
-    elQaAnswered.textContent = '0';
-    elQaExplanationBox.style.display = 'none';
-    if (elQaWrongBox) elQaWrongBox.style.display = 'none';
-    if (elQaWrongGrid) elQaWrongGrid.innerHTML = '';
-
-    for (let i = 0; i < 4; i++) {
-      const card = document.getElementById(`pcard-${i}`);
-      const text = document.getElementById(`ptext-${i}`);
-      const count = document.getElementById(`pcount-${i}`);
-      if (card && text) {
-        card.classList.remove('correct-answer', 'dimmed');
-        text.textContent = (q.options && q.options[i]) ? q.options[i] : '';
-        count.style.display = 'none';
-        count.textContent = '0';
-      }
-    }
-  }
-
-  socket.on('qa_question_started', ({ currentIndex, total, timeLimit, question }) => {
-    switchView('qa');
-    renderQa(question, currentIndex, total, timeLimit);
-    if (window.soundFX) window.soundFX.playJoin();
-  });
-
-  socket.on('qa_timer_tick', ({ timeRemaining, isPaused }) => {
-    projState.qa.timeRemaining = timeRemaining;
-    if (isPaused) {
-      elQaTimerNum.textContent = '⏸️';
-    } else {
-      elQaTimerNum.textContent = timeRemaining;
-    }
-    const fraction = Math.max(0, timeRemaining / projState.qa.timeLimit);
-    const degrees = Math.round(fraction * 360);
-    elQaTimerRing.style.background = `conic-gradient(${timeRemaining <= 5 ? 'var(--rose)' : 'var(--cyan)'} ${degrees}deg, transparent 0)`;
-
-    if (window.soundFX && !isPaused) {
-      if (timeRemaining <= 5 && timeRemaining > 0) window.soundFX.playUrgentTick();
-      else window.soundFX.playTick();
-    }
-  });
-
-  socket.on('qa_timer_paused', ({ isPaused, timeRemaining }) => {
-    if (elQaTimerNum) {
-      elQaTimerNum.textContent = isPaused ? '⏸️' : timeRemaining;
-    }
-  });
-
-  socket.on('qa_lock_changed', ({ isOpen }) => {
-    if (!isOpen && elQaTimerNum) {
-      elQaTimerNum.textContent = '🔒';
-    }
-  });
-
-  socket.on('qa_time_up', () => {
-    elQaTimerNum.textContent = '0';
-    if (window.soundFX) window.soundFX.playBuzzer();
-  });
-
-  socket.on('qa_live_update', ({ stats, totalAnswered, totalPlayers }) => {
-    elQaAnswered.textContent = totalAnswered;
-    const qaTotal = document.getElementById('proj-qa-total');
-    if (qaTotal) qaTotal.textContent = totalPlayers;
-  });
-
-  socket.on('qa_revealed', ({ correctAnswer, explanation, stats, wrongAnswers, leaderboard }) => {
-    if (window.soundFX) window.soundFX.playCorrect();
-    if (window.fireConfetti) window.fireConfetti({ count: 60 });
-
-    for (let i = 0; i < 4; i++) {
-      const card = document.getElementById(`pcard-${i}`);
-      const count = document.getElementById(`pcount-${i}`);
-      if (card && count) {
-        count.style.display = 'inline-block';
-        count.textContent = `${stats.optionCounts[i] || 0} người`;
-        if (i === correctAnswer) {
-          card.classList.add('correct-answer');
-        } else {
-          card.classList.add('dimmed');
-        }
-      }
-    }
-
-    if (explanation) {
-      elQaExplanationText.textContent = explanation;
-      elQaExplanationBox.style.display = 'flex';
-    }
-
-    // Hiển thị danh sách Hội người trả lời sai (Lạc lối)
-    if (elQaWrongBox && elQaWrongGrid) {
-      elQaWrongGrid.innerHTML = '';
-      if (wrongAnswers && wrongAnswers.length > 0) {
-        if (elQaWrongCount) {
-          elQaWrongCount.textContent = `${wrongAnswers.length} người`;
-          elQaWrongCount.style.background = 'var(--rose)';
-        }
-        wrongAnswers.forEach(w => {
-          const chip = document.createElement('div');
-          chip.style.cssText = 'background: rgba(244, 63, 94, 0.25); border: 1.5px solid var(--rose); color: #ffe4e6; padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; animation: popIn 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3);';
-          chip.innerHTML = `<span style="font-size: 1.25rem;">${w.avatar || '😅'}</span> <span>${escapeHtml(w.name)}</span> <span style="color: #fecdd3; font-size: 0.85rem; background: rgba(0,0,0,0.45); padding: 2px 8px; border-radius: 6px;">Chọn ${w.optionLetter}</span>`;
-          elQaWrongGrid.appendChild(chip);
-        });
-        elQaWrongBox.style.display = 'block';
-        if (window.soundFX) window.soundFX.playWrong();
-      } else {
-        if (elQaWrongCount) {
-          elQaWrongCount.textContent = '0 người';
-          elQaWrongCount.style.background = 'var(--emerald)';
-        }
-        elQaWrongGrid.innerHTML = `<div style="color: #6ee7b7; font-weight: 800; font-size: 1.15rem; padding: 10px 0;">🎉 KỲ TÍCH! 100% CẢ PHÒNG ĐỀU TRẢ LỜI ĐÚNG! KHÔNG AI BỊ PHẠT 🍻</div>`;
-        elQaWrongBox.style.display = 'block';
-      }
-    }
-  });
-
-  socket.on('qa_display_changed', ({ displayMode }) => {
-    if (displayMode === 'LEADERBOARD') {
-      switchView('leaderboard');
-    } else {
-      switchView('qa');
-    }
-  });
-
-  // Leaderboard & Podium
-  socket.on('game_mode_changed', ({ mode }) => {
-    projState.mode = mode;
-    if (mode === 'LOBBY') switchView('lobby');
-    if (mode === 'PODIUM') switchView('podium');
-  });
-
-  socket.on('podium_celebration', ({ leaderboard, top3 }) => {
-    switchView('podium');
-    if (window.soundFX) window.soundFX.playCheer();
-    if (window.burstCannons) window.burstCannons();
-
-    if (top3[0]) {
-      document.getElementById('pod-avatar-1').textContent = top3[0].avatar;
-      document.getElementById('pod-name-1').textContent = top3[0].nickname.toUpperCase();
-      document.getElementById('pod-score-1').textContent = `${top3[0].score.toLocaleString()} điểm`;
-    }
-    if (top3[1]) {
-      document.getElementById('pod-avatar-2').textContent = top3[1].avatar;
-      document.getElementById('pod-name-2').textContent = top3[1].nickname;
-      document.getElementById('pod-score-2').textContent = `${top3[1].score.toLocaleString()} điểm`;
-    }
-    if (top3[2]) {
-      document.getElementById('pod-avatar-3').textContent = top3[2].avatar;
-      document.getElementById('pod-name-3').textContent = top3[2].nickname;
-      document.getElementById('pod-score-3').textContent = `${top3[2].score.toLocaleString()} điểm`;
-    }
-
-    // Periodic fireworks on podium
-    const interval = setInterval(() => {
-      if (views.podium.style.display !== 'none') {
-        if (window.fireConfetti) window.fireConfetti();
-      } else {
-        clearInterval(interval);
-      }
-    }, 2500);
-  });
-
-  // Cheer / Toast everywhere
-  socket.on('party_cheer', () => {
-    if (window.burstCannons) window.burstCannons();
-    if (window.soundFX) window.soundFX.playGlassClink();
-  });
-
-  // Sound toggle
-  const btnSound = document.getElementById('btn-sound-toggle');
-  btnSound.addEventListener('click', () => {
-    if (window.soundFX) {
-      const isMuted = window.soundFX.toggleMute();
-      btnSound.textContent = isMuted ? '🔇' : '🔊';
-      btnSound.style.opacity = isMuted ? '0.6' : '1';
-    }
-  });
-
-  // Fullscreen toggle
-  const btnFullscreen = document.getElementById('btn-fullscreen');
-  btnFullscreen.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(console.error);
-    } else {
-      document.exitFullscreen().catch(console.error);
-    }
-  });
-
-  // Double click anywhere on screen toggles fullscreen
-  document.addEventListener('dblclick', (e) => {
-    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+  // 4. Fullscreen Button
+  if (btnFullscreen) {
+    btnFullscreen.addEventListener('click', () => {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(console.error);
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
       } else {
-        document.exitFullscreen().catch(console.error);
+        document.exitFullscreen().catch(err => console.log(err));
       }
-    }
-  });
+    });
+  }
+
+  // Initialize
+  initPetalsCanvas();
+  fetchInfo();
 });

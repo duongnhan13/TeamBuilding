@@ -1,331 +1,322 @@
 [
   {
     "stt": "1",
+    "ms": "6",
+    "fingerprint": "6",
     "name": "Nguyễn Thị Thùy Dung",
     "role": "Trưởng phòng",
-    "fingerprint": "6",
-    "dob": "26/09/1992"
+    "dob": "26/09/1992",
+    "avatar": "👑",
+    "wish": "Thân gửi Chị Thùy Dung - Người thuyền trưởng bản lĩnh và tài sắc vẹn toàn của gia đình TCKT! Chúc Chị ngày 20/10 ngập tràn niềm vui, luôn rạng ngời kiêu hãnh, giữ vững nụ cười quyền lực và năng lượng tích cực để tiếp tục dẫn dắt phòng TCKT gặt hái thêm nhiều thành công rực rỡ!"
   },
   {
     "stt": "2",
+    "ms": "1770",
+    "fingerprint": "1770",
     "name": "Nguyễn Thị Hoài Thanh",
     "role": "Phó phòng",
-    "fingerprint": "1770",
-    "dob": "19/07/1991"
+    "dob": "19/07/1991",
+    "avatar": "🌸",
+    "wish": "Thân gửi Chị Hoài Thanh - Bông hoa dịu dàng, chu đáo và ấm áp của TCKT! Nhân ngày 20/10, chúc Chị luôn tươi trẻ, vạn sự như ý, gia đình viên mãn và luôn là điểm tựa thân thương, ngập tràn tiếng cười của cả đại gia đình chúng ta!"
   },
   {
     "stt": "3",
+    "ms": "8",
+    "fingerprint": "8",
     "name": "Ngô Thị Nga",
     "role": "KT tiền lương",
-    "fingerprint": "8",
-    "dob": "07/06/1995"
+    "dob": "06/07/1995",
+    "avatar": "💸",
+    "wish": "Thân gửi Chị Nga - \"Bà tiên ting ting\" được mong đợi nhất hành tinh! Chúc Chị 20/10 nhận bão hoa, ngập tràn quà tặng, tinh thần luôn phơi phới, bảng lương luôn mượt mà và nụ cười rạng rỡ luôn nở trên môi!"
   },
   {
     "stt": "4",
+    "ms": "2539",
+    "fingerprint": "2539",
     "name": "Đỗ Thị Định",
     "role": "KT thuế",
-    "fingerprint": "2539",
-    "dob": "22/08/1989"
+    "dob": "22/08/1989",
+    "avatar": "✨",
+    "wish": "Thân gửi Chị Định - Chuyên gia cân đối và quyết toán tài ba! Chúc Chị một ngày 20/10 ngập tràn hạnh phúc, công việc hanh thông thuận lợi, nhan sắc ngày càng đằm thắm mặn mà và gia đình luôn ấm êm an vui!"
   },
   {
     "stt": "5",
+    "ms": "381",
+    "fingerprint": "381",
     "name": "Trần Thị Hương",
     "role": "Thủ quỹ, KT khoa Cấp cứu",
-    "fingerprint": "381",
-    "dob": "28/04/1996"
+    "dob": "28/04/1996",
+    "avatar": "🗝️",
+    "wish": "Thân gửi Hương - Người nắm giữ \"tay hòm chìa khóa\" quyền lực với nụ cười tỏa nắng! Chúc em ngày 20/10 tiền đầy ví, tình đầy tim, nhận ngập tràn yêu thương và luôn giữ được tinh thần lạc quan, yêu đời rạng rỡ!"
   },
   {
     "stt": "6",
+    "ms": "3765",
+    "fingerprint": "3765",
     "name": "Nguyễn Thu Trà",
     "role": "KT thanh toán",
-    "fingerprint": "3765",
-    "dob": "20/06/1992"
+    "dob": "20/06/1992",
+    "avatar": "🍵",
+    "wish": "Thân gửi Thu Trà - Cô gái nhanh nhẹn, tỉ mỉ giải quyết mọi hồ sơ trong một nốt nhạc! Chúc Trà ngày 20/10 thật ngọt ngào như một tách trà thơm, luôn tươi tắn, xinh đẹp và đón nhận những điều may mắn, hạnh phúc nhất!"
   },
   {
     "stt": "7",
-    "name": "Dương Quý Nhân",
-    "role": "Phân tích dữ liệu",
-    "fingerprint": "2310",
-    "dob": "13/12/1994"
+    "ms": "3761",
+    "fingerprint": "3761",
+    "name": "Nguyễn Phương Dung",
+    "role": "KT check doanh số",
+    "dob": "19/11/1999",
+    "avatar": "📈",
+    "wish": "Thân gửi Phương Dung - Nữ hoàng kiểm soát số liệu siêu chuẩn xác! Chúc em ngày 20/10 xinh đẹp rạng ngời, tình duyên thăng hoa, doanh số luôn tăng trưởng vùn vụt và cuộc sống ngập tràn niềm vui bất tận!"
   },
   {
     "stt": "8",
-    "name": "Nguyễn Phương Dung",
-    "role": "KT check doanh số",
-    "fingerprint": "3761",
-    "dob": "19/11/1999"
+    "ms": "1236",
+    "fingerprint": "1236",
+    "name": "Ngô Hồng Phương",
+    "role": "KT khoa Sản",
+    "dob": "04/04/1991",
+    "avatar": "👶",
+    "wish": "Thân gửi Chị Hồng Phương - Bông hoa đồng hành cùng niềm vui chào đời của các thiên thần nhỏ! Chúc Chị 20/10 nhận trọn vẹn yêu thương, gia đình luôn hạnh phúc, công việc thuận buồm xuôi gió và ngày càng trẻ đẹp!"
   },
   {
     "stt": "9",
+    "ms": "1437",
+    "fingerprint": "1437",
     "name": "Nguyễn Mai Phương",
     "role": "KT ngoại trú",
-    "fingerprint": "1437",
-    "dob": "23/11/1998"
+    "dob": "23/11/1998",
+    "avatar": "🌼",
+    "wish": "Thân gửi Mai Phương - Nụ cười ân cần, giải quyết hàng trăm lượt chứng từ mỗi ngày vẫn luôn tươi rói! Chúc Mai Phương ngày 20/10 nhận thật nhiều hoa, luôn rạng ngời, tự tin và xinh đẹp như đóa hoa mai mùa xuân!"
   },
   {
     "stt": "10",
+    "ms": "1717",
+    "fingerprint": "1717",
     "name": "Lã Thị Hồng Vi",
     "role": "KT khoa YHCT, UB",
-    "fingerprint": "1717",
-    "dob": "11/01/1999"
+    "dob": "01/11/1999",
+    "avatar": "🌿",
+    "wish": "Thân gửi Hồng Vi - Dịu dàng, đằm thắm và vô cùng tận tâm! Chúc em ngày 20/10 tràn ngập tiếng cười, sức khỏe dồi dào, luôn an yên và tỏa sáng với nét duyên dáng, đáng yêu rất riêng của mình nhé!"
   },
   {
     "stt": "11",
+    "ms": "2462",
+    "fingerprint": "2462",
     "name": "Trần Thị Đoan Trang",
     "role": "KT khoa Nhi, TTSLT",
-    "fingerprint": "2462",
-    "dob": "18/09/1993"
+    "dob": "18/09/1993",
+    "avatar": "🧸",
+    "wish": "Thân gửi Chị Đoan Trang - Nữ kế toán ngọt ngào luôn gắn bó với các bệnh nhi Phương Đông! Chúc Chị ngày 20/10 nhận thật nhiều điều ngọt ngào, công việc hanh thông, luôn giữ nét duyên dáng và nụ cười rạng rỡ!"
   },
   {
     "stt": "12",
+    "ms": "2836",
+    "fingerprint": "2836",
     "name": "Trần Thị Hồng Hạnh",
     "role": "KT khoa Nội, GMHS",
-    "fingerprint": "2836",
-    "dob": "04/06/2001"
+    "dob": "06/04/2001",
+    "avatar": "💖",
+    "wish": "Thân gửi Hồng Hạnh - Cô gái chăm chỉ, dễ thương và luôn mang lại sự an tâm cho mọi người! Chúc em ngày 20/10 thật rực rỡ, ngày càng xinh đẹp, mọi dự định đều thành công mỹ mãn!"
   },
   {
     "stt": "13",
+    "ms": "3398",
+    "fingerprint": "3398",
     "name": "Đồng Thị Hồng Ngọc",
     "role": "KT khoa Ngoại, TM, KSNK",
-    "fingerprint": "3398",
-    "dob": "05/12/1997"
+    "dob": "12/05/1997",
+    "avatar": "💎",
+    "wish": "Thân gửi Hồng Ngọc - Viên ngọc quý sáng lấp lánh của phòng TCKT! Chúc em ngày 20/10 thật hạnh phúc, luôn xinh tươi, rực rỡ và gặt hái thêm thật nhiều thành công mới trong sự nghiệp và cuộc sống!"
   },
   {
     "stt": "14",
+    "ms": "4210",
+    "fingerprint": "4210",
     "name": "Nguyễn Thuỳ Trang",
     "role": "KT khoa LCK, PHCN",
-    "fingerprint": "4210",
-    "dob": "12/04/2003"
+    "dob": "04/12/2003",
+    "avatar": "🎀",
+    "wish": "Thân gửi Thùy Trang - Cô gái trẻ trung, duyên dáng và tràn đầy sức sống! Chúc em ngày 20/10 nhận được thật nhiều điều bất ngờ ngọt ngào, luôn giữ nụ cười tỏa nắng và tuổi trẻ tuyệt vời nhất!"
   },
   {
     "stt": "15",
-    "name": "Tô Vũ Châu",
-    "role": "KT Tài sản",
-    "fingerprint": "4339",
-    "dob": "02/09/1997"
+    "ms": "3159",
+    "fingerprint": "3159",
+    "name": "Nguyễn Thanh Hải",
+    "role": "KT khoa NHM, IVF",
+    "dob": "02/08/1994",
+    "avatar": "🌊",
+    "wish": "Thân gửi Thanh Hải - Người đồng hành cùng những phép màu mầm sống IVF! Chúc em ngày 20/10 luôn xinh đẹp, ngọt ngào, tình yêu thăng hoa và mọi điều ước đều sớm trở thành hiện thực!"
   },
   {
     "stt": "16",
+    "ms": "4151",
+    "fingerprint": "4151",
     "name": "Phạm Quỳnh Trang",
     "role": "Admin",
-    "fingerprint": "4151",
-    "dob": "19/03/2002"
+    "dob": "19/03/2002",
+    "avatar": "⚡",
+    "wish": "Thân gửi Quỳnh Trang - Đầu mối kết nối siêu tốc và chu đáo của đại gia đình! Chúc em 20/10 ngập tràn quà tặng, ngày càng xinh đẹp, tự tin và luôn là cô gái tràn trề năng lượng tích cực!"
   },
   {
     "stt": "17",
+    "ms": "5117",
+    "fingerprint": "5117",
     "name": "Đặng Thanh Hương",
     "role": "KT đoàn khám",
-    "fingerprint": "5117",
-    "dob": "09/03/2002"
+    "dob": "03/09/2002",
+    "avatar": "🌟",
+    "wish": "Thân gửi Thanh Hương - Nhanh nhẹn, tháo vát và luôn tươi cười dù áp lực mùa khám đoàn! Chúc em 20/10 nhận bão quà tặng, tinh thần luôn tươi mới, luôn xinh đẹp và gặp nhiều may mắn!"
   },
   {
     "stt": "18",
+    "ms": "5679",
+    "fingerprint": "5679",
     "name": "Đặng Thanh Nhàn",
     "role": "KTTH",
-    "fingerprint": "5679",
-    "dob": "26/06/1992"
+    "dob": "26/06/1992",
+    "avatar": "🪷",
+    "wish": "Thân gửi Thanh Nhàn - Tên là Nhàn nhưng việc tổng hợp luôn gánh vác tận tâm! Chúc em ngày 20/10 thật thảnh thơi, an nhàn, nhận ngập tràn yêu thương và luôn tỏa hương sắc rạng ngời!"
   },
   {
     "stt": "19",
-    "name": "Lê Bích An",
-    "role": "KT khoa",
-    "fingerprint": "5788",
-    "dob": "08/02/2004"
+    "ms": "5426",
+    "fingerprint": "5426",
+    "name": "Trịnh Lan Anh",
+    "role": "KT tiền lương",
+    "dob": "18/04/2000",
+    "avatar": "🌷",
+    "wish": "Thân gửi Lan Anh - Cô gái xinh xắn phụ trách niềm vui ting ting! Chúc em 20/10 siêu ngọt ngào như cốc trà sữa nướng, nhan sắc ngày càng thăng hạng và tình yêu viên mãn!"
   },
   {
     "stt": "20",
-    "name": "Lê Phương Thảo",
+    "ms": "5747",
+    "fingerprint": "5747",
+    "name": "Bùi Thị Kiều Loan",
     "role": "KT khoa",
-    "fingerprint": "5823",
-    "dob": "12/01/2001"
+    "dob": "16/12/2003",
+    "avatar": "🌻",
+    "wish": "Thân gửi Kiều Loan - Bông hoa Gen Z năng động và cực kỳ đáng yêu! Chúc em có một ngày 20/10 rực rỡ tiếng cười, luôn tươi trẻ, tự tin và cháy hết mình với những đam mê tuổi trẻ!"
   },
   {
     "stt": "21",
-    "name": "Nguyễn Thanh Hải",
-    "role": "KT khoa NHM, IVF",
-    "fingerprint": "3159",
-    "dob": "02/08/1994"
+    "ms": "5788",
+    "fingerprint": "5788",
+    "name": "Lê Bích An",
+    "role": "KT khoa",
+    "dob": "02/08/2004",
+    "avatar": "🕊️",
+    "wish": "Thân gửi Bích An - Cái tên mang trọn vẹn sự an lành và tươi mát! Chúc em 20/10 luôn an vui, xinh đẹp rạng rỡ, học hỏi thêm nhiều điều bổ ích và luôn được yêu thương che chở!"
   },
   {
     "stt": "22",
-    "name": "Nguyễn Thị Yến",
-    "role": "KT HC khoa Ngoại",
-    "fingerprint": "3628",
-    "dob": "09/02/2000"
+    "ms": "5823",
+    "fingerprint": "5823",
+    "name": "Lê Phương Thảo",
+    "role": "KT khoa",
+    "dob": "01/12/2001",
+    "avatar": "🌿",
+    "wish": "Thân gửi Phương Thảo - Duyên dáng như nhành cỏ mùa xuân! Chúc em ngày 20/10 đón nhận vô vàn lời chúc ngọt ngào, luôn xinh tươi, dịu dàng và gặt hái thật nhiều thành quả tốt đẹp!"
   },
   {
     "stt": "23",
-    "name": "Nguyễn Thị Thúy Hằng",
-    "role": "KT HC khoa Nhi",
-    "fingerprint": "4257",
-    "dob": "17/05/1990"
+    "ms": "4049",
+    "fingerprint": "4049",
+    "name": "Hoàng Huyền Trang",
+    "role": "KT thuế",
+    "dob": "27/06/2002",
+    "avatar": "💫",
+    "wish": "Thân gửi Huyền Trang - Chiến binh quyết toán thuế tài năng và duyên dáng! Chúc em 20/10 nhan sắc điểm 10, may mắn vô biên, luôn tươi vui và rạng ngời với nét đẹp riêng biệt!"
   },
   {
     "stt": "24",
-    "name": "Nguyễn Minh Hiền",
-    "role": "KTHC khoa UB",
-    "fingerprint": "6040",
-    "dob": "22/11/1999"
+    "ms": "4047",
+    "fingerprint": "4047",
+    "name": "Nguyễn Thị Linh",
+    "role": "KT thuế",
+    "dob": "12/06/2003",
+    "avatar": "☀️",
+    "wish": "Thân gửi Linh - Thông minh, nhanh nhẹn và cực kỳ dễ mến! Chúc em ngày Phụ nữ Việt Nam 20/10 ngập tràn hạnh phúc, nụ cười luôn tỏa nắng trên môi và có những kỷ niệm thật đẹp!"
   },
   {
     "stt": "25",
-    "name": "Hoàng Huyền Trang",
-    "role": "KT nhập liệu",
-    "fingerprint": "4049",
-    "dob": "27/06/2002"
+    "ms": "4330",
+    "fingerprint": "4330",
+    "name": "Trần Thị Quyên",
+    "role": "KT thuế",
+    "dob": "27/07/2003",
+    "avatar": "🌹",
+    "wish": "Thân gửi Quyên - Xinh xắn, tỉ mỉ và luôn chỉn chu trong mọi việc! Chúc em 20/10 nhận trọn vẹn yêu thương, tiền tài tấn tới, tình cảm đong đầy và luôn giữ nét dễ thương vốn có!"
   },
   {
     "stt": "26",
-    "name": "Lăng Quốc Toàn",
-    "role": "KT nhập liệu",
-    "fingerprint": "4048",
-    "dob": "26/07/2002"
+    "ms": "4340",
+    "fingerprint": "4340",
+    "name": "Dương Lan Hương",
+    "role": "KT thuế",
+    "dob": "31/10/2002",
+    "avatar": "🌺",
+    "wish": "Thân gửi Lan Hương - Đóa hoa lan thanh lịch và thơm ngát! Chúc em ngày 20/10 rực rỡ sắc màu, luôn tràn đầy năng lượng tích cực, yêu đời và gặp nhiều điều may mắn trên mọi nẻo đường!"
   },
   {
     "stt": "27",
-    "name": "Trần Thị Quyên",
-    "role": "KT nhập liệu",
-    "fingerprint": "4330",
-    "dob": "27/07/2003"
+    "ms": "4391",
+    "fingerprint": "4391",
+    "name": "Nguyễn Thị Thu Giang",
+    "role": "KT thuế",
+    "dob": "02/11/2003",
+    "avatar": "🍁",
+    "wish": "Thân gửi Thu Giang - Dịu dàng như dòng sông mùa thu thơ mộng! Chúc em 20/10 nhận cả trời hoa, luôn xinh đẹp, công việc thuận lợi hanh thông và tình duyên luôn thắm nồng!"
   },
   {
     "stt": "28",
-    "name": "Dương Lan Hương",
-    "role": "KT nhập liệu",
-    "fingerprint": "4340",
-    "dob": "31/10/2002"
+    "ms": "5381",
+    "fingerprint": "5381",
+    "name": "Vũ Lâm Dương",
+    "role": "KT thuế",
+    "dob": "20/06/2004",
+    "avatar": "☀️",
+    "wish": "Thân gửi Lâm Dương - Tia nắng ấm áp, năng động và đầy triển vọng! Chúc em 20/10 nhận được thật nhiều món quà bất ngờ, luôn tự tin, xinh đẹp và tỏa sáng theo cách của riêng em!"
   },
   {
     "stt": "29",
-    "name": "Nguyễn Thị Thu Giang",
-    "role": "KT nhập liệu",
-    "fingerprint": "4391",
-    "dob": "02/11/2003"
+    "ms": "5675",
+    "fingerprint": "5675",
+    "name": "Nguyễn Thanh Hà",
+    "role": "KT thuế",
+    "dob": "01/11/2000",
+    "avatar": "🌼",
+    "wish": "Thân gửi Thanh Hà - Nụ cười đôn hậu, tính cách dịu dàng đáng mến! Chúc em 20/10 ngập tràn tiếng cười, gia đình ấm áp, luôn bình an và là đóa hoa xinh đẹp của phòng TCKT!"
   },
   {
     "stt": "30",
-    "name": "Vũ Lâm Dương",
-    "role": "KT nhập liệu",
-    "fingerprint": "5381",
-    "dob": "20/06/2004"
+    "ms": "5821",
+    "fingerprint": "5821",
+    "name": "Nguyễn Thị Hồng",
+    "role": "KT thuế",
+    "dob": "09/12/2004",
+    "avatar": "🪷",
+    "wish": "Thân gửi Hồng - Sắc hồng may mắn và tươi vui của phòng thuế! Chúc em 20/10 thật ngọt ngào, cuộc sống luôn tươi đẹp ngập tràn màu hồng và nụ cười rạng rỡ mỗi ngày!"
   },
   {
     "stt": "31",
-    "name": "Nguyễn Thị Hồng",
-    "role": "KT nhập liệu",
-    "fingerprint": "5821",
-    "dob": "09/12/2004"
+    "ms": "6038",
+    "fingerprint": "6038",
+    "name": "Nguyễn Sông Thương",
+    "role": "KT thuế",
+    "dob": "28/12/2003",
+    "avatar": "🌊",
+    "wish": "Thân gửi Sông Thương - Cái tên đậm chất thơ và nét duyên dáng cuốn hút! Chúc em ngày 20/10 đong đầy yêu thương, hạnh phúc ngút ngàn, công việc trôi chảy và luôn yêu đời trẻ trung!"
   },
   {
     "stt": "32",
-    "name": "Nguyễn Sông Thương",
-    "role": "KT nhập liệu",
-    "fingerprint": "6038",
-    "dob": "28/12/2003"
-  },
-  {
-    "stt": "33",
-    "name": "Vũ Thị Mơ",
-    "role": "XHĐ",
-    "fingerprint": "2503",
-    "dob": "14/01/1992"
-  },
-  {
-    "stt": "34",
-    "name": "Phùng Thu Hường",
-    "role": "XHĐ",
-    "fingerprint": "4159",
-    "dob": "02/05/2001"
-  },
-  {
-    "stt": "35",
-    "name": "Vương Kim Dung",
-    "role": "XHĐ",
-    "fingerprint": "4404",
-    "dob": "15/05/1996"
-  },
-  {
-    "stt": "36",
-    "name": "Vũ Lê Anh Thư",
-    "role": "XHĐ",
-    "fingerprint": "4846",
-    "dob": "13/10/2003"
-  },
-  {
-    "stt": "37",
-    "name": "Đinh Mai Hương",
-    "role": "Leader TN Ngoại trú Tòa A",
-    "fingerprint": "2971",
-    "dob": "26/11/1999"
-  },
-  {
-    "stt": "38",
-    "name": "Châu Ngọc Anh",
-    "role": "Thu ngân",
-    "fingerprint": "2877",
-    "dob": "12/01/2001"
-  },
-  {
-    "stt": "39",
-    "name": "Nguyễn Ngọc Anh",
-    "role": "Thu ngân",
-    "fingerprint": "4565",
-    "dob": "05/10/1991"
-  },
-  {
-    "stt": "40",
-    "name": "Phạm Thị Thu Hà",
-    "role": "TBP Thu ngân tòa A",
-    "fingerprint": "886",
-    "dob": "19/03/1995"
-  },
-  {
-    "stt": "41",
-    "name": "Trần Đình Lâm",
-    "role": "Thu ngân",
-    "fingerprint": "3958",
-    "dob": "06/09/2002"
-  },
-  {
-    "stt": "42",
-    "name": "Nguyễn Lê Thùy Trang",
-    "role": "Thu ngân",
-    "fingerprint": "2144",
-    "dob": "16/02/2001"
-  },
-  {
-    "stt": "43",
-    "name": "Phạm Thị Hồng Luận",
-    "role": "Leader TN Ngoại trú Tòa D",
-    "fingerprint": "3379",
-    "dob": "08/05/1994"
-  },
-  {
-    "stt": "44",
-    "name": "Dương Thị Dung",
-    "role": "TBP Thu ngân tòa D",
-    "fingerprint": "2200",
-    "dob": "25/06/1991"
-  },
-  {
-    "stt": "45",
-    "name": "Nguyễn Thế Tùng",
-    "role": "VIP",
-    "fingerprint": "641",
-    "dob": ""
-  },
-  {
-    "stt": "46",
-    "name": "Hồ Quỳnh Trang",
-    "role": "Học việc",
+    "ms": "6248",
     "fingerprint": "6248",
-    "dob": "24/11/2004"
-  },
-  {
-    "stt": "47",
-    "name": "Đoàn Thị Thương",
-    "role": "Thu ngân",
-    "fingerprint": "5791",
-    "dob": "22/06/2004"
+    "name": "Hồ Quỳnh Trang",
+    "role": "KT học việc",
+    "dob": "21/11/2004",
+    "avatar": "🌱",
+    "wish": "Thân gửi Quỳnh Trang - Bông hoa mới tinh khôi, năng động và đầy nhiệt huyết của TCKT! Chúc em có một ngày 20/10 đầu tiên tại đại gia đình Phương Đông thật đáng nhớ, học hỏi thật nhiều và luôn rạng ngời tỏa sáng!"
   }
 ]

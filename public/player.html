@@ -3,323 +3,372 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Người Chơi - Team Building TCKT</title>
+  <title>Thiệp Chúc 20/10 & Order Yi He Tang - Phòng TCKT Phương Đông</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    /* Mobile specific adjustments */
     body {
-      padding-bottom: env(safe-area-inset-bottom, 20px);
-    }
-    .waiting-pulse-circle {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      background: rgba(99, 102, 241, 0.2);
-      border: 3px solid var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3.5rem;
-      margin: 0 auto 24px;
-      animation: pulseGlow 2s infinite ease-in-out;
-    }
-    .voted-success-card {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1.5px solid var(--emerald);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      margin-top: 14px;
-      animation: popIn 0.3s ease;
-    }
-    .voted-name-highlight {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: #6ee7b7;
-      margin: 8px 0;
+      padding-bottom: env(safe-area-inset-bottom, 30px);
+      background-color: #120a1f;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(244, 63, 94, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(251, 113, 133, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, rgba(136, 19, 55, 0.35) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
   </style>
 </head>
 <body>
-  <div class="player-container">
+  <!-- Romantic falling petals canvas -->
+  <canvas id="petals-canvas"></canvas>
+
+  <div class="container-2010">
     
-    <!-- Top Player Header Bar (Hidden on join screen) -->
-    <header class="glass-panel player-header" id="player-header" style="display: none;">
-      <div class="player-info-badge">
-        <span class="player-avatar-mini" id="my-avatar">😎</span>
+    <!-- Top Header Bar -->
+    <header class="glass-panel" id="top-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-bottom: 20px; border-radius: 16px; border: 1px solid rgba(244, 63, 94, 0.3); background: rgba(30, 27, 75, 0.85);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.6rem;" id="header-avatar">🌸</span>
         <div>
-          <div class="player-name-text" id="my-nickname">Đang tải...</div>
-          <div id="my-zodiac-badge" class="player-zodiac-pill" style="display: none;"></div>
+          <div style="font-size: 0.72rem; color: #fbcfe8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+            BVĐK PHƯƠNG ĐÔNG • TCKT
+          </div>
+          <div id="header-user-name" style="font-size: 1rem; font-weight: 900; color: #fff;">
+            20/10 Yêu Thương 💐
+          </div>
         </div>
       </div>
-      <div class="player-score-tag" id="my-score-tag">
-        0 điểm
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="btn-sound-toggle" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.9rem; border-radius: 999px; background: rgba(255,255,255,0.1);">
+          🔊 Bật Nhạc
+        </button>
+        <button id="btn-change-user" class="btn btn-secondary" style="display: none; padding: 6px 12px; font-size: 0.8rem; border-radius: 999px; background: rgba(255,255,255,0.1);">
+          Đổi Người
+        </button>
       </div>
     </header>
 
-    <!-- SCREEN 1: FESTIVE PARTY CHECK-IN -->
-    <section class="glass-panel player-card party-entry-card" id="screen-join">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div style="font-size: 3.2rem; margin-bottom: 4px; animation: bounce 2s infinite;">🎉</div>
-        <h1 style="font-size: 1.6rem; font-weight: 900;" class="gold-gradient-text">
-          GALA DINNER TCKT 2026
+    <!-- ==========================================
+         SCREEN 1: LOGIN / IDENTIFY WITH MS OR NAME
+         ========================================== -->
+    <section id="screen-login" class="glass-panel" style="padding: 24px 20px; border-radius: 24px; border: 1.5px solid rgba(244, 63, 94, 0.35); background: rgba(26, 23, 56, 0.9);">
+      
+      <div class="hero-banner-2010">
+        <div class="hero-tag-2010">
+          <span>💐</span> CHÀO MỪNG NGÀY PHỤ NỮ VIỆT NAM 20/10
+        </div>
+        <h1 class="title-2010">
+          TRAO GỬI YÊU THƯƠNG
         </h1>
-        <p style="font-size: 0.95rem; color: #fef08a; font-weight: 800; margin-top: 4px;">
-          Bệnh viện ĐK Phương Đông • Đêm Hội Gắn Kết 🥂
+        <p class="subtitle-2010">
+          Mở thiệp chúc mừng & nhận 1 cốc trà sữa Yi He Tang ngọt ngào dành riêng cho bạn! 🧋
         </p>
       </div>
 
-      <!-- Error Toast Box -->
-      <div id="join-error-box" style="display: none; background: rgba(244, 63, 94, 0.25); border: 1.5px solid var(--rose); border-radius: 14px; padding: 12px; margin-bottom: 14px; color: #fecdd3; font-size: 0.95rem; text-align: center; font-weight: 800;">
+      <!-- Error box -->
+      <div id="login-error-box" style="display: none; background: rgba(244, 63, 94, 0.25); border: 1.5px solid var(--rose); border-radius: 14px; padding: 12px; margin-bottom: 16px; color: #fecdd3; font-size: 0.95rem; text-align: center; font-weight: 800;">
       </div>
 
-      <!-- SMART UNIFIED LOGIN: EITHER FINGERPRINT OR NAME -->
-      <div class="login-method-card" style="background: rgba(251, 191, 36, 0.08); border: 1.5px solid rgba(251, 191, 36, 0.4); border-radius: 18px; padding: 16px; margin-bottom: 14px;">
-        <label for="smart-search-input" style="font-weight: 900; font-size: 0.98rem; color: #fef08a; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-          <span>👆 Nhập mã vân tay HOẶC gõ tên bạn:</span>
+      <!-- Smart Input for MS or Name -->
+      <div style="background: rgba(244, 63, 94, 0.08); border: 1.5px solid rgba(244, 63, 94, 0.4); border-radius: 18px; padding: 16px; margin-bottom: 16px;">
+        <label for="smart-search-input" style="font-weight: 900; font-size: 0.95rem; color: #fecdd3; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span>🌸 Nhập Mã số (MS) HOẶC gõ Tên bạn:</span>
           <span style="background: rgba(16, 185, 129, 0.25); border: 1px solid var(--emerald); color: #6ee7b7; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">
             ⚡ Tự động tìm
           </span>
         </label>
         
-        <input type="text" id="smart-search-input" class="input-field party-search-input" 
-               placeholder="Gõ mã số (vd: 6, 2310) hoặc gõ Tên..." 
+        <input type="text" id="smart-search-input" class="input-field" 
+               placeholder="Gõ mã số (vd: 6, 1770, 6248...) hoặc gõ Tên..." 
                autocomplete="off"
-               style="font-size: 1.15rem; font-weight: 800; text-align: center; height: 50px; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(251, 191, 36, 0.5); color: #fef08a;">
+               style="font-size: 1.15rem; font-weight: 800; text-align: center; height: 50px; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(244, 63, 94, 0.5); color: #fef08a; border-radius: 14px;">
         
         <!-- Live Quick-Pick Suggestion Chips -->
         <div id="smart-suggestion-box" style="display: none; margin-top: 10px; max-height: 140px; overflow-y: auto; padding: 4px; display: flex; flex-wrap: wrap; gap: 8px;">
         </div>
-
-        <!-- Instant feedback when matching member found by fingerprint code -->
-        <div id="fp-match-badge" style="display: none; margin-top: 10px; padding: 10px 14px; background: rgba(16, 185, 129, 0.25); border: 1.5px solid var(--emerald); border-radius: 12px; text-align: center; font-weight: 900; color: #6ee7b7; font-size: 1rem; animation: popIn 0.3s ease;">
-          ✨ Khớp mã vân tay: <span id="fp-match-name" style="color: #ffffff; text-decoration: underline;"></span> 🥂
-        </div>
       </div>
 
-      <!-- OR DROPDOWN (47 MEMBERS) -->
-      <div style="display: flex; align-items: center; margin: 10px 0; text-align: center;">
+      <!-- OR Select from Dropdown (32 members) -->
+      <div style="display: flex; align-items: center; margin: 12px 0; text-align: center;">
         <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
-        <span style="padding: 0 10px; color: #94a3b8; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Hoặc chọn từ danh sách 47 người</span>
+        <span style="padding: 0 10px; color: #fbcfe8; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Hoặc chọn từ danh sách 32 người</span>
         <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
       </div>
 
-      <div style="margin-bottom: 14px;">
-        <select id="select-member" class="input-field party-select-input" style="font-size: 0.95rem; font-weight: 800; height: 46px;">
-          <option value="">-- Bấm vào đây để chọn tên bạn (47 người) --</option>
+      <div style="margin-bottom: 16px;">
+        <select id="select-member" class="input-field" style="font-size: 0.95rem; font-weight: 800; height: 48px; border-radius: 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(244, 63, 94, 0.35); color: #fff;">
+          <option value="">-- Chạm để chọn tên bạn (32 người) --</option>
         </select>
       </div>
 
-      <!-- Selected Member Confirmation & Preview Card -->
-      <div class="member-quick-card party-vip-badge" id="member-profile-card" style="display: none; margin-bottom: 14px; background: rgba(16, 185, 129, 0.15); border: 1.5px solid var(--emerald); border-radius: 16px; padding: 14px 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+      <!-- Selected Member Preview Card -->
+      <div id="member-preview-card" style="display: none; background: rgba(244, 63, 94, 0.15); border: 1.5px solid #f43f5e; border-radius: 18px; padding: 16px; margin-bottom: 18px; animation: popIn 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div id="preview-avatar" style="font-size: 2.8rem; line-height: 1;">👑</div>
           <div style="flex: 1;">
-            <div style="font-size: 0.75rem; color: #6ee7b7; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">
-              ✅ XÁC NHẬN THÀNH VIÊN VÀO BÀN TIỆC:
+            <div style="font-size: 0.75rem; color: #fecdd3; font-weight: 800; text-transform: uppercase;">
+              ✨ ĐÃ NHẬN DIỆN THÀNH VIÊN:
             </div>
-            <div class="member-quick-name" id="card-member-name" style="font-size: 1.3rem; font-weight: 900; color: #fff; margin-top: 2px;">
+            <div id="preview-name" style="font-size: 1.3rem; font-weight: 900; color: #fff;">
               Nguyễn Thị Thùy Dung
             </div>
-            <div id="card-member-meta" style="font-size: 0.82rem; color: #fef08a; margin-top: 2px;">
-              Mã vân tay: 2310
+            <div style="font-size: 0.88rem; color: #fef08a; font-weight: 700; margin-top: 2px;">
+              <span id="preview-role">Trưởng phòng</span> • MS: <span id="preview-ms">6</span>
             </div>
-            <!-- Prevent Mistaken Identity Button -->
-            <button type="button" id="btn-change-member" class="btn btn-secondary btn-sm" style="margin-top: 8px; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1;">
-              🔄 Bấm nhầm? Chọn lại người khác
-            </button>
-          </div>
-          <div style="font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6)); margin-left: 10px;" id="card-member-avatar">
-            😎
           </div>
         </div>
       </div>
 
-      <!-- Festive Check-in Button (No more security code vibe!) -->
-      <div class="party-checkin-wrapper">
-        <button type="button" class="btn-party-checkin" id="btn-fingerprint-scan" title="Bấm để vào tiệc">
-          <div class="party-checkin-icon">🎟️</div>
-          <div class="party-checkin-label" id="scanner-status-text">
-            BẤM VÀO ĐÂY ĐỂ VÀO TIỆC NGAY 🚀
-          </div>
-        </button>
-      </div>
+      <!-- Action Button -->
+      <button id="btn-proceed-card" class="btn" style="width: 100%; height: 54px; font-size: 1.12rem; font-weight: 900; background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; box-shadow: 0 8px 25px rgba(244, 63, 94, 0.45); border-radius: 16px;">
+        MỞ THIỆP CHÚC MỪNG 20/10 💌
+      </button>
 
-      <!-- Advanced Optional Accordion -->
-      <details style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted); text-align: left;">
-        <summary style="cursor: pointer; color: var(--cyan); font-weight: 700; text-align: center;">⚙️ Tùy chọn đổi Avatar biểu tượng</summary>
-        <div style="margin-top: 10px; background: rgba(255,255,255,0.04); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
-          <div style="margin-bottom: 8px; font-weight: 800; color: #fff;">Chọn biểu tượng đại diện của bạn:</div>
-          <div class="avatar-selector" id="avatar-list"></div>
-          <div style="display: none;">
-            <input type="password" id="input-fingerprint" class="input-field" placeholder="Mã...">
-            <input type="text" id="input-dob" class="input-field" placeholder="dd/mm/yyyy...">
-          </div>
-        </div>
-      </details>
-
-      <div style="font-size: 0.85rem; color: #94a3b8; text-align: center; margin-top: 14px; font-weight: 600;">
-        🥂 Chúc bạn có một buổi tối thật bùng nổ và nhiều tiếng cười!
-      </div>
     </section>
 
-    <!-- SCREEN 2: WAITING IN LOBBY -->
-    <section class="glass-panel player-card party-entry-card" id="screen-waiting" style="display: none; text-align: center;">
-      <div class="waiting-pulse-circle" id="wait-avatar" style="border-color: var(--gold); box-shadow: 0 0 35px rgba(245, 158, 11, 0.4);">😎</div>
-      <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 6px;" class="gold-gradient-text">
-        ✨ BẠN ĐÃ VÀO BÀN TIỆC!
-      </h2>
-      <div id="wait-member-info" style="font-size: 1.3rem; font-weight: 900; color: #ffffff; margin-bottom: 8px;"></div>
-      <div id="wait-zodiac-info" style="margin-bottom: 18px;"></div>
+    <!-- ==========================================
+         SCREEN 2: GREETING CARD & WISHES
+         ========================================== -->
+    <section id="screen-card" style="display: none;">
       
-      <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 18px; line-height: 1.6;">
-        🍸 Hãy cùng nâng ly với đồng đội và hướng mắt lên màn hình lớn nhé!<br>
-        MC sẽ khởi động trò chơi trong giây lát!
-      </p>
-
-      <!-- Missing Colleagues Banner (Nhắc nhau) -->
-      <div class="missing-members-box" id="player-missing-box" style="margin-bottom: 16px; text-align: left; padding: 14px 18px;">
-        <div style="font-weight: 800; font-size: 0.92rem; color: #fecdd3; margin-bottom: 8px; display: flex; justify-content: space-between;">
-          <span>📢 Còn <span id="player-missing-count" style="color: var(--gold); font-weight: 900;">0</span> đồng đội chưa vào:</span>
-          <span style="font-size: 0.75rem; color: #fca5a5;">(Nhắc nhau vào bàn tiệc)</span>
+      <!-- 3D Wax-sealed Envelope -->
+      <div id="envelope-section">
+        <div class="envelope-stage">
+          <div class="envelope-wrapper" id="envelope-elem">
+            <div class="envelope-flap"></div>
+            <div class="wax-seal">
+              <span style="font-size: 1.5rem;">💌</span>
+            </div>
+            <div class="envelope-tag" id="envelope-tag-name">
+              Kính gửi: Bạn 🌸
+            </div>
+          </div>
         </div>
-        <div id="player-missing-names" style="font-size: 0.85rem; color: #ffe4e6; line-height: 1.5; max-height: 90px; overflow-y: auto;">
-          Đang tải danh sách...
-        </div>
-      </div>
-
-      <div style="background: rgba(255, 255, 255, 0.06); padding: 12px; border-radius: 14px; font-size: 0.9rem; color: var(--gold); font-weight: 700;">
-        ⏳ Đang kết nối trực tiếp với Màn Chiếu Sân Khấu 🎪
-      </div>
-    </section>
-
-    <!-- SCREEN 3: SQUIZZ (BÓC PHỐT / BÌNH CHỌN & CÂU HỎI MỞ) -->
-    <section class="glass-panel player-card" id="screen-squizz" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <span class="q-badge" id="player-sq-index">CÂU 1 / 12</span>
-        <span style="font-size: 0.85rem; color: var(--gold); font-weight: 800;" id="player-sq-title">Bình chọn</span>
-      </div>
-
-      <h2 style="font-size: 1.25rem; font-weight: 800; line-height: 1.4; margin-bottom: 16px;" id="player-sq-question">
-        Đang tải câu hỏi...
-      </h2>
-
-      <!-- Mode 1: VOTE_MEMBER form (Bình chọn thành viên trong chuyến đi) -->
-      <div id="sq-vote-form">
-        <label style="font-size: 0.9rem; font-weight: 700; color: #fef08a; margin-bottom: 6px; display: block;">
-          ✍️ Chạm chọn 1 người trong chuyến đi để bình chọn:
-        </label>
-        
-        <!-- Filterable colleague search input -->
-        <input type="text" id="input-squizz-filter" class="input-field" placeholder="🔍 Gõ để tìm nhanh tên thành viên trong chuyến đi..." style="margin-bottom: 8px;">
-
-        <!-- 47 Official Members Quick Click Tags -->
-        <div class="suggestion-tags-box" id="member-suggestions" style="max-height: 220px; overflow-y: auto; margin-bottom: 16px;">
-          <!-- Filled by JS -->
-        </div>
-
-        <button class="btn btn-rose" id="btn-submit-vote" style="width: 100%; font-size: 1.15rem; padding: 15px;">
-          GỬI BÌNH CHỌN 🗳️
-        </button>
-      </div>
-
-      <!-- Mode 2: OPEN_TEXT form -->
-      <div id="sq-opentext-form" style="display: none;">
-        <label style="font-size: 0.9rem; font-weight: 700; color: var(--gold); margin-bottom: 8px; display: block;">
-          💬 Nhập câu trả lời hoặc cảm nghĩ của bạn:
-        </label>
-        <textarea id="input-squizz-opentext" class="input-field" style="height: 110px; font-size: 1.1rem; line-height: 1.4; resize: none;" placeholder="Viết tiếng lòng của bạn tại đây..."></textarea>
-        
-        <button class="btn btn-gold" id="btn-submit-opentext" style="width: 100%; font-size: 1.15rem; padding: 15px; margin-top: 10px;">
-          GỬI CÂU TRẢ LỜI 🚀
-        </button>
-      </div>
-
-      <!-- Voted Success Display -->
-      <div class="voted-success-card" id="sq-vote-done" style="display: none;">
-        <div style="font-size: 2rem;">✅</div>
-        <div style="font-weight: 700; font-size: 0.95rem; color: white;" id="sq-vote-done-label">Bạn đã gửi bình chọn cho:</div>
-        <div class="voted-name-highlight" id="sq-my-voted-name">HOÀI THANH</div>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">
-          Hãy hướng mắt lên màn hình máy chiếu để xem kết quả nhé!
+        <p style="text-align: center; color: #fbcfe8; font-weight: 800; font-size: 0.95rem; margin-top: 10px; animation: bounce 2s infinite;">
+          👆 Chạm vào phong bì để mở thiệp chúc mừng!
         </p>
-        <button class="btn btn-secondary" id="btn-change-vote" style="margin-top: 14px; font-size: 0.85rem; padding: 8px 16px;">
-          ✏️ Đổi lại câu trả lời
-        </button>
       </div>
-    </section>
 
-    <!-- SCREEN 4: BỘ Q&A (KAHOOT STYLE) -->
-    <section class="glass-panel player-card" id="screen-qa" style="display: none; padding: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <span class="qa-category-tag" id="player-qa-cat" style="font-size: 0.8rem;">⚔️ Lịch sử</span>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span id="player-qa-timer" style="background: rgba(244, 63, 94, 0.25); border: 1px solid var(--rose); color: #fecdd3; font-weight: 900; font-size: 0.85rem; padding: 3px 10px; border-radius: 999px;">⏱️ 15s</span>
-          <span class="q-badge" id="player-qa-index">CÂU 1 / 15</span>
+      <!-- The Letter Card (Reveals after tap) -->
+      <div class="greeting-card-modal" id="letter-card">
+        <div class="card-emblem">💐✨</div>
+        <div style="text-align: center; margin-bottom: 6px;">
+          <span class="card-recipient-pill">
+            <span id="card-avatar-pill">👑</span>
+            <span id="card-role-pill">Trưởng phòng</span> • MS: <span id="card-ms-pill">6</span>
+          </span>
+        </div>
+        <div class="card-header-title">
+          CHÚC MỪNG 20/10
+        </div>
+        <div class="card-recipient-name" id="card-recipient-name">
+          Nguyễn Thị Thùy Dung
+        </div>
+
+        <div class="card-wish-body" id="card-wish-text">
+          Đang tải lời chúc yêu thương...
+        </div>
+
+        <div class="card-footer-sign">
+          — Đại gia đình Phòng Tài Chính Kế Toán • BVĐK Phương Đông — 💖
+        </div>
+
+        <!-- Gift invitation call to action -->
+        <div class="gift-invitation-box">
+          <div style="font-size: 2.2rem; margin-bottom: 6px;">🧋🎁</div>
+          <h3 style="font-size: 1.25rem; font-weight: 900; color: #fef08a; margin-bottom: 6px;">
+            MÓN QUÀ NGỌT NGÀO DÀNH RIÊNG CHO BẠN
+          </h3>
+          <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 14px;">
+            Ban tổ chức xin gửi tặng bạn <strong>1 cốc trà sữa Yi He Tang</strong> mát lạnh theo đúng sở thích!
+          </p>
+          <button id="btn-goto-order" class="btn" style="width: 100%; height: 48px; font-size: 1rem; font-weight: 900; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); border-radius: 14px;">
+            CHỌN MÓN TRÀ SỮA YIHETANG CỦA BẠN 🧋
+          </button>
         </div>
       </div>
 
-      <h2 style="font-size: 1.15rem; font-weight: 800; line-height: 1.35; margin-bottom: 14px;" id="player-qa-question">
-        Đang tải câu hỏi...
-      </h2>
+    </section>
 
-      <!-- 4 Kahoot Tap Buttons -->
-      <div class="mobile-qa-grid" id="player-qa-options-grid">
-        <button class="mobile-opt-btn opt-a" data-opt="0">
-          <div style="font-size: 1.3rem; margin-bottom: 4px;">▲</div>
-          <div class="opt-label" id="p-opt-0">Đáp án A</div>
-        </button>
-
-        <button class="mobile-opt-btn opt-b" data-opt="1">
-          <div style="font-size: 1.3rem; margin-bottom: 4px;">◆</div>
-          <div class="opt-label" id="p-opt-1">Đáp án B</div>
-        </button>
-
-        <button class="mobile-opt-btn opt-c" data-opt="2">
-          <div style="font-size: 1.3rem; margin-bottom: 4px;">●</div>
-          <div class="opt-label" id="p-opt-2">Đáp án C</div>
-        </button>
-
-        <button class="mobile-opt-btn opt-d" data-opt="3">
-          <div style="font-size: 1.3rem; margin-bottom: 4px;">■</div>
-          <div class="opt-label" id="p-opt-3">Đáp án D</div>
-        </button>
+    <!-- ==========================================
+         SCREEN 3: YI HE TANG DRINK MENU
+         ========================================== -->
+    <section id="screen-menu" style="display: none; margin-top: 20px;">
+      
+      <div class="glass-panel" style="padding: 18px 16px; border-radius: 20px; border: 1.5px solid rgba(244, 63, 94, 0.35); background: rgba(26, 23, 56, 0.92); margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 900; color: #fff;">
+              MENU TRÀ SỮA YI HE TANG 🧋
+            </h2>
+            <p style="font-size: 0.85rem; color: #fbcfe8; font-weight: 600; margin-top: 2px;">
+              Mời <span id="menu-user-name" style="color: #fef08a; font-weight: 800;">bạn</span> chọn 1 món yêu thích:
+            </p>
+          </div>
+          <button id="btn-back-to-card" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem; border-radius: 999px;">
+            💌 Xem Thiệp
+          </button>
+        </div>
       </div>
 
-      <!-- QA Open Text form if QA question is OPEN_TEXT -->
-      <div id="player-qa-opentext-form" style="display: none; margin-top: 10px;">
-        <input type="text" id="input-qa-opentext" class="input-field" placeholder="Nhập câu trả lời của bạn..." style="margin-bottom: 12px; font-size: 1.1rem;">
-        <button class="btn btn-primary" id="btn-submit-qa-opentext" style="width: 100%; font-size: 1.15rem; padding: 14px;">
-          GỬI ĐÁP ÁN 🚀
-        </button>
+      <!-- Category Filter Pills -->
+      <div class="menu-category-scroll" id="cat-chips-container">
+        <!-- Rendered by JS -->
       </div>
 
-      <!-- Result Banner after host reveals -->
-      <div id="player-qa-result" style="display: none; margin-top: 14px; text-align: center; padding: 14px; border-radius: 14px;">
-        <div id="player-qa-result-title" style="font-size: 1.25rem; font-weight: 900;"></div>
-        <div id="player-qa-result-points" style="font-size: 0.95rem; font-weight: 700; margin-top: 4px;"></div>
+      <!-- Drinks Grid -->
+      <div class="drinks-grid" id="drinks-grid-container">
+        <!-- Rendered by JS -->
       </div>
+
+    </section>
+
+    <!-- ==========================================
+         SCREEN 4: ORDER CONFIRMED RECEIPT VIEW
+         ========================================== -->
+    <section id="screen-confirmed" style="display: none; margin-top: 20px;">
+      
+      <div class="glass-panel receipt-card">
+        <div style="font-size: 3.5rem; margin-bottom: 8px; animation: popIn 0.4s ease;">✅</div>
+        <div style="display: inline-block; background: rgba(16, 185, 129, 0.25); border: 1px solid var(--emerald); color: #6ee7b7; padding: 4px 16px; border-radius: 999px; font-size: 0.85rem; font-weight: 800; margin-bottom: 8px;">
+          ORDER THÀNH CÔNG 🎉
+        </div>
+        <h2 style="font-size: 1.6rem; font-weight: 900; color: #ffffff;">
+          ĐÃ GHI NHẬN MÓN CỦA BẠN!
+        </h2>
+        
+        <div class="receipt-drink-title" id="receipt-drink-name">
+          Trà Sữa Nướng (Yi He Roasted)
+        </div>
+
+        <div class="receipt-specs-box">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 6px;">
+            <span style="color: #94a3b8;">Người nhận:</span>
+            <strong id="receipt-member-name" style="color: #fff;">Nguyễn Thị Thùy Dung</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 6px;">
+            <span style="color: #94a3b8;">Size:</span>
+            <strong id="receipt-size" style="color: #fef08a;">Size M (Vừa)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 6px;">
+            <span style="color: #94a3b8;">Độ ngọt (Đường):</span>
+            <strong id="receipt-sugar" style="color: #fff;">70%</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 6px;">
+            <span style="color: #94a3b8;">Lượng đá:</span>
+            <strong id="receipt-ice" style="color: #fff;">50% (Ít đá)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 6px;">
+            <span style="color: #94a3b8;">Topping thêm:</span>
+            <strong id="receipt-toppings" style="color: #6ee7b7;">Trân châu hoàng kim, Pudding trứng</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #94a3b8;">Ghi chú:</span>
+            <span id="receipt-note" style="color: #cbd5e1; font-style: italic;">Không có</span>
+          </div>
+        </div>
+
+        <p style="font-size: 0.92rem; color: #fbcfe8; margin: 16px 0 20px; line-height: 1.5;">
+          Cốc trà sữa ngọt ngào sẽ sớm được chuẩn bị và chuyển đến tay bạn. Chúc bạn một ngày 20/10 ngập tràn niềm vui, xinh đẹp và hạnh phúc! 💖
+        </p>
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button id="btn-reopen-card" class="btn btn-secondary" style="flex: 1; height: 46px; font-size: 0.95rem; border-radius: 14px;">
+            💌 Xem Lại Thiệp
+          </button>
+          <button id="btn-change-order" class="btn" style="flex: 1; height: 46px; font-size: 0.95rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border-radius: 14px;">
+            🔄 Đổi Món Khác
+          </button>
+        </div>
+      </div>
+
     </section>
 
   </div>
 
-  <!-- Party Cheer Overlay on Player Phone -->
-  <div class="cheer-overlay" id="cheer-overlay" style="display: none;">
-    <div class="cheer-content">
-      <div class="cheer-emoji">🍻</div>
-      <div class="cheer-title" id="cheer-overlay-title">100% CẠN CHÉN!</div>
-      <p style="color: white; font-size: 1.2rem; margin-top: 10px; font-weight: 700;">
-        ZÔ! ZÔ! ZÔ! 1, 2, 3 UỐNG!
-      </p>
-      <button class="btn btn-gold" id="btn-close-cheer" style="margin-top: 24px; font-size: 1.1rem; padding: 12px 30px;">
-        Tuyệt vời! 🍻
+  <!-- ==========================================
+       ORDER CUSTOMIZATION MODAL (BOTTOM SHEET)
+       ========================================== -->
+  <div class="order-modal-backdrop" id="order-modal-backdrop">
+    <div class="order-modal-sheet" id="order-modal-sheet">
+      <div class="sheet-handle"></div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div id="modal-drink-icon" style="width: 48px; height: 48px; border-radius: 14px; background: rgba(244, 63, 94, 0.2); border: 1px solid #f43f5e; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+            🧋
+          </div>
+          <div>
+            <h3 id="modal-drink-name" style="font-size: 1.25rem; font-weight: 900; color: #fff;">
+              Trà Sữa Nướng
+            </h3>
+            <span id="modal-drink-badge" style="font-size: 0.75rem; color: #fef08a; font-weight: 800;">
+              Best Seller ⭐
+            </span>
+          </div>
+        </div>
+        <button id="btn-close-modal" style="background: rgba(255,255,255,0.1); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;">
+          ✕
+        </button>
+      </div>
+
+      <!-- 1. Chọn Size -->
+      <div class="opt-section-title">1. Chọn Size cốc:</div>
+      <div class="pill-grid" id="modal-sizes-grid">
+        <div class="pill-opt selected" data-val="M">Size M (Vừa) - Chuẩn vị</div>
+        <div class="pill-opt" data-val="L">Size L (Lớn) - Uống đã hơn</div>
+      </div>
+
+      <!-- 2. Chọn Độ Ngọt -->
+      <div class="opt-section-title">2. Lượng đường:</div>
+      <div class="pill-grid" id="modal-sugar-grid">
+        <div class="pill-opt selected" data-val="100% (Chuẩn)">100% (Chuẩn)</div>
+        <div class="pill-opt" data-val="70%">70%</div>
+        <div class="pill-opt" data-val="50% (Vừa vặn)">50% (Vừa vặn)</div>
+        <div class="pill-opt" data-val="30% (Ít ngọt)">30% (Ít ngọt)</div>
+        <div class="pill-opt" data-val="0% (Không đường)">0% (Không đường)</div>
+      </div>
+
+      <!-- 3. Chọn Lượng Đá -->
+      <div class="opt-section-title">3. Lượng đá:</div>
+      <div class="pill-grid" id="modal-ice-grid">
+        <div class="pill-opt selected" data-val="100% (Chuẩn)">100% (Chuẩn)</div>
+        <div class="pill-opt" data-val="70%">70%</div>
+        <div class="pill-opt" data-val="50% (Ít đá)">50% (Ít đá)</div>
+        <div class="pill-opt" data-val="Không đá">Không đá</div>
+        <div class="pill-opt" data-val="Uống ấm nóng">Uống ấm nóng 🔥</div>
+      </div>
+
+      <!-- 4. Chọn Topping (chọn nhiều) -->
+      <div class="opt-section-title">4. Chọn Topping kèm theo (chọn nhiều):</div>
+      <div class="pill-grid" id="modal-topping-grid">
+        <div class="topping-checkbox-chip" data-top="Trân châu hoàng kim">✨ Trân châu hoàng kim</div>
+        <div class="topping-checkbox-chip" data-top="Trân châu trắng">⚪ Trân châu trắng</div>
+        <div class="topping-checkbox-chip" data-top="Pudding trứng">🍮 Pudding trứng</div>
+        <div class="topping-checkbox-chip" data-top="Kem cheese (Macchiato)">🧀 Kem cheese</div>
+        <div class="topping-checkbox-chip" data-top="Thạch dừa">🥥 Thạch dừa</div>
+        <div class="topping-checkbox-chip" data-top="Đậu đỏ">🫘 Đậu đỏ</div>
+      </div>
+
+      <!-- 5. Ghi chú -->
+      <div class="opt-section-title">5. Ghi chú thêm (nếu có):</div>
+      <input type="text" id="modal-note-input" class="input-field" 
+             placeholder="Vd: Cho em xin thêm ống hút, giao trước 11h..." 
+             style="height: 44px; font-size: 0.92rem; border-radius: 12px; margin-bottom: 20px;">
+
+      <!-- Submit Order Button -->
+      <button id="btn-confirm-submit-order" class="btn" style="width: 100%; height: 50px; font-size: 1.05rem; font-weight: 900; background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); border-radius: 16px;">
+        XÁC NHẬN GỬI ORDER NÀY 🚀
       </button>
+
     </div>
   </div>
 
-  <!-- Dependencies -->
+  <!-- Scripts -->
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/confetti.js"></script>
   <script src="/js/audio.js"></script>
-  <script src="/js/zodiac.js"></script>
   <script src="/js/player.js"></script>
 </body>
 </html>
